@@ -11,8 +11,8 @@ import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useState } from 'react';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import { mainListItems, secondaryListItems } from './listItems';
 
 const drawerWidth = 240;
@@ -99,7 +99,7 @@ export default function TopBar({ children }) {
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
+              <AccountCircle />
             </Badge>
           </IconButton>
         </Toolbar>
