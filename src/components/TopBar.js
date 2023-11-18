@@ -15,6 +15,10 @@ import { useState } from 'react';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { mainListItems, secondaryListItems } from './listItems';
 
+// import logos
+import IIITHLogo from '../assets/images/iiithlogo.png';
+import SCRCLogo from '../assets/images/scrclogo.png';
+
 const drawerWidth = 240;
 
 const AppBar = styled(MuiAppBar, {
@@ -81,7 +85,9 @@ export default function TopBar({ children }) {
       <AppBar position="absolute" open={open}>
         <Toolbar
           sx={{
-            pr: '24px' // keep right padding when drawer closed
+            pr: '24px', // keep right padding when drawer closed
+            display: 'flex',
+            alignItems: 'center'
           }}>
           <IconButton
             edge="start"
@@ -94,8 +100,27 @@ export default function TopBar({ children }) {
             }}>
             <MenuIcon />
           </IconButton>
-          <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-            Dashboard
+          <img
+            src={IIITHLogo}
+            style={{
+              width: '100px',
+              // add no warp to prevent text from wrapping
+              whiteSpace: 'wrap'
+            }}
+            alt="IIIT Hyderabad"
+          />
+          <img
+            src={SCRCLogo}
+            style={{ width: '100px', whiteSpace: 'wrap' }}
+            alt="Smart City Research Center"
+          />
+          <Typography
+            component="h1"
+            variant="h3"
+            color="inherit"
+            noWrap
+            sx={{ flexGrow: 1, textAlign: 'center', paddingRight: '100px' }}>
+            CTOP
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={4} color="secondary">
