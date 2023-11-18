@@ -13,11 +13,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { useState } from 'react';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import { mainListItems, secondaryListItems } from './listItems';
 
 // import logos
 import IIITHLogo from '../assets/images/iiithlogo.png';
 import SCRCLogo from '../assets/images/scrclogo.png';
+import MainListItems from './listItems';
 
 const drawerWidth = 240;
 
@@ -143,9 +143,9 @@ export default function TopBar({ children }) {
         </Toolbar>
         <Divider />
         <List component="nav">
-          {mainListItems}
-          <Divider sx={{ my: 1 }} />
-          {secondaryListItems}
+          <MainListItems />
+          {/* <Divider sx={{ my: 1 }} />
+          {secondaryListItems} */}
         </List>
       </Drawer>
       <MainContent>{children}</MainContent>
