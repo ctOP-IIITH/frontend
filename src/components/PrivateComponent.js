@@ -1,7 +1,11 @@
+import { useContext } from 'react';
 import { Box, Button } from '@mui/material';
 import { axiosAuthInstance } from '../services/axiosConfig';
+import { AuthContext } from '../contexts/AuthContext';
 
 function PrivateComponent() {
+  const { logout } = useContext(AuthContext);
+
   return (
     <Box>
       <h1>PrivateComponent</h1>
@@ -29,6 +33,15 @@ function PrivateComponent() {
           variant="contained"
           color="primary">
           GET ALL USERS
+        </Button>
+        {/* Let's also add logout button */}
+        <Button
+          onClick={async () => {
+            logout();
+          }}
+          variant="contained"
+          color="secondary">
+          Logout
         </Button>
       </div>
     </Box>
