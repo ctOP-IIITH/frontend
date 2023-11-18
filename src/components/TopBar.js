@@ -2,6 +2,7 @@ import { styled } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
@@ -13,11 +14,16 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { useState } from 'react';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import { useNavigate } from 'react-router-dom';
 
 // import logos
+
 import IIITHLogo from '../assets/images/iiithlogo.png';
 import SCRCLogo from '../assets/images/scrclogo.png';
 import MainListItems from './listItems';
+
+// auth Service
+import { useAuth } from '../contexts/AuthContext';
 
 const drawerWidth = 240;
 
@@ -79,6 +85,9 @@ export default function TopBar({ children }) {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -122,11 +131,21 @@ export default function TopBar({ children }) {
             sx={{ flexGrow: 1, textAlign: 'center', paddingRight: '100px' }}>
             CTOP
           </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <AccountCircle />
-            </Badge>
-          </IconButton>
+          {isLoggedIn ? (
+            <IconButton color="inherit">
+              <Badge color="secondary">
+                <AccountCircle />
+              </Badge>
+            </IconButton>
+          ) : (
+            <Button
+              onClick={() => {
+                navigate('/login');
+              }}
+              color="inherit">
+              Login
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>

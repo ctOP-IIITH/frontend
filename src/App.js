@@ -6,11 +6,16 @@ import PrivateComponent from './components/PrivateComponent';
 import NotFound from './components/NotFound';
 import TopBar from './components/TopBar';
 import Login from './components/Login';
+import { useAuth } from './contexts/AuthContext';
 
 function PrivateRoute() {
-  const isLoggedIn = false; // useAuth();
-
+  const { isLoggedIn } = useAuth();
   return isLoggedIn ? <Outlet /> : <Navigate to="/login" />;
+}
+
+function PublicRoute() {
+  const { isLoggedIn } = useAuth();
+  return isLoggedIn ? <Navigate to="/" /> : <Outlet />;
 }
 
 function App() {
@@ -19,7 +24,9 @@ function App() {
       <TopBar>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="login" element={<PublicRoute />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
           <Route path="private" element={<PrivateRoute />}>
             <Route path="/private" element={<PrivateComponent />} />
           </Route>
