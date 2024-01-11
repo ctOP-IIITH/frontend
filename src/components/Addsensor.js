@@ -16,6 +16,7 @@ export default function MultipleSelect() {
 
 
   const handleParameterChange = (index, key, value) => {
+    setParameters([...parameters, { name: '', dataType: '' , unitname: ''}]);
     const newParameters = [...parameters];
     newParameters[index][key] = value;
     setParameters(newParameters);
@@ -31,6 +32,15 @@ export default function MultipleSelect() {
     setParameters([...parameters, { name: '', dataType: '' }]);
   };
 
+   const handleCreateNodeType = () => {
+    // Log selected vertical, node type, and added parameters to the console
+    // console.log('Selected Vertical:', selectedData);
+    console.log('Node Type:', document.getElementById('text-field').value);
+    console.log('Sensor Name:', document.getElementById('text-field1').value);
+    console.log('Added Parameters:', parameters);
+  };
+
+
   return (
     <Box sx={{ p: 3 }}>
       <div>
@@ -43,7 +53,7 @@ export default function MultipleSelect() {
           />
 
           <TextField
-            id="text-field"
+            id="text-field1"
             label="Sensor Name"
             variant="outlined"
             fullWidth
@@ -65,8 +75,8 @@ export default function MultipleSelect() {
           <TextField
             label="Unit name"
             variant="outlined"
-            value={param.name}
-            onChange={(e) => handleParameterChange(index, 'name', e.target.value)}
+            value={param.unitname}
+            onChange={(e) => handleParameterChange(index, 'unitname', e.target.value)}
             sx={{ mr: 1, flex: 1 }}
           />
           <FormControl variant="outlined" sx={{ mr: 1, flex: 1, m: 1 }}>
@@ -94,8 +104,8 @@ export default function MultipleSelect() {
       </Button>
 
       {/* Submit button */}
-      <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, m: 1 }}>
-        Create Node Type
+      <Button type="submit" variant="contained" color="primary" onClick={handleCreateNodeType}  sx={{ mt: 2, m: 1 }}>
+        Create Sensor Type
       </Button>
     </Box>
   );

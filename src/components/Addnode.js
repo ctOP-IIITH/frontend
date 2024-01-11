@@ -74,6 +74,7 @@ const data = [
 
 export default function MultipleSelect() {
   const [selectedData, setSelectedData] = React.useState(null);
+ 
   const [parameters, setParameters] = React.useState([]);
 
   const handleChange = (event) => {
@@ -85,9 +86,17 @@ export default function MultipleSelect() {
   };
 
   const handleParameterChange = (index, key, value) => {
+    setParameters([...parameters, { name: '', dataType: '' }]);
     const newParameters = [...parameters];
     newParameters[index][key] = value;
     setParameters(newParameters);
+  };
+
+  const handleCreateNodeType = () => {
+    // Log selected vertical, node type, and added parameters to the console
+    console.log('Selected Vertical:', selectedData);
+    console.log('Node Type:', document.getElementById('text-field').value);
+    console.log('Added Parameters:', parameters);
   };
 
   const handleRemoveParameter = (index) => {
@@ -173,7 +182,7 @@ export default function MultipleSelect() {
       </Button>
 
       {/* Submit button */}
-      <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, m: 1 }}>
+      <Button type="submit" variant="contained" color="primary" onClick={handleCreateNodeType} sx={{ mt: 2, m: 1 }}>
         Create Node Type
       </Button>
     </Box>
