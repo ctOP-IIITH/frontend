@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import { Typography } from '@mui/material';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -74,8 +74,14 @@ const data = [
 
 export default function MultipleSelect() {
   const [selectedData, setSelectedData] = React.useState(null);
- 
+ const [selectedDataError, setSelectedDataError] = React.useState(false);
   const [parameters, setParameters] = React.useState([]);
+  const [nodeType, setNodeType] = React.useState('');
+// const [sensorName, setSensorName] = React.useState('');
+const [nodeTypeError, setNodeTypeError] = React.useState(false);
+// const [sensorNameError, setSensorNameError] = React.useState(false);
+
+
 
   const handleChange = (event) => {
     const {
@@ -83,6 +89,7 @@ export default function MultipleSelect() {
     } = event;
     const selectedItem = data.find((item) => item.id === value);
     setSelectedData(selectedItem);
+    setSelectedDataError(false);
   };
 
   const handleParameterChange = (index, key, value) => {
@@ -92,12 +99,33 @@ export default function MultipleSelect() {
     setParameters(newParameters);
   };
 
-  const handleCreateNodeType = () => {
-    // Log selected vertical, node type, and added parameters to the console
-    console.log('Selected Vertical:', selectedData);
-    console.log('Node Type:', document.getElementById('text-field').value);
-    console.log('Added Parameters:', parameters);
-  };
+
+const handleCreateNodeType = () => {
+   if (!nodeType) {
+    setNodeTypeError(true);
+  }
+  else{
+    setNodeTypeError(false);
+  }
+
+  if (!selectedData) {
+    setSelectedDataError(true);
+  }else{
+    setSelectedDataError(false);
+    }
+  
+
+
+  if(!nodeType || selectedData){
+    return;
+  }
+  
+
+  // Log selected vertical, node type, and added parameters to the console
+  console.log('Selected Vertical:', selectedData);
+  console.log('Node Type:', document.getElementById('text-field').value);
+  console.log('Added Parameters:', parameters);
+};
 
   const handleRemoveParameter = (index) => {
     const newParameters = [...parameters];
@@ -112,38 +140,53 @@ export default function MultipleSelect() {
   return (
     <Box sx={{ p: 3 }}>
       <div>
-        <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
-          <InputLabel
-            id="demo-multiple-name-label"
-            sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to create space
-          >
-            Select Vertical
-          </InputLabel>
-          <Select
-            labelId="demo-multiple-name-label"
-            id="demo-multiple-name"
-            multiple={false}
-            value={selectedData ? selectedData.id : ''}
-            onChange={handleChange}
-            MenuProps={MenuProps}
-            sx={{ flex: 1 }}
-            label="Select Vertical" // Added label prop to ensure space for label
-          >
-            {data.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+<FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
+  <InputLabel
+    id="demo-multiple-name-label"
+    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to create space
+  >
+    Select Vertical
+  </InputLabel>
+  <Select
+    labelId="demo-multiple-name-label"
+    id="demo-multiple-name"
+    multiple={false}
+    value={selectedData ? selectedData.id : ''}
+    onChange={handleChange}
+    MenuProps={MenuProps}
+    sx={{ flex: 1 }}
+    label="Select Vertical" // Added label prop to ensure space for label
+    error={selectedDataError} // Add error prop based on selectedDataError
+  >
+    {data.map((item) => (
+      <MenuItem key={item.id} value={item.id}>
+        {item.name}
+      </MenuItem>
+    ))}
+  </Select>
+
+  {selectedDataError && (
+    <Typography variant="caption" color="error">
+      Vertical type is required
+    </Typography>
+  )}
+</FormControl>
+
 
           <TextField
-            id="text-field"
-            label="Node type"
-            variant="outlined"
-            fullWidth
-            sx={{ m: 1 }}
-          />
+  id="text-field"
+  label="Node type"
+  variant="outlined"
+  fullWidth
+  sx={{ m: 1 }}
+  value={nodeType}
+  onChange={(e) => {
+    setNodeType(e.target.value);
+    setNodeTypeError(false); // Reset error on change
+  }}
+  error={nodeTypeError}
+  helperText={nodeTypeError ? 'Node type is required' : ''}
+/>
       
       </div>
 

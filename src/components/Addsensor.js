@@ -13,6 +13,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function MultipleSelect() {
   const [parameters, setParameters] = React.useState([]);
+  const [nodeType, setNodeType] = React.useState('');
+const [sensorName, setSensorName] = React.useState('');
+const [nodeTypeError, setNodeTypeError] = React.useState(false);
+const [sensorNameError, setSensorNameError] = React.useState(false);
 
 
   const handleParameterChange = (index, key, value) => {
@@ -32,34 +36,77 @@ export default function MultipleSelect() {
     setParameters([...parameters, { name: '', dataType: '' }]);
   };
 
-   const handleCreateNodeType = () => {
-    // Log selected vertical, node type, and added parameters to the console
-    // console.log('Selected Vertical:', selectedData);
-    console.log('Node Type:', document.getElementById('text-field').value);
+  //  const handleCreateNodeType = () => {
+  //   // Log selected vertical, node type, and added parameters to the console
+  //   // console.log('Selected Vertical:', selectedData);
+    // console.log('Node Type:', document.getElementById('text-field').value);
+    // console.log('Sensor Name:', document.getElementById('text-field1').value);
+    // console.log('Added Parameters:', parameters);
+  // };
+
+
+  const handleCreateNodeType = () => {
+  if (!nodeType) {
+    setNodeTypeError(true);
+  }
+  else{
+    setNodeTypeError(false);
+  }
+  
+
+
+  if (!sensorName) {
+    setSensorNameError(true);
+  }
+  else{
+    setSensorNameError(false);
+  }
+  if(!nodeType || sensorName){
+    return;
+  }
+  
+
+  // Log selected vertical, node type, and added parameters to the console
+  // console.log('Selected Vertical:', selectedData);
+  console.log('Node Type:', document.getElementById('text-field').value);
     console.log('Sensor Name:', document.getElementById('text-field1').value);
     console.log('Added Parameters:', parameters);
-  };
+};
 
 
   return (
     <Box sx={{ p: 3 }}>
       <div>
          <TextField
-            id="text-field"
-            label="Node type"
-            variant="outlined"
-            fullWidth
-            sx={{ m: 1 }}
-          />
+  id="text-field"
+  label="Node type"
+  variant="outlined"
+  fullWidth
+  sx={{ m: 1 }}
+  value={nodeType}
+  onChange={(e) => {
+    setNodeType(e.target.value);
+    setNodeTypeError(false); // Reset error on change
+  }}
+  error={nodeTypeError}
+  helperText={nodeTypeError ? 'Node type is required' : ''}
+/>
 
-          <TextField
-            id="text-field1"
-            label="Sensor Name"
-            variant="outlined"
-            fullWidth
-            sx={{ m: 1 }}
-          />
-      
+<TextField
+  id="text-field1"
+  label="Sensor Name"
+  variant="outlined"
+  fullWidth
+  sx={{ m: 1 }}
+  value={sensorName}
+  onChange={(e) => {
+    setSensorName(e.target.value);
+    setSensorNameError(false); // Reset error on change
+  }}
+  error={sensorNameError}
+  helperText={sensorNameError ? 'Sensor Name is required' : ''}
+/>
+
       </div>
 
       {/* Parameter input fields */}
