@@ -9,22 +9,130 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Typography } from '@mui/material';
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+
+const data = [
+  {
+  "id": "airQuality",
+  "name": "Air Quality",
+  "description": "Information about air quality",
+  "nodes": [
+    {
+      "nodeName": "AE-AQ1",
+      "sensorType": "kristnam",
+      "data": {
+        "pm25": 10,
+        "pm10": 12
+      }
+    },
+    {
+      "nodeName": "AE-AQ2",
+      "sensorType": "shenitech",
+      "data": {
+        "pm25": 10,
+        "pm10": 12,
+        "co2": 36
+      }
+    }
+  ]
+},
+  // { id: 'airQuality', name: 'Air Quality', description: 'Information about air quality', nodes:'' },
+  { id: 'waterQuality', name: 'Water Quality', description: 'Information about water quality' , "nodes": [
+    {
+      "nodeName": "AE-WM1",
+      "sensorType": "kristnam",
+      "data": {
+        "pm25": 10,
+        "pm10": 12
+      }
+    },
+    {
+      "nodeName": "AE-WM2",
+      "sensorType": "shenitech",
+      "data": {
+        "pm25": 10,
+        "pm10": 12
+      }
+    }
+  ]},
+  { id: 'weatherMonitoring', name: 'Weather Monitoring', description: 'Information about weather monitoring' },
+];
 
 export default function MultipleSelect() {
   const [parameters, setParameters] = React.useState([]);
-  const [nodeType, setNodeType] = React.useState('');
-const [sensorName, setSensorName] = React.useState('');
-const [nodeTypeError, setNodeTypeError] = React.useState(false);
-const [sensorNameError, setSensorNameError] = React.useState(false);
+  const [sensorType, setsensorType] = React.useState('');
+// const [sensorName, setSensorName] = React.useState('');
+const [sensorTypeError, setsensorTypeError] = React.useState(false);
+// const [sensorNameError, setSensorNameError] = React.useState(false);
+ const [selectedData, setSelectedData] = React.useState(null);
+ const [selectedDataError, setSelectedDataError] = React.useState(false);
+ const [selectedsensorType, setSelectedsensorType] = React.useState(''); 
+  const [availableParameters, setAvailableParameters] = React.useState([]);
+
+ React.useEffect(() => {
+  if (selectedsensorType && selectedData) {
+    const selectedNode = selectedData.nodes.find((node) => node.sensorType === selectedsensorType);
+    if (selectedNode && selectedNode.data) {
+      // Extract parameter names from the data object
+      const params = Object.keys(selectedNode.data);
+      setAvailableParameters(params.map((param) => ({ name: param }))); // Update this line
+    }
+  } else {
+    setAvailableParameters([]);
+  }
+}, [selectedsensorType, selectedData]);
 
 
-  const handleParameterChange = (index, key, value) => {
-    setParameters([...parameters, { name: '', dataType: '' , unitname: ''}]);
-    const newParameters = [...parameters];
-    newParameters[index][key] = value;
-    setParameters(newParameters);
+
+const handleChange = (event) => {
+  const {
+    target: { value },
+  } = event;
+  const selectedItem = data.find((item) => item.id === value);
+  setSelectedData(selectedItem);
+  setSelectedDataError(false);
+
+  const selectedNodeId = event.target.value;
+  const selectedNode = data.find((item) => item.id === selectedNodeId);
+
+  if (selectedNode && selectedNode.nodes && selectedNode.nodes.length > 0) {
+    setParameters([]); // Clear parameters when the vertical changes
+    setSelectedsensorType('None'); // Set selected node type to 'None'
+  } else {
+    setParameters([]); // Clear parameters when 'None' is selected or another node type is selected
+  }
+};
+
+
+
+const handleParameterChange = (index, key, value) => {
+  const newParameters = [...parameters];
+  newParameters[index] = {
+    ...newParameters[index],
+    [key]: value,
   };
+  
+
+  if (selectedsensorType === 'None') {
+    // Reset parameters to empty object when "None" is selected
+    setParameters([{}]);
+  } else {
+    setParameters(newParameters);
+  }
+};
+
 
   const handleRemoveParameter = (index) => {
     const newParameters = [...parameters];
@@ -32,11 +140,21 @@ const [sensorNameError, setSensorNameError] = React.useState(false);
     setParameters(newParameters);
   };
 
-  const handleAddParameter = () => {
-    setParameters([...parameters, { name: '', dataType: '' }]);
-  };
+const handleAddParameter = () => {
+  if (selectedsensorType === 'None') {
+    // If "None" is selected, reset parameters to empty array and availableParameters to empty object
+    setParameters([]);
+    setAvailableParameters([]);
+  } else {
+    const newParameter = { name: '', unitname: '', dataType: '' };
+    setParameters([...parameters, newParameter]);
+    setAvailableParameters([...availableParameters, newParameter]);
+  }
+};
 
-  //  const handleCreateNodeType = () => {
+
+
+  //  const handleCreatesensorType = () => {
   //   // Log selected vertical, node type, and added parameters to the console
   //   // console.log('Selected Vertical:', selectedData);
     // console.log('Node Type:', document.getElementById('text-field').value);
@@ -45,25 +163,37 @@ const [sensorNameError, setSensorNameError] = React.useState(false);
   // };
 
 
-  const handleCreateNodeType = () => {
-  if (!nodeType) {
-    setNodeTypeError(true);
+  const handleCreatesensorType = () => {
+  if (!sensorType) {
+    setsensorTypeError(true);
   }
   else{
-    setNodeTypeError(false);
+    setsensorTypeError(false);
+  }
+  
+   if (!selectedData) {
+    setSelectedDataError(true);
+  }else{
+    setSelectedDataError(false);
+    }
+  
+
+
+  if(!sensorType || selectedData){
+    return;
   }
   
 
 
-  if (!sensorName) {
-    setSensorNameError(true);
-  }
-  else{
-    setSensorNameError(false);
-  }
-  if(!nodeType || sensorName){
-    return;
-  }
+  // if (!sensorName) {
+  //   setSensorNameError(true);
+  // }
+  // else{
+  //   setSensorNameError(false);
+  // }
+  // if(!sensorType || sensorName ){
+  //   return;
+  // }
   
 
   // Log selected vertical, node type, and added parameters to the console
@@ -77,22 +207,99 @@ const [sensorNameError, setSensorNameError] = React.useState(false);
   return (
     <Box sx={{ p: 3 }}>
       <div>
+
+         <Typography noWrap sx={{ fontSize: '1.5rem' }}>
+      <div>
+        <strong>Create New Sensor Type</strong> <br />
+      </div>
+  </Typography>
+
+        <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
+  <InputLabel
+    id="demo-multiple-name-label"
+    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to create space
+  >
+    Select Vertical
+  </InputLabel>
+  <Select
+    labelId="demo-multiple-name-label"
+    id="demo-multiple-name"
+    multiple={false}
+    value={selectedData ? selectedData.id : ''}
+    onChange={handleChange}
+    MenuProps={MenuProps}
+    sx={{ flex: 1 }}
+    label="Select Vertical" // Added label prop to ensure space for label
+    error={selectedDataError} // Add error prop based on selectedDataError
+  >
+    {data.map((item) => (
+      <MenuItem key={item.id} value={item.id}>
+        {item.name}
+      </MenuItem>
+    ))}
+  </Select>
+
+  {selectedDataError && (
+    <Typography variant="caption" color="error">
+      Vertical type is required
+    </Typography>
+  )}
+</FormControl>
+
+<FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
+  <InputLabel
+    id="demo-multiple-name-label"
+    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to create space
+  >
+    Select Sensor Type
+  </InputLabel>
+ <Select
+  labelId="demo-multiple-name-label"
+  id="demo-multiple-name"
+  multiple={false}
+  value={selectedsensorType}
+  onChange={(e) => setSelectedsensorType(e.target.value)}
+  MenuProps={MenuProps}
+  sx={{ flex: 1 }}
+  label="Select Sensor Type"
+  // error={selectedDataError}
+>
+  <MenuItem value="None">None</MenuItem>
+  {selectedData && selectedData.nodes && selectedData.nodes.length > 0 && (
+    selectedData.nodes.map((node) => (
+      <MenuItem key={node.sensorType} value={node.sensorType}>
+        {node.sensorType}
+      </MenuItem>
+    ))
+  )}
+</Select>
+ <Typography variant="caption" color="true">
+      Select Vertical to enable menu options
+    </Typography>
+
+
+  {/* {selectedDataError && (
+    <Typography variant="caption" color="error">
+      Sensor type is required
+    </Typography>
+  )} */}
+</FormControl>
          <TextField
   id="text-field"
-  label="Node type"
+  label="Sensor Type Name"
   variant="outlined"
   fullWidth
   sx={{ m: 1 }}
-  value={nodeType}
+  value={sensorType}
   onChange={(e) => {
-    setNodeType(e.target.value);
-    setNodeTypeError(false); // Reset error on change
+    setsensorType(e.target.value);
+    setsensorTypeError(false); // Reset error on change
   }}
-  error={nodeTypeError}
-  helperText={nodeTypeError ? 'Node type is required' : ''}
+  error={sensorTypeError}
+  helperText={sensorTypeError ? 'Sensor type is required' : ''}
 />
 
-<TextField
+{/* <TextField
   id="text-field1"
   label="Sensor Name"
   variant="outlined"
@@ -105,12 +312,12 @@ const [sensorNameError, setSensorNameError] = React.useState(false);
   }}
   error={sensorNameError}
   helperText={sensorNameError ? 'Sensor Name is required' : ''}
-/>
+/> */}
 
       </div>
 
       {/* Parameter input fields */}
-      {parameters.map((param, index) => (
+      {availableParameters.map((param, index) => (
         <Box key={param.name} sx={{ display: 'flex', alignItems: 'center', mt: 2, width: '100%', m: 1 }}>
           <TextField
             label="Parameter Name"
@@ -151,7 +358,7 @@ const [sensorNameError, setSensorNameError] = React.useState(false);
       </Button>
 
       {/* Submit button */}
-      <Button type="submit" variant="contained" color="primary" onClick={handleCreateNodeType}  sx={{ mt: 2, m: 1 }}>
+      <Button type="submit" variant="contained" color="primary" onClick={handleCreatesensorType}  sx={{ mt: 2, m: 1 }}>
         Create Sensor Type
       </Button>
     </Box>

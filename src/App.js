@@ -6,6 +6,7 @@ import Vertical from './components/Vertical';
 import Details from './components/Details';
 import Nodedata from './components/Nodedata';
 import Addnode from './components/Addnode';
+import Addvertical from './components/Addvertical';
 import Addsensor from './components/Addsensor';
 import PrivateComponent from './components/PrivateComponent';
 import NotFound from './components/NotFound';
@@ -36,6 +37,7 @@ function App() {
            <Route path="/nodedata" element={<Nodedata />} /> 
            <Route path="/vertical/:id" element={<Details />} />
            <Route path="/addnode" element={<Addnode />} /> 
+           <Route path="/addvertical" element={<Addvertical />} /> 
            <Route path="/addsensor" element={<Addsensor />} /> 
           
           <Route path="login" element={<PublicRoute />}>

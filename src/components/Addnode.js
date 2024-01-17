@@ -6,9 +6,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import DeleteIcon from '@mui/icons-material/Delete';
+// import IconButton from '@mui/material/IconButton';
+// import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+// import DeleteIcon from '@mui/icons-material/Delete';
 import { Typography } from '@mui/material';
 
 const ITEM_HEIGHT = 48;
@@ -76,47 +76,75 @@ export default function MultipleSelect() {
   const [selectedData, setSelectedData] = React.useState(null);
  const [selectedDataError, setSelectedDataError] = React.useState(false);
   const [parameters, setParameters] = React.useState([]);
-  const [nodeType, setNodeType] = React.useState('');
-// const [sensorName, setSensorName] = React.useState('');
-const [nodeTypeError, setNodeTypeError] = React.useState(false);
-// const [sensorNameError, setSensorNameError] = React.useState(false);
+  // const [nodeType, setNodeType] = React.useState('');
+  const [latitude, setlatitude] = React.useState('');
+  const [longitude, setlongitude] = React.useState('');
+   const [latitudeError, setlatitudeError]= React.useState('');
+  const [longitudeError, setlongitudeError] = React.useState('');
+  // const [sensorName, setSensorName] = React.useState('');
+  // const [nodeTypeError, setNodeTypeError] = React.useState(false);
+  // const [sensorNameError, setSensorNameError] = React.useState(false);
+  const [selectedNodeType, setSelectedNodeType] = React.useState(''); 
 
 
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    const selectedItem = data.find((item) => item.id === value);
-    setSelectedData(selectedItem);
-    setSelectedDataError(false);
-  };
 
-  const handleParameterChange = (index, key, value) => {
-    setParameters([...parameters, { name: '', dataType: '' }]);
-    const newParameters = [...parameters];
-    newParameters[index][key] = value;
-    setParameters(newParameters);
-  };
+const handleChange = (event) => {
+  const {
+    target: { value },
+  } = event;
+  const selectedItem = data.find((item) => item.id === value);
+  setSelectedData(selectedItem);
+  setSelectedDataError(false);
+
+  const selectedNodeId = event.target.value;
+  const selectedNode = data.find((item) => item.id === selectedNodeId);
+
+  if (selectedNode && selectedNode.nodes && selectedNode.nodes.length > 0) {
+    setParameters([]); // Clear parameters when the vertical changes
+    setSelectedNodeType(selectedNode.nodes[0].nodeType);
+  } else {
+    setSelectedNodeType('');
+  }
+};
+
+  // const handleParameterChange = (index, key, value) => {
+  //   setParameters([...parameters, { name: '', dataType: '' }]);
+  //   const newParameters = [...parameters];
+  //   newParameters[index][key] = value;
+  //   setParameters(newParameters);
+  // };
 
 
 const handleCreateNodeType = () => {
-   if (!nodeType) {
-    setNodeTypeError(true);
-  }
-  else{
-    setNodeTypeError(false);
-  }
+  //  if (!nodeType) {
+  //   setNodeTypeError(true);
+  // }
+  // else{
+  //   setNodeTypeError(false);
+  // }
 
   if (!selectedData) {
     setSelectedDataError(true);
   }else{
     setSelectedDataError(false);
     }
+
+     if (!latitude) {
+    setlatitudeError(true);
+  }else{
+    setlatitudeError(false);
+    }
+
+      if (!longitude) {
+    setlongitudeError(true);
+  }else{
+    setlongitudeError(false);
+    }
   
 
 
-  if(!nodeType || selectedData){
+  if( !selectedData || !latitude || !longitude){
     return;
   }
   
@@ -125,21 +153,30 @@ const handleCreateNodeType = () => {
   console.log('Selected Vertical:', selectedData);
   console.log('Node Type:', document.getElementById('text-field').value);
   console.log('Added Parameters:', parameters);
+  console.log('latitude:', latitude);
+  console.log('longitude:', longitude);
 };
 
-  const handleRemoveParameter = (index) => {
-    const newParameters = [...parameters];
-    newParameters.splice(index, 1);
-    setParameters(newParameters);
-  };
+  // const handleRemoveParameter = (index) => {
+  //   const newParameters = [...parameters];
+  //   newParameters.splice(index, 1);
+  //   setParameters(newParameters);
+  // };
 
-  const handleAddParameter = () => {
-    setParameters([...parameters, { name: '', dataType: '' }]);
-  };
+  // const handleAddParameter = () => {
+  //   setParameters([...parameters, { name: '', dataType: '' }]);
+  // };
 
   return (
     <Box sx={{ p: 3 }}>
       <div>
+
+         <Typography noWrap sx={{ fontSize: '1.5rem' }}>
+      <div>
+        <strong>Create New Node</strong> <br />
+      </div>
+  </Typography>
+
 <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
   <InputLabel
     id="demo-multiple-name-label"
@@ -165,6 +202,7 @@ const handleCreateNodeType = () => {
     ))}
   </Select>
 
+
   {selectedDataError && (
     <Typography variant="caption" color="error">
       Vertical type is required
@@ -173,25 +211,83 @@ const handleCreateNodeType = () => {
 </FormControl>
 
 
+
+<FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
+  <InputLabel
+    id="demo-multiple-name-label"
+    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to create space
+  >
+    Select Sensor Type
+  </InputLabel>
+ <Select
+  labelId="demo-multiple-name-label"
+  id="demo-multiple-name"
+  multiple={false}
+  value={selectedNodeType}
+  onChange={(e) => setSelectedNodeType(e.target.value)}
+  MenuProps={MenuProps}
+  sx={{ flex: 1 }}
+  label="Select Sensor Type"
+  error={selectedDataError}
+>
+  {selectedData && selectedData.nodes && selectedData.nodes.length > 0 && (
+    selectedData.nodes.map((node) => (
+      <MenuItem key={node.nodeType} value={node.nodeType}>
+        {node.nodeType}
+      </MenuItem>
+    ))
+  )}
+</Select>
+
+
+
+
+  {selectedDataError && (
+    <Typography variant="caption" color="error">
+      Sensor type is required
+    </Typography>
+  )}
+   <Typography variant="caption" color="true">
+      Select Vertical to enable menu options
+    </Typography>
+</FormControl>
+
+
           <TextField
   id="text-field"
-  label="Node type"
+  label="Latitude"
   variant="outlined"
   fullWidth
   sx={{ m: 1 }}
-  value={nodeType}
+  value={latitude}
   onChange={(e) => {
-    setNodeType(e.target.value);
-    setNodeTypeError(false); // Reset error on change
+    setlatitude(e.target.value);
+    setlatitudeError(false); // Reset error on change
   }}
-  error={nodeTypeError}
-  helperText={nodeTypeError ? 'Node type is required' : ''}
+  error={latitudeError}
+  helperText={latitudeError ? 'Latitude is required' : ''}
+/>
+
+
+          <TextField
+  id="text-field"
+  label="Longitude"
+  variant="outlined"
+  fullWidth
+  sx={{ m: 1 }}
+  value={longitude}
+  onChange={(e) => {
+    setlongitude(e.target.value);
+    setlongitudeError(false); // Reset error on change
+  }}
+  error={longitudeError}
+  helperText={longitudeError ? 'Longitude is required' : ''}
 />
       
       </div>
 
       {/* Parameter input fields */}
-      {parameters.map((param, index) => (
+      {/* {parameters.map((param, index) => (
         <Box key={param.name} sx={{ display: 'flex', alignItems: 'center', mt: 2, width: '100%', m: 1 }}>
           <TextField
             label="Parameter Name"
@@ -217,16 +313,15 @@ const handleCreateNodeType = () => {
             <DeleteIcon />
           </IconButton>
         </Box>
-      ))}
+      ))} */}
 
-      {/* Add Parameter button */}
-      <Button startIcon={<AddCircleOutlineIcon />} onClick={handleAddParameter} sx={{ mt: 2, m: 1 }}>
+      {/* <Button startIcon={<AddCircleOutlineIcon />} onClick={handleAddParameter} sx={{ mt: 2, m: 1 }}>
         Add Parameter
-      </Button>
+      </Button> */}
 
       {/* Submit button */}
       <Button type="submit" variant="contained" color="primary" onClick={handleCreateNodeType} sx={{ mt: 2, m: 1 }}>
-        Create Node Type
+        Create Node
       </Button>
     </Box>
   );
