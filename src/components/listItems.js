@@ -4,7 +4,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import AppsIcon from '@mui/icons-material/Apps';
-import LockIcon from '@mui/icons-material/Lock';
+// import LockIcon from '@mui/icons-material/Lock';
 // import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
 import AddToQueueIcon from '@mui/icons-material/AddToQueue';
 
@@ -25,12 +25,6 @@ function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="Home" />
       </ListItemButton>
-      <ListItemButton onClick={() => handleItemClick('/private')}>
-        <ListItemIcon>
-          <LockIcon />
-        </ListItemIcon>
-        <ListItemText primary="Private" />
-      </ListItemButton>
       <ListItemButton onClick={() => handleItemClick('/vertical')}>
         <ListItemIcon>
           <AppsIcon />
@@ -39,13 +33,13 @@ function MainListItems() {
       </ListItemButton>
       <ListItemButton onClick={() => handleItemClick('/addvertical')}>
         <ListItemIcon>
-          <AddToQueueIcon/>
+          <AddToQueueIcon />
         </ListItemIcon>
         <ListItemText primary="Create Vertical" />
       </ListItemButton>
-            <ListItemButton onClick={() => handleItemClick('/addsensor')}>
+      <ListItemButton onClick={() => handleItemClick('/addsensor')}>
         <ListItemIcon>
-          <AddToQueueIcon/>
+          <AddToQueueIcon />
         </ListItemIcon>
         <ListItemText primary="Create Sensor Type" />
       </ListItemButton>
@@ -55,9 +49,8 @@ function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="Create Node" />
       </ListItemButton>
- 
 
-       {/* <ListItemButton onClick={() => handleItemClick('/details')}>
+      {/* <ListItemButton onClick={() => handleItemClick('/details')}>
         <ListItemIcon>
           <AddToQueueIcon/>
         </ListItemIcon>

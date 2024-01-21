@@ -29,25 +29,39 @@ function App() {
     <Router>
       <TopBar>
         <Routes>
+          {/* Open Routes */}
           <Route path="/" element={<Home />} />
 
-           <Route path="/vertical" element={<Vertical />} /> 
-           <Route path="/details" element={<Details />} /> 
-           <Route path="/nodedata/:id" element={<Nodedata />} /> 
-           <Route path="/nodedata" element={<Nodedata />} /> 
-           <Route path="/vertical/:id" element={<Details />} />
-           <Route path="/addnode" element={<Addnode />} /> 
-           <Route path="/addvertical" element={<Addvertical />} /> 
-           <Route path="/addsensor" element={<Addsensor />} /> 
-          
+          {/* Public Only Routes */}
           <Route path="login" element={<PublicRoute />}>
             <Route path="/login" element={<Login />} />
           </Route>
 
+          {/* Private Only Routes */}
           <Route path="private" element={<PrivateRoute />}>
             <Route path="/private" element={<PrivateComponent />} />
           </Route>
-          
+          <Route path="vertical" element={<PrivateRoute />}>
+            <Route path="/vertical" element={<Vertical />} />
+            <Route path="/vertical/:id" element={<Details />} />
+          </Route>
+          <Route path="details" element={<PrivateRoute />}>
+            <Route path="/details" element={<Details />} />
+          </Route>
+          <Route path="nodedata" element={<PrivateRoute />}>
+            <Route path="/nodedata" element={<Nodedata />} />
+            <Route path="/nodedata/:id" element={<Nodedata />} />
+          </Route>
+          <Route path="addnode" element={<PrivateRoute />}>
+            <Route path="/addnode" element={<Addnode />} />
+          </Route>
+          <Route path="addvertical" element={<PrivateRoute />}>
+            <Route path="/addvertical" element={<Addvertical />} />
+          </Route>
+          <Route path="addsensor" element={<PrivateRoute />}>
+            <Route path="/addsensor" element={<Addsensor />} />
+          </Route>
+
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

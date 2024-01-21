@@ -1,9 +1,9 @@
 import { axiosInstance } from './axiosConfig';
-import { clearTokens, saveTokens } from './tokenService';
+import { getAccessToken, clearTokens, saveTokens } from './tokenService';
 
 // authService.js
 const authService = {
-  isAuthenticated: true, // getAccessToken() !== null,
+  isAuthenticated: getAccessToken() !== null,
   // eslint-disable-next-line no-unused-vars
   login: async (email, password) => {
     try {
