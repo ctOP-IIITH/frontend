@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken, getRefreshToken, saveTokens, clearTokens } from './tokenService';
 
-const BACKEND_API_URL = 'http://localhost:8000';
+const BACKEND_API_URL = 'http://localhost:8001';
 
 export const axiosInstance = axios.create({
   baseURL: BACKEND_API_URL,
