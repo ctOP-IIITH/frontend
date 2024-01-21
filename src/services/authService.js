@@ -20,6 +20,7 @@ const authService = {
         return response.data;
       }
     } catch (err) {
+      console.log(err);
       alert('Login failed');
     }
     return null;

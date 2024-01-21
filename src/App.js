@@ -13,6 +13,7 @@ import NotFound from './components/NotFound';
 import TopBar from './components/TopBar';
 import Login from './components/Login';
 import { useAuth } from './contexts/AuthContext';
+import AllNodes from './components/Allnodes';
 
 function PrivateRoute() {
   const { isLoggedIn } = useAuth();
@@ -47,6 +48,9 @@ function App() {
           </Route>
           <Route path="details" element={<PrivateRoute />}>
             <Route path="/details" element={<Details />} />
+          </Route>
+          <Route path="allnodes" element={<PrivateRoute />}>
+            <Route path="/allnodes" element={<AllNodes />} />
           </Route>
           <Route path="nodedata" element={<PrivateRoute />}>
             <Route path="/nodedata" element={<Nodedata />} />
