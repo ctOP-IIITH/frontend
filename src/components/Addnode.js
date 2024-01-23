@@ -323,6 +323,7 @@ const handleCreateNodeType = () => {
       <Button type="submit" variant="contained" color="primary" onClick={handleCreateNodeType} sx={{ mt: 2, m: 1 }}>
         Create Node
       </Button>
+      
     </Box>
   );
 }

@@ -4,7 +4,8 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
+import Typography from '@mui/material/Typography';
+
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -176,10 +177,11 @@ function Vertical() {
       <Fab
         color="primary"
         aria-label="add"
-        style={{ position: 'absolute', bottom: 16, right: 16 }}
+        style={{ position: 'absolute', bottom: 16, right: 16, borderRadius: '20%' , width: 120,}}
         onClick={handleClickOpen}
+        
       >
-        <AddIcon />
+        <Typography variant="button">add domain</Typography>
       </Fab>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{selectedItem ? selectedItem.name : ''}</DialogTitle>
