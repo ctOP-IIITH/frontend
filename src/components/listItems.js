@@ -6,7 +6,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import AppsIcon from '@mui/icons-material/Apps';
 import LockIcon from '@mui/icons-material/Lock';
 // import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
-import AddToQueueIcon from '@mui/icons-material/AddToQueue';
+// import AddToQueueIcon from '@mui/icons-material/AddToQueue';
 
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
@@ -35,9 +35,9 @@ function MainListItems() {
         <ListItemIcon>
           <AppsIcon />
         </ListItemIcon>
-        <ListItemText primary="All Verticals" />
+        <ListItemText primary="Domains" />
       </ListItemButton>
-      <ListItemButton onClick={() => handleItemClick('/addvertical')}>
+      {/* <ListItemButton onClick={() => handleItemClick('/addvertical')}>
         <ListItemIcon>
           <AddToQueueIcon/>
         </ListItemIcon>
@@ -55,6 +55,7 @@ function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="Create Node" />
       </ListItemButton>
+       */}
  
 
        {/* <ListItemButton onClick={() => handleItemClick('/details')}>

@@ -10,6 +10,10 @@ import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Typography } from '@mui/material';
+import withReactContent from 'sweetalert2-react-content';
+import Swal from 'sweetalert2';
+
+const MySwal = withReactContent(Swal);
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -116,29 +120,42 @@ const handleChange = (event) => {
 };
 
 
-
 const handleParameterChange = (index, key, value) => {
-  const newParameters = [...parameters];
-  newParameters[index] = {
-    ...newParameters[index],
-    [key]: value,
-  };
   
+  // Update parameters state without triggering re-render
+  setParameters((prevParameters) => {
+    const newParameters = [...prevParameters];
+    newParameters[index] = {
+      ...newParameters[index],
+      [key]: value,
+    };
+    return newParameters;
+  });
 
-  if (selectedsensorType === 'None') {
-    // Reset parameters to empty object when "None" is selected
-    setParameters([{}]);
-  } else {
-    setParameters(newParameters);
-  }
+  // Update availableParameters state without triggering re-render
+  setAvailableParameters((prevAvailableParameters) => {
+    const newAvailableParameters = [...prevAvailableParameters];
+    newAvailableParameters[index] = {
+      ...newAvailableParameters[index],
+      [key]: value,
+    };
+    return newAvailableParameters;
+  });
 };
 
 
-  const handleRemoveParameter = (index) => {
-    const newParameters = [...parameters];
-    newParameters.splice(index, 1);
-    setParameters(newParameters);
-  };
+
+const handleRemoveParameter = (index) => {
+  const newParameters = [...parameters];
+  newParameters.splice(index, 1);
+  setParameters(newParameters);
+
+  // Update availableParameters state as well
+  const newAvailableParameters = [...availableParameters];
+  newAvailableParameters.splice(index, 1);
+  setAvailableParameters(newAvailableParameters);
+};
+
 
 const handleAddParameter = () => {
   if (selectedsensorType === 'None') {
@@ -148,59 +165,51 @@ const handleAddParameter = () => {
   } else {
     const newParameter = { name: '', unitname: '', dataType: '' };
     setParameters([...parameters, newParameter]);
-    setAvailableParameters([...availableParameters, newParameter]);
+    setAvailableParameters([...availableParameters, { ...newParameter }]); // Provide default values
   }
 };
 
 
 
-  //  const handleCreatesensorType = () => {
-  //   // Log selected vertical, node type, and added parameters to the console
-  //   // console.log('Selected Vertical:', selectedData);
-    // console.log('Node Type:', document.getElementById('text-field').value);
-    // console.log('Sensor Name:', document.getElementById('text-field1').value);
-    // console.log('Added Parameters:', parameters);
-  // };
 
 
-  const handleCreatesensorType = () => {
-  if (!sensorType) {
-    setsensorTypeError(true);
-  }
-  else{
-    setsensorTypeError(false);
-  }
-  
-   if (!selectedData) {
+
+const handleAddsensorType = () => {
+  // if (!sensorType) {
+  //   setsensorTypeError(true);
+  // } else {
+  //   setsensorTypeError(false);
+  // }
+
+  if (!selectedData) {
     setSelectedDataError(true);
-  }else{
+  } else {
     setSelectedDataError(false);
-    }
-  
+  }
 
-
-  if(!sensorType || selectedData){
+  if (!sensorType || !selectedData) {
     return;
   }
-  
 
-
-  // if (!sensorName) {
-  //   setSensorNameError(true);
-  // }
-  // else{
-  //   setSensorNameError(false);
-  // }
-  // if(!sensorType || sensorName ){
-  //   return;
-  // }
-  
+  const sensorParameters = parameters.map((param) => ({
+    name: param.name,
+    unitname: param.unitname,
+    dataType: param.dataType,
+  }));
 
   // Log selected vertical, node type, and added parameters to the console
-  // console.log('Selected Vertical:', selectedData);
-  console.log('Node Type:', document.getElementById('text-field').value);
-    console.log('Sensor Name:', document.getElementById('text-field1').value);
-    console.log('Added Parameters:', parameters);
+  console.log('Selected Domain:', selectedData.name);
+  console.log('Node Type:', selectedsensorType);
+  console.log('Sensor Type Name:', sensorType);
+  console.log('Added Parameters:', sensorParameters);
+
+  MySwal.fire({
+    icon: 'success',
+    title: 'Success!',
+    text: 'Sensor type added successfully.',
+    showConfirmButton: false,
+    timer: 1500, // Auto close after 1.5 seconds
+  });
 };
 
 
@@ -210,16 +219,16 @@ const handleAddParameter = () => {
 
          <Typography noWrap sx={{ fontSize: '1.5rem' }}>
       <div>
-        <strong>Create New Sensor Type</strong> <br />
+        <strong>Add New Sensor Type</strong> <br />
       </div>
   </Typography>
 
         <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
   <InputLabel
     id="demo-multiple-name-label"
-    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to create space
+    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to Add space
   >
-    Select Vertical
+    Select Domain
   </InputLabel>
   <Select
     labelId="demo-multiple-name-label"
@@ -229,7 +238,7 @@ const handleAddParameter = () => {
     onChange={handleChange}
     MenuProps={MenuProps}
     sx={{ flex: 1 }}
-    label="Select Vertical" // Added label prop to ensure space for label
+    label="Select Domain" // Added label prop to ensure space for label
     error={selectedDataError} // Add error prop based on selectedDataError
   >
     {data.map((item) => (
@@ -241,7 +250,7 @@ const handleAddParameter = () => {
 
   {selectedDataError && (
     <Typography variant="caption" color="error">
-      Vertical type is required
+      Domain type is required
     </Typography>
   )}
 </FormControl>
@@ -249,7 +258,7 @@ const handleAddParameter = () => {
 <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
   <InputLabel
     id="demo-multiple-name-label"
-    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to create space
+    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to Add space
   >
     Select Sensor Type
   </InputLabel>
@@ -274,7 +283,7 @@ const handleAddParameter = () => {
   )}
 </Select>
  <Typography variant="caption" color="true">
-      Select Vertical to enable menu options
+      Select Domain to enable menu options
     </Typography>
 
 
@@ -319,9 +328,11 @@ const handleAddParameter = () => {
       {/* Parameter input fields */}
       {availableParameters.map((param, index) => (
         <Box key={param.name} sx={{ display: 'flex', alignItems: 'center', mt: 2, width: '100%', m: 1 }}>
-          <TextField
-            label="Parameter Name"
+
+           <TextField
+            label="Paramter name"
             variant="outlined"
+            onFocus={(e) => e.target.select()} 
             value={param.name}
             onChange={(e) => handleParameterChange(index, 'name', e.target.value)}
             sx={{ mr: 1, flex: 1 }}
@@ -347,8 +358,9 @@ const handleAddParameter = () => {
             </Select>
           </FormControl>
           <IconButton onClick={() => handleRemoveParameter(index)}>
-            <DeleteIcon />
-          </IconButton>
+  <DeleteIcon />
+</IconButton>
+
         </Box>
       ))}
 
@@ -358,8 +370,8 @@ const handleAddParameter = () => {
       </Button>
 
       {/* Submit button */}
-      <Button type="submit" variant="contained" color="primary" onClick={handleCreatesensorType}  sx={{ mt: 2, m: 1 }}>
-        Create Sensor Type
+      <Button type="submit" variant="contained" color="primary" onClick={handleAddsensorType}  sx={{ mt: 2, m: 1 }}>
+        Add Sensor Type
       </Button>
     </Box>
   );

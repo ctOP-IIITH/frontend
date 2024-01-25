@@ -14,7 +14,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import TablePagination from '@mui/material/TablePagination';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 
@@ -103,12 +102,8 @@ const data = [
       }]
     }
 ];
-
-// const message = `Truncation should be conditionally applicable on this long line of text
-//  as this is a much longer line than what the container can support. `;
-
-function generateKey(node) {
-  return Object.entries(node).map(([param, value]) => `${param}-${value}`).join('-');
+function generateUniqueKey(index) {
+  return `${index}-${Date.now()}`;
 }
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -120,15 +115,9 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 //   fontSize: '30px',
 }));
 
-// ... (previous imports)
-
-// ... (previous imports)
-
 export default function Details() {
   const [selectedData, setSelectedData] = React.useState(null);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const location = useLocation();
+ const location = useLocation();
 
   React.useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -145,35 +134,34 @@ export default function Details() {
     setSelectedData(selectedItem);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
 
   return (
     <Box sx={{ p: 3, m:3 }}>
       <div>
           <Grid item xs>
-  <Typography noWrap sx={{ fontSize: '1.5rem' }}>
+  <Typography >
     {selectedData ? (
-      <div>
-        <strong>Device Information</strong> <br />
-        <strong>Node ID:</strong> {selectedData.name} <br />
-        <strong>Node Type:</strong> {selectedData.nodeType} <br />
-        <strong>Parameters:</strong>
+      <div style={{ fontSize: '1rem' }}>
+        <strong style={{ fontSize: '1.5rem' , marginBottom: '10px'}}>Device Information</strong> <br />
+        Node ID:{selectedData.name} <br />
+        Node Type: {selectedData.nodeType} <br />
+        Parameters:
         {Object.keys(selectedData.data[0]).map((param) => (
           <span key={param}>
             {param} &nbsp;
           </span>
         ))}
+        <br/>
+        <br/>
+        <strong style={{ fontSize: '1.5rem'}} >Subscriptions:</strong>
+        <p>To DO subscription url</p><br/>  
       </div>
     ) : (
       'No nodes available'
     )}
+     
+     {/* write subscription here TO DO */}
+    <strong style={{ fontSize: '1.5rem'}}>Node Data:</strong>
   </Typography>
 </Grid>
 
@@ -182,7 +170,7 @@ export default function Details() {
             id="demo-multiple-name-label"
             sx={{ marginRight: 1, marginBottom: 1 }}
           >
-            Select Vertical
+            Select Domain
           </InputLabel>
           <Select
             labelId="demo-multiple-name-label"
@@ -192,7 +180,7 @@ export default function Details() {
             onChange={handleChange}
             MenuProps={MenuProps}
             sx={{ flex: 1 }}
-            label="Select Vertical"
+            label="Select Domain"
           >
             {data.map((item) => (
               <MenuItem key={item.name} value={item.name}>
@@ -214,33 +202,19 @@ export default function Details() {
                       </TableCell>
                     ))}
                   </TableRow>
-                  {(rowsPerPage > 0
-                    ? selectedData.data.slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                    : selectedData.data
-                  ).map((node) => (
-                    <TableRow key={generateKey(node)}>
-                      {Object.values(node).map((value) => (
-                        <TableCell key={`${value}`} align="right">
-                          {value}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
+                  {selectedData.data.map((entry, entryIndex) => (
+  <TableRow key={generateUniqueKey(entryIndex)}>
+    {Object.keys(entry).map((param) => (
+      <TableCell key={param} align="right">
+        {entry[param]} {/* Display the value of the parameter */}
+      </TableCell>
+    ))}
+  </TableRow>
+))}
                 </TableBody>
               </Table>
             </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={selectedData.data.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+
           </div>
         ) : (
           <StyledPaper>No nodes available</StyledPaper>

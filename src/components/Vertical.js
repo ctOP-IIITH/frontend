@@ -5,18 +5,11 @@ import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Fab from '@mui/material/Fab';
 import Typography from '@mui/material/Typography';
-
-
-import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import PanToolAltIcon from '@mui/icons-material/PanToolAlt'; // Import PanToolAltIcon
-
-
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
+import SweetAlert from 'sweetalert2';
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -85,52 +78,51 @@ const data = [
  
 
 function Vertical() {
-  const [verticalName, setVerticalName] = useState('');
-  const [description, setDescription] = useState('');
-  const [verticalNameError, setVerticalNameError] = React.useState(false);
-  const [descritionError, setDescriptionError] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  // const [verticalName, setVerticalName] = useState('');
+  // const [description, setDescription] = useState('');
+  // const [verticalNameError, setVerticalNameError] = React.useState(false);
+  // const [descritionError, setDescriptionError] = React.useState(false);
+  // const [open, setOpen] = React.useState(false);
+  // const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  
+// const updatedData = data;
+  const handleClickOpen = () => {
+     navigate(`/add`);
 
-  const handleClickOpen = (item) => {
-    setSelectedItem(item);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
   };
 
 
-  const handleAddNode = () => {
-    
-    if (!verticalName) {
-      setVerticalNameError(true);
-    } else {
-      setVerticalNameError(false);
-    }
 
-    if (!description) {
-      setDescriptionError(true);
-    } else {
-      setDescriptionError(false);
-    }
-    if (!verticalName || !description) {
-      return;
-    }
-    // Print values to console
-    console.log('Vertical Name:', verticalName);
-    console.log('Description:', description);
-
-    // Close the dialog
-    handleClose();
-    
-  };
   const handleVerticalClick = (verticalId) => {
     navigate(`/details?filter=${encodeURIComponent(verticalId)}`);
   };
+
+const handleDeleteItem = (itemId) => {
+  data.filter((item) => item.id !== itemId);
+// TO DO to refresh AE in frontned write API fro get AE
+};
+
+  const handleDeleteClick = (itemId) => {
+    data.filter((item) => item.id !== itemId);
+    // navigate(`/details?filter=${encodeURIComponent(verticalId)}`);
+  SweetAlert.fire({
+    title: 'Are you sure?',
+    text: `Do you want to delete?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Call the delete function or dispatch an action to delete the item
+      handleDeleteItem(itemId);
+    }
+  });
+};
+
+
 
   return (
     
@@ -138,7 +130,7 @@ function Vertical() {
       {/* Add the search box here */}
       <Box sx={{ p: 3 }}>
         <TextField
-          label="Search Verticals"
+          label="Search Domain"
           variant="outlined"
           fullWidth
           margin="normal"
@@ -152,12 +144,17 @@ function Vertical() {
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .map((item) => (
-        <Grid key={item.id} item xs={4}>
-          <Item onClick={() => handleVerticalClick(item.name)}>
-            <h3>{item.name}</h3>
-            <p>{item.description}</p>
-          </Item>
-        </Grid>
+       <Grid key={item.id} item xs={4}>
+  <div style={{ position: 'relative' }}>
+    <Item onClick={() => handleVerticalClick(item.name)}>
+      <h3>{item.name}</h3>
+      <p>{item.description}</p>
+    </Item>
+    <div style={{ position: 'absolute', top: 0, right: 0 }}>
+      <DeleteIcon onClick={() => handleDeleteClick(item.id)} />
+    </div>
+  </div>
+</Grid>
       ))}
     {data.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -177,13 +174,14 @@ function Vertical() {
       <Fab
         color="primary"
         aria-label="add"
-        style={{ position: 'absolute', bottom: 16, right: 16, borderRadius: '20%' , width: 120,}}
+        style={{ position: 'absolute', bottom: 16, right: 16}}
         onClick={handleClickOpen}
         
       >
-        <Typography variant="button">add domain</Typography>
-      </Fab>
-      <Dialog open={open} onClose={handleClose}>
+        <Typography variant="button">ADD</Typography>
+       </Fab>
+
+      {/* <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{selectedItem ? selectedItem.name : ''}</DialogTitle>
         <DialogTitle>Vertical Addition</DialogTitle>
         <DialogContent>
@@ -233,7 +231,7 @@ function Vertical() {
             Add Node
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */} 
     </>
 
       
