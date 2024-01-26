@@ -3,7 +3,7 @@ import { getAccessToken, clearTokens, saveTokens } from './tokenService';
 
 // authService.js
 const authService = {
-  isAuthenticated: getAccessToken() !== null || true,
+  isAuthenticated: getAccessToken() !== null,
   // eslint-disable-next-line no-unused-vars
   login: async (email, password) => {
     try {
