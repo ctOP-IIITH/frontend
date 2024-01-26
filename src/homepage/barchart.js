@@ -23,7 +23,9 @@ function BarChart({ selectedSegment }) {
         { x: 'Air Quality', y: 19 },
         { x: 'Water Quality', y: 7 },
         { x: 'Water Quantity', y: 17 },
-        { x: 'Crwod Monitoring', y: 10 }
+        { x: 'Crowd Monitoring', y: 10 },
+        { x: 'Weather Monitoring', y: 19 },
+        { x: 'Energy Monitoring', y: 15 }
       ],
       backgroundColor: ['#FF6384']
     },
@@ -33,7 +35,9 @@ function BarChart({ selectedSegment }) {
         { x: 'Air Quality', y: 19 },
         { x: 'Water Quality', y: 7 },
         { x: 'Water Quantity', y: 17 },
-        { x: 'Crwod Monitoring', y: 10 }
+        { x: 'Crowd Monitoring', y: 10 },
+        { x: 'Weather Monitoring', y: 19 },
+        { x: 'Energy Monitoring', y: 15 }
       ],
       backgroundColor: ['#36A2EB']
     },
@@ -43,7 +47,9 @@ function BarChart({ selectedSegment }) {
         { x: 'Air Quality', y: 19 },
         { x: 'Water Quality', y: 7 },
         { x: 'Water Quantity', y: 17 },
-        { x: 'Crwod Monitoring', y: 10 }
+        { x: 'Crowd Monitoring', y: 10 },
+        { x: 'Weather Monitoring', y: 19 },
+        { x: 'Energy Monitoring', y: 15 }
       ],
       backgroundColor: ['#FFCE56']
     },
@@ -53,7 +59,9 @@ function BarChart({ selectedSegment }) {
         { x: 'Air Quality', y: 19 },
         { x: 'Water Quality', y: 7 },
         { x: 'Water Quantity', y: 17 },
-        { x: 'Crwod Monitoring', y: 10 }
+        { x: 'Crowd Monitoring', y: 10 },
+        { x: 'Weather Monitoring', y: 19 },
+        { x: 'Energy Monitoring', y: 15 }
       ],
       backgroundColor: ['#4BC0C0']
     },
@@ -63,7 +71,9 @@ function BarChart({ selectedSegment }) {
         { x: 'Air Quality', y: 19 },
         { x: 'Water Quality', y: 7 },
         { x: 'Water Quantity', y: 17 },
-        { x: 'Crwod Monitoring', y: 10 }
+        { x: 'Crowd Monitoring', y: 10 },
+        { x: 'Weather Monitoring', y: 19 },
+        { x: 'Energy Monitoring', y: 15 }
       ],
       backgroundColor: ['#9966FF']
     },
@@ -73,7 +83,9 @@ function BarChart({ selectedSegment }) {
         { x: 'Air Quality', y: 19 },
         { x: 'Water Quality', y: 7 },
         { x: 'Water Quantity', y: 17 },
-        { x: 'Crwod Monitoring', y: 10 }
+        { x: 'Crowd Monitoring', y: 10 },
+        { x: 'Weather Monitoring', y: 19 },
+        { x: 'Energy Monitoring', y: 15 }
       ],
       backgroundColor: ['#FF9F40']
     },
@@ -83,7 +95,9 @@ function BarChart({ selectedSegment }) {
         { x: 'Air Quality', y: 19 },
         { x: 'Water Quality', y: 7 },
         { x: 'Water Quantity', y: 17 },
-        { x: 'Crwod Monitoring', y: 10 }
+        { x: 'Crowd Monitoring', y: 10 },
+        { x: 'Weather Monitoring', y: 19 },
+        { x: 'Energy Monitoring', y: 15 }
       ],
       backgroundColor: ['#C9CBCF']
     }
@@ -107,10 +121,25 @@ function BarChart({ selectedSegment }) {
       ]
     };
 
+    const options = {
+      plugins: {
+        title: {
+          display: true,
+          text: `Verticals in Region ${data.label}`
+        }
+      },
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    };
+
     return (
-      <div>
-        <h2>Bar Chart for {data.label}</h2>
-        <Bar data={chartData} />
+      <div className="bar-chart">
+        <Bar data={chartData} options={options} />
+        <h5>Bar Chart for {data.label}</h5>
       </div>
     );
   }

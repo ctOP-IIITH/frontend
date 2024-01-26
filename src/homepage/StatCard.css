@@ -8,6 +8,13 @@
   border-radius: 4px;
 }
 
+.card-image {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 8px;
+  display: block;
+  margin: 100 auto;
+}
 .number {
   font-size: 24px;
   color: #007bff; /* Blue color for the numbers */

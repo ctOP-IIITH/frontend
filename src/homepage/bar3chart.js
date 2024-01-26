@@ -18,19 +18,44 @@ function Bar3Chart() {
     labels: ['Gachibowli', 'Madhapur', 'Miyapur', 'KPHB', 'JNTU', 'Jubilee Hills', 'Abids'],
     datasets: [
       {
-        label: 'Nodes',
-        data: [65, 59, 80, 81, 56, 55, 40],
-        backgroundColor: 'rgba(155, 69, 192,0.2)',
-        borderColor: 'rgba(155, 69, 192,1)',
+        label: 'Working Nodes',
+        data: [15, 59, 80, 81, 56, 55, 40],
+        backgroundColor: '#00cc00',
+        borderColor: '#006400',
+        borderWidth: 1
+      },
+      {
+        label: 'Not Working Nodes',
+        data: [3, 59, 80, 81, 56, 55, 40],
+        backgroundColor: '#ff0000',
+        borderColor: '#b30000',
         borderWidth: 1
       }
     ]
   };
 
+  const options = {
+    plugins: {
+      title: {
+        display: true,
+        text: 'Domains in a Region'
+      }
+    },
+    responsive: true,
+    scales: {
+      x: {
+        stacked: true
+      },
+      y: {
+        stacked: true
+      }
+    }
+  };
+
   return (
-    <div className="bar-chart">
-      <Bar data={data} />
-      <h4>-------REGIONS-------</h4>
+    <div className="bar3-chart">
+      <Bar data={data} options={options} />
+      <h5>REGIONS</h5>
     </div>
   );
 }

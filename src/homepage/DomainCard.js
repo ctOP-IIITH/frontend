@@ -1,5 +1,5 @@
 import React from 'react';
-import './DomainCard.css'; // Make sure to create this CSS file for styling
+import './DomainCard.css';
 
 function DomainCard({ icon, label }) {
   return (

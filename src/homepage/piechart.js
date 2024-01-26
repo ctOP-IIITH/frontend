@@ -61,33 +61,17 @@ function PieChart({ onSegmentClick }) {
     const { index } = getElementAtEvent(chartRef.current, e)[0];
     console.log('Clicked segment index:', index);
     onSegmentClick(index);
-    // console.log('Clicked segment index:', index);
-    // console.log('Segment data length:', segmentData.length);
-
-    // if (index >= 0 && index < segmentData.length) {
-    //   const selectedSegment = segmentData[index];
-
-    //   // Check if selectedSegment has the 'data' property
-    //   if (selectedSegment && Array.isArray(selectedSegment.data)) {
-    //     // Access the 'data' property and perform the necessary operations
-    //     const segmentDataArray = selectedSegment.data;
-
-    //     // Check if segmentDataArray has a valid length before using it
-    //     if (segmentDataArray.length > 0) {
-    //       // Handle the data as needed
-    //     } else {
-    //       console.error("Selected segment's data array is empty.");
-    //     }
-    //   } else {
-    //     console.error("Selected segment is missing 'data' property or 'data' is not an array.");
-    //   }
-    // } else {
-    //   console.error('Invalid segment index.');
-    // }
   };
 
   const options = {
-    cutout: 0
+    cutout: 0,
+    plugins: {
+      title: {
+        display: true,
+        text: 'Regions'
+      }
+    },
+    responsive: true
   };
 
   return (

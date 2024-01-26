@@ -1,11 +1,22 @@
 .bar-chart {
-  width: 50%;
+  /* width: 45%; */
   height: auto;
-  margin-top: 120px; /* Adjust the value as needed */
+  margin-top: 80px;
 }
 
 /* Style for the canvas created by Chart.js */
 .canvas {
   max-width: 100%;
-  height: auto;
+  height: 100;
+}
+
+.chart-card {
+  border: 1px solid #e0e0e0; /* Light grey border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+  /* padding: 20px; Space inside the card */
+  margin: 20px; /* Space outside the card */
+  background-color: #ffffff; /* White background */
+  /* full width */
+  width: 50%;
 }
