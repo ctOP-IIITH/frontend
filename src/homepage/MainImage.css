@@ -1,0 +1,13 @@
+/* .main-image { */
+/* background-image: url('./hydiot.jpg'); Adjust the path if necessary */
+/* height: 300px; Adjust height as necessary */
+/* background-size: cover; */
+/* background-position: center; */
+/* } */
+
+.main-image {
+  background-image: url('./hydiot.jpg'); /* Adjust the path if necessary */
+  background-size: cover;
+  background-position: center top; /* Align background image to the top */
+  height: 400px; /* Or use vh units like height: 50vh; to make it responsive */
+}

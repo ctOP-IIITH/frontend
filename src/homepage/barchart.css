@@ -1,0 +1,11 @@
+.bar-chart {
+  width: 50%;
+  height: auto;
+  margin-top: 120px; /* Adjust the value as needed */
+}
+
+/* Style for the canvas created by Chart.js */
+.canvas {
+  max-width: 100%;
+  height: auto;
+}
