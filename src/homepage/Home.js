@@ -1,6 +1,5 @@
 // import React from 'react';
 import React, { useState } from 'react';
-import { Box } from '@mui/system';
 import { Typography, Container } from '@mui/material';
 // import Header from './header';
 import StatCard from './StatCard';
@@ -33,7 +32,7 @@ function Home() {
   };
 
   return (
-    <Box className="home">
+    <div className="home">
       <div className="main-image">
         <Container maxWidth="sm">
           <Typography variant="h3" align="center" color="#1d2994" gutterBottom>
@@ -81,7 +80,7 @@ function Home() {
           <BarChart selectedSegment={selectedSegment} />
         </div>
       </div>
-    </Box>
+    </div>
   );
 }
 

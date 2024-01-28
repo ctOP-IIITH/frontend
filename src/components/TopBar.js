@@ -73,8 +73,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const MainContent = styled('main')(({ theme }) => ({
   flexGrow: 1,
-  height: '100vh',
-  overflow: 'auto',
+  // height: '100vh',
+  width: '100%',
   paddingTop: theme.spacing(8),
   paddingLeft: theme.spacing(9),
   paddingRight: theme.spacing(2)
@@ -89,7 +89,13 @@ export default function TopBar({ children }) {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        marginRight: 0,
+        bgcolor: '#eceef8'
+      }}>
       <CssBaseline />
       <AppBar position="absolute" open={open}>
         <Toolbar
@@ -125,11 +131,11 @@ export default function TopBar({ children }) {
           />
           <Typography
             component="h1"
-            variant="h3"
-            color="#fafafa"
+            variant="h4"
+            color="#ffffff"
             noWrap
             sx={{ flexGrow: 1, textAlign: 'center', paddingRight: '100px' }}>
-            City Operating IoT Platform (ctOP)
+            City IoT Operating Platform (ctOP)
           </Typography>
           {isLoggedIn ? (
             <IconButton color=" inherit ">
@@ -167,7 +173,7 @@ export default function TopBar({ children }) {
           {secondaryListItems} */}
         </List>
       </Drawer>
-      <MainContent>{children}</MainContent>
+      <MainContent className="main-content">{children}</MainContent>
       <Toolbar />
     </Box>
   );
