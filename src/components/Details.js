@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useContext, useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -15,6 +15,8 @@ import { Button } from '@mui/material';
 import SweetAlert from 'sweetalert2';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Fab from '@mui/material/Fab';
+import { DataContext } from '../contexts/DataContext';
+import { axiosAuthInstance } from '../services/axiosConfig';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -27,62 +29,6 @@ const MenuProps = {
   }
 };
 
-const data = [
-  {
-    id: 'airQuality',
-    name: 'Air Quality',
-    description: 'Information about air quality',
-    nodes: [
-      {
-        nodeName: 'AE-AQ1',
-        nodeType: 'kristnam',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      },
-      {
-        nodeName: 'AE-AQ2',
-        nodeType: 'shenitech',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      }
-    ]
-  },
-
-  // { id: 'airQuality', name: 'Air Quality', description: 'Information about air quality', nodes:'' },
-  {
-    id: 'waterQuality',
-    name: 'Water Quality',
-    description: 'Information about water quality',
-    nodes: [
-      {
-        nodeName: 'AE-WM1',
-        nodeType: 'kristnam',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      },
-      {
-        nodeName: 'AE-WM2',
-        nodeType: 'shenitech',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      }
-    ]
-  },
-  {
-    id: 'weatherMonitoring',
-    name: 'Weather Monitoring',
-    description: 'Information about weather monitoring'
-  }
-];
-
 const StyledPaper = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? 'black' : '#fff',
   ...theme.typography.body2,
@@ -93,17 +39,31 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 export default function Details() {
+  // eslint-disable-next-line no-unused-vars
+  const { verticals, nodes, setNodes } = useContext(DataContext);
+
   // Uncommented usage
-  const [selectedData, setSelectedData] = React.useState(null);
+  const [selectedData, setSelectedData] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
-  React.useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(location.search);
     const filter = params.get('filter');
     // Find the selectedData based on verticalId
     console.log(filter);
-    const selectedItem = data.find((item) => item.name === filter);
-    setSelectedData(selectedItem);
+    axiosAuthInstance.get(`/nodes/${filter}`).then((response) => {
+      const selectedItem = {
+        id: filter,
+        name: filter,
+        nodes: response.data.map((node) => ({
+          nodeName: node.node_name,
+          nodeType: node.node_type,
+          data: node.data
+        }))
+      };
+
+      setSelectedData(selectedItem);
+    });
   }, []);
 
   const handleClickOpen = () => {
@@ -114,13 +74,14 @@ export default function Details() {
   };
 
   const handleDeleteItem = (itemId) => {
-    data.filter((item) => item.id !== itemId);
+    console.log(itemId);
+    // data.filter((item) => item.id !== itemId);
     // TO DO to refresh AE in frontned write API fro get node of that AE
   };
 
   const handleDeleteClick = (itemId) => {
-    data.filter((item) => item.id !== itemId);
-
+    // data.filter((item) => item.id !== itemId);
+    console.log(itemId);
     SweetAlert.fire({
       title: 'Are you sure?',
       text: `Do you want to delete?`,
@@ -140,8 +101,8 @@ export default function Details() {
     const {
       target: { value }
     } = event;
-    const selectedItem = data.find((item) => item.name === value);
-    setSelectedData(selectedItem);
+    // reload the page with the new verticalId
+    navigate(`/details?filter=${encodeURIComponent(value)}`);
   };
 
   return (
@@ -160,9 +121,8 @@ export default function Details() {
             onChange={handleChange}
             MenuProps={MenuProps}
             sx={{ flex: 1 }}
-            label="Select Domain"
-          >
-            {data.map((item) => (
+            label="Select Domain">
+            {verticals.map((item) => (
               <MenuItem key={item.id} value={item.name}>
                 {item.name}
               </MenuItem>
@@ -179,8 +139,7 @@ export default function Details() {
                   <Button
                     variant="outlined"
                     color="secondary"
-                    onClick={() => handleVerticalClick(node.nodeName)}
-                  >
+                    onClick={() => handleVerticalClick(node.nodeName)}>
                     View Node Details
                   </Button>
                 </Typography>
@@ -190,8 +149,7 @@ export default function Details() {
                     justifyContent: 'flex-end',
                     marginTop: '-20px',
                     paddingRight: '8px'
-                  }}
-                >
+                  }}>
                   <DeleteIcon onClick={handleDeleteClick} />
                 </div>
               </StyledPaper>
@@ -205,9 +163,8 @@ export default function Details() {
       <Fab
         color="primary"
         aria-label="add"
-        style={{ position: 'absolute', bottom: 16, right: 16 }}
-        onClick={handleClickOpen}
-      >
+        style={{ position: 'fixed', bottom: 16, right: 16 }}
+        onClick={handleClickOpen}>
         <Typography variant="button">ADD</Typography>
       </Fab>
     </Box>

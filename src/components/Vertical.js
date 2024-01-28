@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -10,6 +10,8 @@ import PanToolAltIcon from '@mui/icons-material/PanToolAlt'; // Import PanToolAl
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import SweetAlert from 'sweetalert2';
+import { axiosAuthInstance } from '../services/axiosConfig';
+import { DataContext } from '../contexts/DataContext';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -23,64 +25,8 @@ const Item = styled(Paper)(({ theme }) => ({
   }
 }));
 
-const data = [
-  {
-    id: 'airQuality',
-    name: 'Air Quality',
-    description: 'Information about air quality',
-    nodes: [
-      {
-        nodeName: 'AE-AQ1',
-        nodeType: 'kristnam',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      },
-      {
-        nodeName: 'AE-AQ2',
-        nodeType: 'shenitech',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      }
-    ]
-  },
-
-  // { id: 'airQuality', name: 'Air Quality', description: 'Information about air quality', nodes:'' },
-  {
-    id: 'waterQuality',
-    name: 'Water Quality',
-    description: 'Information about water quality',
-    nodes: [
-      {
-        nodeName: 'AE-WM1',
-        nodeType: 'kristnam',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      },
-      {
-        nodeName: 'AE-WM2',
-        nodeType: 'shenitech',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      }
-    ]
-  },
-  {
-    id: 'weatherMonitoring',
-    name: 'Weather Monitoring',
-    description: 'Information about weather monitoring'
-  }
-];
-
 function Vertical() {
-  // const [verticalName, setVerticalName] = useState('');
+  const { verticals, setVerticals } = useContext(DataContext);
   // const [description, setDescription] = useState('');
   // const [verticalNameError, setVerticalNameError] = React.useState(false);
   // const [descritionError, setDescriptionError] = React.useState(false);
@@ -88,6 +34,21 @@ function Vertical() {
   // const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axiosAuthInstance.get('/verticals/all').then((response) => {
+      const verts = [];
+      response.data.forEach((element) => {
+        verts.push({
+          id: element.id,
+          name: element.res_name,
+          description: element.description,
+          orid: element.orid
+        });
+      });
+      setVerticals(verts);
+    });
+  });
 
   // const updatedData = data;
   const handleClickOpen = () => {
@@ -99,12 +60,12 @@ function Vertical() {
   };
 
   const handleDeleteItem = (itemId) => {
-    data.filter((item) => item.id !== itemId);
+    verticals.filter((item) => item.id !== itemId);
     // TO DO to refresh AE in frontned write API fro get AE
   };
 
   const handleDeleteClick = (itemId) => {
-    data.filter((item) => item.id !== itemId);
+    verticals.filter((item) => item.id !== itemId);
     // navigate(`/details?filter=${encodeURIComponent(verticalId)}`);
     SweetAlert.fire({
       title: 'Are you sure?',
@@ -135,7 +96,7 @@ function Vertical() {
       </Box>
 
       <Grid container spacing={3}>
-        {data
+        {verticals
           .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
           .map((item) => (
             <Grid key={item.id} item xs={4}>
@@ -150,7 +111,7 @@ function Vertical() {
               </div>
             </Grid>
           ))}
-        {data.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        {verticals.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
           .length === 0 && (
           <Grid item xs={12}>
             <Item>
