@@ -10,6 +10,10 @@ import Button from '@mui/material/Button';
 // import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 // import DeleteIcon from '@mui/icons-material/Delete';
 import { Typography } from '@mui/material';
+import withReactContent from 'sweetalert2-react-content';
+import Swal from 'sweetalert2';
+
+const MySwal = withReactContent(Swal);
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -116,7 +120,7 @@ const handleChange = (event) => {
   // };
 
 
-const handleCreateNodeType = () => {
+const handleAddNodeType = () => {
   //  if (!nodeType) {
   //   setNodeTypeError(true);
   // }
@@ -146,15 +150,26 @@ const handleCreateNodeType = () => {
 
   if( !selectedData || !latitude || !longitude){
     return;
+
+    
   }
   
 
   // Log selected vertical, node type, and added parameters to the console
-  console.log('Selected Vertical:', selectedData);
+  console.log('Selected Domain:', selectedData);
   console.log('Node Type:', document.getElementById('text-field').value);
   console.log('Added Parameters:', parameters);
   console.log('latitude:', latitude);
   console.log('longitude:', longitude);
+
+   MySwal.fire({
+    icon: 'success',
+    title: 'Success!',
+    text: 'Node added successfully.',
+    showConfirmButton: false,
+    timer: 1500, // Auto close after 1.5 seconds
+  });
+  
 };
 
   // const handleRemoveParameter = (index) => {
@@ -173,16 +188,16 @@ const handleCreateNodeType = () => {
 
          <Typography noWrap sx={{ fontSize: '1.5rem' }}>
       <div>
-        <strong>Create New Node</strong> <br />
+        <strong>Add New Node</strong> <br />
       </div>
   </Typography>
 
 <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
   <InputLabel
     id="demo-multiple-name-label"
-    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to create space
+    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to Add space
   >
-    Select Vertical
+    Select Domain
   </InputLabel>
   <Select
     labelId="demo-multiple-name-label"
@@ -192,7 +207,7 @@ const handleCreateNodeType = () => {
     onChange={handleChange}
     MenuProps={MenuProps}
     sx={{ flex: 1 }}
-    label="Select Vertical" // Added label prop to ensure space for label
+    label="Select Domain" // Added label prop to ensure space for label
     error={selectedDataError} // Add error prop based on selectedDataError
   >
     {data.map((item) => (
@@ -205,7 +220,7 @@ const handleCreateNodeType = () => {
 
   {selectedDataError && (
     <Typography variant="caption" color="error">
-      Vertical type is required
+      Domain type is required
     </Typography>
   )}
 </FormControl>
@@ -215,7 +230,7 @@ const handleCreateNodeType = () => {
 <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
   <InputLabel
     id="demo-multiple-name-label"
-    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to create space
+    sx={{ marginRight: 1, marginBottom: 1 }} // Added marginBottom to Add space
   >
     Select Sensor Type
   </InputLabel>
@@ -230,6 +245,7 @@ const handleCreateNodeType = () => {
   label="Select Sensor Type"
   error={selectedDataError}
 >
+  <MenuItem value="None">None</MenuItem>
   {selectedData && selectedData.nodes && selectedData.nodes.length > 0 && (
     selectedData.nodes.map((node) => (
       <MenuItem key={node.nodeType} value={node.nodeType}>
@@ -248,7 +264,7 @@ const handleCreateNodeType = () => {
     </Typography>
   )}
    <Typography variant="caption" color="true">
-      Select Vertical to enable menu options
+      Select Domain to enable menu options
     </Typography>
 </FormControl>
 
@@ -320,9 +336,10 @@ const handleCreateNodeType = () => {
       </Button> */}
 
       {/* Submit button */}
-      <Button type="submit" variant="contained" color="primary" onClick={handleCreateNodeType} sx={{ mt: 2, m: 1 }}>
-        Create Node
+      <Button type="submit" variant="contained" color="primary" onClick={handleAddNodeType} sx={{ mt: 2, m: 1 }}>
+        Add Node
       </Button>
+      
     </Box>
   );
 }

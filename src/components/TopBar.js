@@ -129,7 +129,7 @@ export default function TopBar({ children }) {
             color="#fafafa"
             noWrap
             sx={{ flexGrow: 1, textAlign: 'center', paddingRight: '100px' }}>
-            City Operating Iot Platform (ctOP)
+            City Operating IoT Platform (ctOP)
           </Typography>
           {isLoggedIn ? (
             <IconButton color=" inherit ">

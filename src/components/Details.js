@@ -10,7 +10,11 @@ import Select from '@mui/material/Select';
 import { useLocation ,useNavigate} from 'react-router-dom';
 // import { useParams } from 'react-router-dom'; // Import useParams
 // import {  } from 'react-router-dom';
-
+import Typography from '@mui/material/Typography';
+import { Button } from '@mui/material';
+import SweetAlert from 'sweetalert2';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Fab from '@mui/material/Fab';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -96,9 +100,38 @@ export default function Details() {
     setSelectedData(selectedItem);
   }, []);
 
+
+    const handleClickOpen = () => {
+     navigate(`/add`);
+
+  };
   const handleVerticalClick = (nodeID) => {
     navigate(`/nodedata?filter=${encodeURIComponent(nodeID)}`);
   };
+
+  const handleDeleteItem = (itemId) => {
+  data.filter((item) => item.id !== itemId);
+// TO DO to refresh AE in frontned write API fro get node of that AE
+};
+
+  const handleDeleteClick = (itemId) => {
+    data.filter((item) => item.id !== itemId);
+    
+  SweetAlert.fire({
+    title: 'Are you sure?',
+    text: `Do you want to delete?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Call the delete function or dispatch an action to delete the item
+      handleDeleteItem(itemId);
+    }
+  });
+};
+
 
   const handleChange = (event) => {
     const {
@@ -107,6 +140,9 @@ export default function Details() {
     const selectedItem = data.find((item) => item.name === value);
     setSelectedData(selectedItem);
   };
+
+
+
 
   return (
         <Box sx={{ p: 3 }}>
@@ -117,7 +153,7 @@ export default function Details() {
             id="demo-multiple-name-label"
             sx={{ marginRight: 1, marginBottom: 1 }}
           >
-            Select Vertical
+            Select Domain
           </InputLabel>
           <Select
             labelId="demo-multiple-name-label"
@@ -127,7 +163,7 @@ export default function Details() {
             onChange={handleChange}
             MenuProps={MenuProps}
             sx={{ flex: 1 }}
-            label="Select Vertical"
+            label="Select Domain"
           >
             {data.map((item) => (
               <MenuItem key={item.id} value={item.name}>
@@ -138,18 +174,34 @@ export default function Details() {
         </FormControl>
       
 
-        {selectedData && Array.isArray(selectedData.nodes) && selectedData.nodes.length > 0 ? (
-          <Stack spacing={3} sx={{ marginTop: 2 }}>
-            {selectedData.nodes.map((node) => (
-              <StyledPaper key={node.nodeName} onClick={() => handleVerticalClick(node.nodeName)}>
-                {node.nodeName}
-              </StyledPaper>
-            ))}
-          </Stack>
-        ) : (
-          <StyledPaper>No nodes available</StyledPaper>
-        )}
+ {selectedData && Array.isArray(selectedData.nodes) && selectedData.nodes.length > 0 ? (
+  <Stack spacing={3} sx={{ marginTop: 2 }}>
+    {selectedData.nodes.map((node) => (
+      <StyledPaper key={node.nodeName}>
+        <Typography variant="h6">
+          {node.nodeName}{" "}
+          <Button variant="outlined" color="secondary" onClick={() => handleVerticalClick(node.nodeName)}>View Node Details</Button>
+        </Typography>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-20px', paddingRight: '8px' }}>
+          <DeleteIcon onClick={handleDeleteClick} />
+        </div>
+      </StyledPaper>
+    ))}
+  </Stack>
+) : (
+  <StyledPaper>No nodes available</StyledPaper>
+)}
       </div>
+
+      <Fab
+        color="primary"
+        aria-label="add"
+        style={{ position: 'absolute', bottom: 16, right: 16}}
+        onClick={handleClickOpen}
+        
+      >
+        <Typography variant="button">ADD</Typography>
+       </Fab>
     </Box>
   );
 }
