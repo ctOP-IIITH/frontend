@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useAuth } from './contexts/AuthContext';
 // import Home from './components/Home';
 import Home from './homepage/Home';
 import Add from './components/Add';
@@ -34,15 +34,6 @@ function App() {
         <Routes>
           {/* Open Routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/add" element={<Add />} />
-          <Route path="/vertical" element={<Vertical />} />
-          <Route path="/details" element={<Details />} />
-          <Route path="/nodedata/:id" element={<Nodedata />} />
-          <Route path="/nodedata" element={<Nodedata />} />
-          <Route path="/vertical/:id" element={<Details />} />
-          <Route path="/addnode" element={<Addnode />} />
-          <Route path="/addvertical" element={<Addvertical />} />
-          <Route path="/addsensor" element={<Addsensor />} />
 
           {/* Public Only Routes */}
           <Route path="login" element={<PublicRoute />}>
@@ -53,9 +44,9 @@ function App() {
           <Route path="private" element={<PrivateRoute />}>
             <Route path="/private" element={<PrivateComponent />} />
           </Route>
-          <Route path="vertical" element={<PrivateRoute />}>
-            <Route path="/vertical" element={<Vertical />} />
-            <Route path="/vertical/:id" element={<Details />} />
+          <Route path="verticals" element={<PrivateRoute />}>
+            <Route path="/verticals" element={<Vertical />} />
+            <Route path="/verticals/:id" element={<Details />} />
           </Route>
           <Route path="details" element={<PrivateRoute />}>
             <Route path="/details" element={<Details />} />
@@ -75,6 +66,9 @@ function App() {
           </Route>
           <Route path="addsensor" element={<PrivateRoute />}>
             <Route path="/addsensor" element={<Addsensor />} />
+          </Route>
+          <Route path="add" element={<PrivateRoute />}>
+            <Route path="/add" element={<Add />} />
           </Route>
 
           <Route path="/404" element={<NotFound />} />

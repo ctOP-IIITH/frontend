@@ -25,7 +25,7 @@ function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="Home" />
       </ListItemButton>
-      <ListItemButton onClick={() => handleItemClick('/vertical')}>
+      <ListItemButton onClick={() => handleItemClick('/verticals')}>
         <ListItemIcon>
           <AppsIcon />
         </ListItemIcon>
