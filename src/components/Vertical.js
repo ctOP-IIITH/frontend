@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -11,7 +11,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import SweetAlert from 'sweetalert2';
 
-
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -20,62 +19,69 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
   cursor: 'pointer', // Set default cursor style
   '&:hover': {
-    cursor: `url(${PanToolAltIcon}) 0 0, auto`, // Use PanToolAltIcon as cursor on hover
-  },
+    cursor: `url(${PanToolAltIcon}) 0 0, auto` // Use PanToolAltIcon as cursor on hover
+  }
 }));
 
 const data = [
   {
-  "id": "airQuality",
-  "name": "Air Quality",
-  "description": "Information about air quality",
-  "nodes": [
-    {
-      "nodeName": "AE-AQ1",
-      "nodeType": "kristnam",
-      "data": {
-        "pm25": 10,
-        "pm10": 12
+    id: 'airQuality',
+    name: 'Air Quality',
+    description: 'Information about air quality',
+    nodes: [
+      {
+        nodeName: 'AE-AQ1',
+        nodeType: 'kristnam',
+        data: {
+          pm25: 10,
+          pm10: 12
+        }
+      },
+      {
+        nodeName: 'AE-AQ2',
+        nodeType: 'shenitech',
+        data: {
+          pm25: 10,
+          pm10: 12
+        }
       }
-    },
-    {
-      "nodeName": "AE-AQ2",
-      "nodeType": "shenitech",
-      "data": {
-        "pm25": 10,
-        "pm10": 12
-      }
-    }
-  ]
-},
+    ]
+  },
 
   // { id: 'airQuality', name: 'Air Quality', description: 'Information about air quality', nodes:'' },
-  { id: 'waterQuality', name: 'Water Quality', description: 'Information about water quality' , "nodes": [
-    {
-      "nodeName": "AE-WM1",
-      "nodeType": "kristnam",
-      "data": {
-        "pm25": 10,
-        "pm10": 12
+  {
+    id: 'waterQuality',
+    name: 'Water Quality',
+    description: 'Information about water quality',
+    nodes: [
+      {
+        nodeName: 'AE-WM1',
+        nodeType: 'kristnam',
+        data: {
+          pm25: 10,
+          pm10: 12
+        }
+      },
+      {
+        nodeName: 'AE-WM2',
+        nodeType: 'shenitech',
+        data: {
+          pm25: 10,
+          pm10: 12
+        }
       }
-    },
-    {
-      "nodeName": "AE-WM2",
-      "nodeType": "shenitech",
-      "data": {
-        "pm25": 10,
-        "pm10": 12
-      }
-    }
-  ]},
-  { id: 'weatherMonitoring', name: 'Weather Monitoring', description: 'Information about weather monitoring' },
+    ]
+  },
+  {
+    id: 'weatherMonitoring',
+    name: 'Weather Monitoring',
+    description: 'Information about weather monitoring'
+  }
 ];
-
 
 // axiosInstance.get(url).then(res => {
 //   data = res.body;
 // })
- 
 
 function Vertical() {
   // const [verticalName, setVerticalName] = useState('');
@@ -86,47 +92,41 @@ function Vertical() {
   // const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  
-// const updatedData = data;
+
+  // const updatedData = data;
   const handleClickOpen = () => {
-     navigate(`/add`);
-
+    navigate(`/add`);
   };
-
-
 
   const handleVerticalClick = (verticalId) => {
     navigate(`/details?filter=${encodeURIComponent(verticalId)}`);
   };
 
-const handleDeleteItem = (itemId) => {
-  data.filter((item) => item.id !== itemId);
-// TO DO to refresh AE in frontned write API fro get AE
-};
+  const handleDeleteItem = (itemId) => {
+    data.filter((item) => item.id !== itemId);
+    // TO DO to refresh AE in frontned write API fro get AE
+  };
 
   const handleDeleteClick = (itemId) => {
     data.filter((item) => item.id !== itemId);
     // navigate(`/details?filter=${encodeURIComponent(verticalId)}`);
-  SweetAlert.fire({
-    title: 'Are you sure?',
-    text: `Do you want to delete?`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Call the delete function or dispatch an action to delete the item
-      handleDeleteItem(itemId);
-    }
-  });
-};
-
-
+    SweetAlert.fire({
+      title: 'Are you sure?',
+      text: `Do you want to delete?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Call the delete function or dispatch an action to delete the item
+        handleDeleteItem(itemId);
+      }
+    });
+  };
 
   return (
-    
-        <Box sx={{ p: 3, flexGrow: 1 }}>
+    <Box sx={{ p: 3, flexGrow: 1 }}>
       {/* Add the search box here */}
       <Box sx={{ p: 3 }}>
         <TextField
@@ -139,49 +139,42 @@ const handleDeleteItem = (itemId) => {
       </Box>
 
       <Grid container spacing={3}>
-    {data
-      .filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      .map((item) => (
-       <Grid key={item.id} item xs={4}>
-  <div style={{ position: 'relative' }}>
-    <Item onClick={() => handleVerticalClick(item.name)}>
-      <h3>{item.name}</h3>
-      <p>{item.description}</p>
-    </Item>
-    <div style={{ position: 'absolute', top: 0, right: 0 }}>
-      <DeleteIcon onClick={() => handleDeleteClick(item.id)} />
-    </div>
-  </div>
-</Grid>
-      ))}
-    {data.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ).length === 0 && (
-      <Grid item xs={12}>
-        <Item>
-          <p>Vertical not found.</p>
-        </Item>
+        {data
+          .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+          .map((item) => (
+            <Grid key={item.id} item xs={4}>
+              <div style={{ position: 'relative' }}>
+                <Item onClick={() => handleVerticalClick(item.name)}>
+                  <h3>{item.name}</h3>
+                  <p>{item.description}</p>
+                </Item>
+                <div style={{ position: 'absolute', top: 0, right: 0 }}>
+                  <DeleteIcon onClick={() => handleDeleteClick(item.id)} />
+                </div>
+              </div>
+            </Grid>
+          ))}
+        {data.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+          .length === 0 && (
+          <Grid item xs={12}>
+            <Item>
+              <p>Vertical not found.</p>
+            </Item>
+          </Grid>
+        )}
       </Grid>
-    )}
-  </Grid>
 
+      <>
+        <Fab
+          color="primary"
+          aria-label="add"
+          style={{ position: 'absolute', bottom: 16, right: 16 }}
+          onClick={handleClickOpen}
+        >
+          <Typography variant="button">ADD</Typography>
+        </Fab>
 
-
-    
-    <>
-      <Fab
-        color="primary"
-        aria-label="add"
-        style={{ position: 'absolute', bottom: 16, right: 16}}
-        onClick={handleClickOpen}
-        
-      >
-        <Typography variant="button">ADD</Typography>
-       </Fab>
-
-      {/* <Dialog open={open} onClose={handleClose}>
+        {/* <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{selectedItem ? selectedItem.name : ''}</DialogTitle>
         <DialogTitle>Vertical Addition</DialogTitle>
         <DialogContent>
@@ -231,16 +224,10 @@ const handleDeleteItem = (itemId) => {
             Add Node
           </Button>
         </DialogActions>
-      </Dialog> */} 
-    </>
-
-      
+      </Dialog> */}
+      </>
     </Box>
-
-     
   );
 }
 
 export default Vertical;
-
-

@@ -6,7 +6,6 @@ import Box from '@mui/material/Box';
 // import Add from './components/Add';
 import { useNavigate } from 'react-router-dom';
 
-
 // import { APP_NAME } from '../constants';
 
 function Home() {
@@ -16,20 +15,21 @@ function Home() {
   };
 
   return (
-    <Box sx={{ m: 1 } }>
-    <Container maxWidth="sm">
-      <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
-        City name
-      </Typography>
-    </Container>
-    <Fab color="primary"
-          aria-label="add"
-          style={{ position: 'fixed', bottom: 16, right: 16 }}
-          onClick={handleVerticalClick}
-          >
+    <Box sx={{ m: 1 }}>
+      <Container maxWidth="sm">
+        <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
+          City name
+        </Typography>
+      </Container>
+      <Fab
+        color="primary"
+        aria-label="add"
+        style={{ position: 'fixed', bottom: 16, right: 16 }}
+        onClick={handleVerticalClick}
+      >
         <AddIcon />
-        </Fab>
-        </Box>
+      </Fab>
+    </Box>
   );
 }
 export default Home;

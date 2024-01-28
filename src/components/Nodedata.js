@@ -23,84 +23,87 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
+      width: 250
+    }
+  }
 };
 
-
-
-
 const data = [
-
-    {
-      "name": "AE-AQ1",
-      "nodeType": "kristnam",
-      "data": [{
-        "pm25": 12,
-        "pm10": 13
-      }]
-    },
-    
-    {
-      "name": "AE-AQ2",
-      "nodeType": "shenitech",
-      "data": [{
-        "pm25": 56,
-        "pm10": 12,
-        "co2":80
-      },{
-        "pm25": 12,
-        "pm10": 13,
-        "co2":70
-      },
+  {
+    name: 'AE-AQ1',
+    nodeType: 'kristnam',
+    data: [
       {
-        "pm25": 56,
-        "pm10": 12,
-        "co2":80
-      },{
-        "pm25": 12,
-        "pm10": 13,
-        "co2":70
-      },
-      {
-        "pm25": 56,
-        "pm10": 12,
-        "co2":80
-      },{
-        "pm25": 12,
-        "pm10": 13,
-        "co2":70
+        pm25: 12,
+        pm10: 13
       }
     ]
-    },
-    
-    {
-      "name": "AE-WM1",
-      "nodeType": "kristnam",
-      "data": [{
-        "ph": 10,
-        "turbidity": 12
+  },
+
+  {
+    name: 'AE-AQ2',
+    nodeType: 'shenitech',
+    data: [
+      {
+        pm25: 56,
+        pm10: 12,
+        co2: 80
       },
-    {
-        "ph": 13,
-        "turbidity": 12
+      {
+        pm25: 12,
+        pm10: 13,
+        co2: 70
       },
-    {
-        "ph": 14,
-        "turbidity": 12
+      {
+        pm25: 56,
+        pm10: 12,
+        co2: 80
       },
-    {
-        "ph": 1,
-        "turbidity": 12
-      }]
-    },
-    {
-      "name": "AE-WM2",
-      "nodeType": "shenitech",
-      "data": [{
-      }]
-    }
+      {
+        pm25: 12,
+        pm10: 13,
+        co2: 70
+      },
+      {
+        pm25: 56,
+        pm10: 12,
+        co2: 80
+      },
+      {
+        pm25: 12,
+        pm10: 13,
+        co2: 70
+      }
+    ]
+  },
+
+  {
+    name: 'AE-WM1',
+    nodeType: 'kristnam',
+    data: [
+      {
+        ph: 10,
+        turbidity: 12
+      },
+      {
+        ph: 13,
+        turbidity: 12
+      },
+      {
+        ph: 14,
+        turbidity: 12
+      },
+      {
+        ph: 1,
+        turbidity: 12
+      }
+    ]
+  },
+  {
+    name: 'AE-WM2',
+    nodeType: 'shenitech',
+    data: [{}]
+  }
 ];
 function generateUniqueKey(index) {
   return `${index}-${Date.now()}`;
@@ -111,13 +114,13 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(2),
   textAlign: 'left',
-  color: 'black',
-//   fontSize: '30px',
+  color: 'black'
+  //   fontSize: '30px',
 }));
 
 export default function Details() {
   const [selectedData, setSelectedData] = React.useState(null);
- const location = useLocation();
+  const location = useLocation();
 
   React.useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -128,48 +131,46 @@ export default function Details() {
 
   const handleChange = (event) => {
     const {
-      target: { value },
+      target: { value }
     } = event;
     const selectedItem = data.find((item) => item.name === value);
     setSelectedData(selectedItem);
   };
 
-
   return (
-    <Box sx={{ p: 3, m:3 }}>
+    <Box sx={{ p: 3, m: 3 }}>
       <div>
-          <Grid item xs>
-  <Typography >
-    {selectedData ? (
-      <div style={{ fontSize: '1rem' }}>
-        <strong style={{ fontSize: '1.5rem' , marginBottom: '10px'}}>Device Information</strong> <br />
-        Node ID:{selectedData.name} <br />
-        Node Type: {selectedData.nodeType} <br />
-        Parameters:
-        {Object.keys(selectedData.data[0]).map((param) => (
-          <span key={param}>
-            {param} &nbsp;
-          </span>
-        ))}
-        <br/>
-        <br/>
-        <strong style={{ fontSize: '1.5rem'}} >Subscriptions:</strong>
-        <p>To DO subscription url</p><br/>  
-      </div>
-    ) : (
-      'No nodes available'
-    )}
-     
-     {/* write subscription here TO DO */}
-    <strong style={{ fontSize: '1.5rem'}}>Node Data:</strong>
-  </Typography>
-</Grid>
+        <Grid item xs>
+          <Typography>
+            {selectedData ? (
+              <div style={{ fontSize: '1rem' }}>
+                <strong style={{ fontSize: '1.5rem', marginBottom: '10px' }}>
+                  Device Information
+                </strong>{' '}
+                <br />
+                Node ID:{selectedData.name} <br />
+                Node Type: {selectedData.nodeType} <br />
+                Parameters:
+                {Object.keys(selectedData.data[0]).map((param) => (
+                  <span key={param}>{param} &nbsp;</span>
+                ))}
+                <br />
+                <br />
+                <strong style={{ fontSize: '1.5rem' }}>Subscriptions:</strong>
+                <p>To DO subscription url</p>
+                <br />
+              </div>
+            ) : (
+              'No nodes available'
+            )}
+
+            {/* write subscription here TO DO */}
+            <strong style={{ fontSize: '1.5rem' }}>Node Data:</strong>
+          </Typography>
+        </Grid>
 
         <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
-          <InputLabel
-            id="demo-multiple-name-label"
-            sx={{ marginRight: 1, marginBottom: 1 }}
-          >
+          <InputLabel id="demo-multiple-name-label" sx={{ marginRight: 1, marginBottom: 1 }}>
             Select Domain
           </InputLabel>
           <Select
@@ -203,18 +204,17 @@ export default function Details() {
                     ))}
                   </TableRow>
                   {selectedData.data.map((entry, entryIndex) => (
-  <TableRow key={generateUniqueKey(entryIndex)}>
-    {Object.keys(entry).map((param) => (
-      <TableCell key={param} align="right">
-        {entry[param]} {/* Display the value of the parameter */}
-      </TableCell>
-    ))}
-  </TableRow>
-))}
+                    <TableRow key={generateUniqueKey(entryIndex)}>
+                      {Object.keys(entry).map((param) => (
+                        <TableCell key={param} align="right">
+                          {entry[param]} {/* Display the value of the parameter */}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
-
           </div>
         ) : (
           <StyledPaper>No nodes available</StyledPaper>

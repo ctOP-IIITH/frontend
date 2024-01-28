@@ -7,7 +7,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { useLocation ,useNavigate} from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 // import { useParams } from 'react-router-dom'; // Import useParams
 // import {  } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
@@ -22,137 +22,134 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
+      width: 250
+    }
+  }
 };
 
 const data = [
   {
-  "id": "airQuality",
-  "name": "Air Quality",
-  "description": "Information about air quality",
-  "nodes": [
-    {
-      "nodeName": "AE-AQ1",
-      "nodeType": "kristnam",
-      "data": {
-        "pm25": 10,
-        "pm10": 12
+    id: 'airQuality',
+    name: 'Air Quality',
+    description: 'Information about air quality',
+    nodes: [
+      {
+        nodeName: 'AE-AQ1',
+        nodeType: 'kristnam',
+        data: {
+          pm25: 10,
+          pm10: 12
+        }
+      },
+      {
+        nodeName: 'AE-AQ2',
+        nodeType: 'shenitech',
+        data: {
+          pm25: 10,
+          pm10: 12
+        }
       }
-    },
-    {
-      "nodeName": "AE-AQ2",
-      "nodeType": "shenitech",
-      "data": {
-        "pm25": 10,
-        "pm10": 12
-      }
-    }
-  ]
-},
+    ]
+  },
 
   // { id: 'airQuality', name: 'Air Quality', description: 'Information about air quality', nodes:'' },
-  { id: 'waterQuality', name: 'Water Quality', description: 'Information about water quality' , "nodes": [
-    {
-      "nodeName": "AE-WM1",
-      "nodeType": "kristnam",
-      "data": {
-        "pm25": 10,
-        "pm10": 12
+  {
+    id: 'waterQuality',
+    name: 'Water Quality',
+    description: 'Information about water quality',
+    nodes: [
+      {
+        nodeName: 'AE-WM1',
+        nodeType: 'kristnam',
+        data: {
+          pm25: 10,
+          pm10: 12
+        }
+      },
+      {
+        nodeName: 'AE-WM2',
+        nodeType: 'shenitech',
+        data: {
+          pm25: 10,
+          pm10: 12
+        }
       }
-    },
-    {
-      "nodeName": "AE-WM2",
-      "nodeType": "shenitech",
-      "data": {
-        "pm25": 10,
-        "pm10": 12
-      }
-    }
-  ]},
-  { id: 'weatherMonitoring', name: 'Weather Monitoring', description: 'Information about weather monitoring' },
+    ]
+  },
+  {
+    id: 'weatherMonitoring',
+    name: 'Weather Monitoring',
+    description: 'Information about weather monitoring'
+  }
 ];
-
-
-
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? 'black' : '#fff',
   ...theme.typography.body2,
   padding: theme.spacing(2),
   textAlign: 'left',
-  color: 'black',
-//   fontSize: '30px',
+  color: 'black'
+  //   fontSize: '30px',
 }));
 
 export default function Details() {
-   // Uncommented usage
+  // Uncommented usage
   const [selectedData, setSelectedData] = React.useState(null);
-    const location = useLocation();
-      const navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
   React.useEffect(() => {
     const params = new URLSearchParams(location.search);
     const filter = params.get('filter');
     // Find the selectedData based on verticalId
-    console.log(filter)
+    console.log(filter);
     const selectedItem = data.find((item) => item.name === filter);
     setSelectedData(selectedItem);
   }, []);
 
-
-    const handleClickOpen = () => {
-     navigate(`/add`);
-
+  const handleClickOpen = () => {
+    navigate(`/add`);
   };
   const handleVerticalClick = (nodeID) => {
     navigate(`/nodedata?filter=${encodeURIComponent(nodeID)}`);
   };
 
   const handleDeleteItem = (itemId) => {
-  data.filter((item) => item.id !== itemId);
-// TO DO to refresh AE in frontned write API fro get node of that AE
-};
+    data.filter((item) => item.id !== itemId);
+    // TO DO to refresh AE in frontned write API fro get node of that AE
+  };
 
   const handleDeleteClick = (itemId) => {
     data.filter((item) => item.id !== itemId);
-    
-  SweetAlert.fire({
-    title: 'Are you sure?',
-    text: `Do you want to delete?`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Call the delete function or dispatch an action to delete the item
-      handleDeleteItem(itemId);
-    }
-  });
-};
 
+    SweetAlert.fire({
+      title: 'Are you sure?',
+      text: `Do you want to delete?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Call the delete function or dispatch an action to delete the item
+        handleDeleteItem(itemId);
+      }
+    });
+  };
 
   const handleChange = (event) => {
     const {
-      target: { value },
+      target: { value }
     } = event;
     const selectedItem = data.find((item) => item.name === value);
     setSelectedData(selectedItem);
   };
 
-
-
-
   return (
-        <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3 }}>
       <div>
         {/* <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}> */}
-             <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
-          <InputLabel
-            id="demo-multiple-name-label"
-            sx={{ marginRight: 1, marginBottom: 1 }}
-          >
+        <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
+          <InputLabel id="demo-multiple-name-label" sx={{ marginRight: 1, marginBottom: 1 }}>
             Select Domain
           </InputLabel>
           <Select
@@ -172,37 +169,47 @@ export default function Details() {
             ))}
           </Select>
         </FormControl>
-      
 
- {selectedData && Array.isArray(selectedData.nodes) && selectedData.nodes.length > 0 ? (
-  <Stack spacing={3} sx={{ marginTop: 2 }}>
-    {selectedData.nodes.map((node) => (
-      <StyledPaper key={node.nodeName}>
-        <Typography variant="h6">
-          {node.nodeName}{" "}
-          <Button variant="outlined" color="secondary" onClick={() => handleVerticalClick(node.nodeName)}>View Node Details</Button>
-        </Typography>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-20px', paddingRight: '8px' }}>
-          <DeleteIcon onClick={handleDeleteClick} />
-        </div>
-      </StyledPaper>
-    ))}
-  </Stack>
-) : (
-  <StyledPaper>No nodes available</StyledPaper>
-)}
+        {selectedData && Array.isArray(selectedData.nodes) && selectedData.nodes.length > 0 ? (
+          <Stack spacing={3} sx={{ marginTop: 2 }}>
+            {selectedData.nodes.map((node) => (
+              <StyledPaper key={node.nodeName}>
+                <Typography variant="h6">
+                  {node.nodeName}{' '}
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => handleVerticalClick(node.nodeName)}
+                  >
+                    View Node Details
+                  </Button>
+                </Typography>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    marginTop: '-20px',
+                    paddingRight: '8px'
+                  }}
+                >
+                  <DeleteIcon onClick={handleDeleteClick} />
+                </div>
+              </StyledPaper>
+            ))}
+          </Stack>
+        ) : (
+          <StyledPaper>No nodes available</StyledPaper>
+        )}
       </div>
 
       <Fab
         color="primary"
         aria-label="add"
-        style={{ position: 'absolute', bottom: 16, right: 16}}
+        style={{ position: 'absolute', bottom: 16, right: 16 }}
         onClick={handleClickOpen}
-        
       >
         <Typography variant="button">ADD</Typography>
-       </Fab>
+      </Fab>
     </Box>
   );
 }
-

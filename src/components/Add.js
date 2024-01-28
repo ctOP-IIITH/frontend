@@ -106,7 +106,8 @@ function Add() {
                 color="inherit"
                 disabled={activeStep === 0}
                 onClick={handleBack}
-                sx={{ mr: 1, bgcolor: '#b4bce3' }}>
+                sx={{ mr: 1, bgcolor: '#b4bce3' }}
+              >
                 Back
               </Button>
 
@@ -114,14 +115,16 @@ function Add() {
               <Button
                 onClick={handleComplete}
                 sx={{ mr: 1, bgcolor: '#b4bce3' }}
-                style={{ display: activeStep === steps.length - 1 ? 'none' : 'inline-block' }}>
+                style={{ display: activeStep === steps.length - 1 ? 'none' : 'inline-block' }}
+              >
                 SKIP
               </Button>
               {activeStep !== steps.length &&
                 (completed[activeStep] ? (
                   <Typography
                     variant="caption"
-                    sx={{ display: 'inline-block', bgcolor: '#b4bce3' }}>
+                    sx={{ display: 'inline-block', bgcolor: '#b4bce3' }}
+                  >
                     Step {activeStep + 1} already completed
                   </Typography>
                 ) : (
