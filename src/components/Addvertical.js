@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import withReactContent from 'sweetalert2-react-content';
 import Swal from 'sweetalert2';
+import { axiosAuthInstance } from '../services/axiosConfig';
 
 const MySwal = withReactContent(Swal);
 
@@ -35,14 +36,41 @@ export default function MultipleSelect() {
     // Your existing code for handling vertical name and description
     console.log('Vertical Name:', VerticalName);
     console.log('Description:', Description);
-    // Show SweetAlert on success
-    MySwal.fire({
-      icon: 'success',
-      title: 'Success!',
-      text: 'Domain added successfully.',
-      showConfirmButton: false,
-      timer: 1500 // Auto close after 1.5 seconds
-    });
+
+    axiosAuthInstance
+      .post('/verticals/create-ae', {
+        ae_name: VerticalName,
+        ae_description: Description,
+        path: ''
+      })
+      .then((response) => {
+        if (response.data.detail === 'AE created') {
+          // Show SweetAlert on success
+          MySwal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Domain added successfully.',
+            showConfirmButton: false,
+            timer: 1500 // Auto close after 1.5 seconds
+          });
+        } else {
+          MySwal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            footer: '<a href="">Why do I have this issue?</a>'
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        MySwal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+          footer: '<a href="">Why do I have this issue?</a>'
+        });
+      });
   };
 
   return (
@@ -93,8 +121,7 @@ export default function MultipleSelect() {
         variant="contained"
         color="primary"
         onClick={handleAddVerticalName}
-        sx={{ mt: 2, m: 1 }}
-      >
+        sx={{ mt: 2, m: 1 }}>
         Add Domain
       </Button>
     </Box>
