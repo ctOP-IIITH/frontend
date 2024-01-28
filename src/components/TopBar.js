@@ -73,7 +73,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const MainContent = styled('main')(({ theme }) => ({
   flexGrow: 1,
-  // height: '100vh',
+  minHeight: '100vh',
   width: '100%',
   paddingTop: theme.spacing(8),
   paddingLeft: theme.spacing(9),
@@ -95,8 +95,7 @@ export default function TopBar({ children }) {
         width: '100%',
         marginRight: 0,
         bgcolor: '#eceef8'
-      }}
-    >
+      }}>
       <CssBaseline />
       <AppBar position="absolute" open={open}>
         <Toolbar
@@ -104,8 +103,7 @@ export default function TopBar({ children }) {
             pr: '24px', // keep right padding when drawer closed
             display: 'flex',
             alignItems: 'center'
-          }}
-        >
+          }}>
           <IconButton
             edge="start"
             color="inherit"
@@ -114,8 +112,7 @@ export default function TopBar({ children }) {
             sx={{
               marginRight: '36px',
               ...(open && { display: 'none' })
-            }}
-          >
+            }}>
             <MenuIcon />
           </IconButton>
           <img
@@ -137,8 +134,7 @@ export default function TopBar({ children }) {
             variant="h4"
             color="#ffffff"
             noWrap
-            sx={{ flexGrow: 1, textAlign: 'center', paddingRight: '100px' }}
-          >
+            sx={{ flexGrow: 1, textAlign: 'center', paddingRight: '100px' }}>
             City IoT Operating Platform (ctOP)
           </Typography>
           {isLoggedIn ? (
@@ -152,8 +148,7 @@ export default function TopBar({ children }) {
               onClick={() => {
                 navigate('/login');
               }}
-              color="inherit"
-            >
+              color="inherit">
               Login
             </Button>
           )}
@@ -166,8 +161,7 @@ export default function TopBar({ children }) {
             alignItems: 'center',
             justifyContent: 'flex-end',
             px: [1]
-          }}
-        >
+          }}>
           <IconButton onClick={toggleDrawer}>
             <ChevronLeftIcon />
           </IconButton>

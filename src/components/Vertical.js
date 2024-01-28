@@ -79,10 +79,6 @@ const data = [
   }
 ];
 
-// axiosInstance.get(url).then(res => {
-//   data = res.body;
-// })
-
 function Vertical() {
   // const [verticalName, setVerticalName] = useState('');
   // const [description, setDescription] = useState('');
@@ -169,8 +165,7 @@ function Vertical() {
           color="primary"
           aria-label="add"
           style={{ position: 'absolute', bottom: 16, right: 16 }}
-          onClick={handleClickOpen}
-        >
+          onClick={handleClickOpen}>
           <Typography variant="button">ADD</Typography>
         </Fab>
 
