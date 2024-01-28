@@ -126,13 +126,13 @@ export default function TopBar({ children }) {
           <Typography
             component="h1"
             variant="h3"
-            color="inherit"
+            color="#fafafa"
             noWrap
             sx={{ flexGrow: 1, textAlign: 'center', paddingRight: '100px' }}>
             City Operating IoT Platform (ctOP)
           </Typography>
           {isLoggedIn ? (
-            <IconButton color="inherit">
+            <IconButton color=" inherit ">
               <Badge color="secondary">
                 <AccountCircle />
               </Badge>
