@@ -20,13 +20,13 @@ import { axiosAuthInstance } from '../services/axiosConfig';
 
 const MySwal = withReactContent(Swal);
 
-function CreateNodeType() {
-  const [nodeTypeName, setNodeTypeName] = useState('');
+function CreateSensorType() {
+  const [sensorTypeName, setSensorTypeName] = useState('');
   const [selectedVertical, setSelectedVertical] = useState('');
   const [parameters, setParameters] = useState([]); // [{ name: '', dataType: '' }
   const [sensorTypes, setSensorTypes] = useState([]);
-  const [baseNodeType, setBaseNodeType] = useState('');
-  const { verticals, nodesData, updateNodesData } = useContext(DataContext);
+  const [baseSensorType, setBaseSensorType] = useState('');
+  const { verticals } = useContext(DataContext);
 
   const handleAddParameter = () => {
     setParameters([...parameters, { name: '', dataType: '' }]);
@@ -42,9 +42,9 @@ function CreateNodeType() {
     setParameters(parameters.filter((_, i) => i !== index));
   };
 
-  const handleBaseNodeTypeChange = (event) => {
+  const handleBaseSensorTypeChange = (event) => {
     const selectedBaseType = sensorTypes.find((type) => type.res_name === event.target.value);
-    setBaseNodeType(event.target.value);
+    setBaseSensorType(event.target.value);
 
     if (selectedBaseType) {
       // parameters in selectedBaseType.parameters
@@ -66,7 +66,7 @@ function CreateNodeType() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!selectedVertical || !nodeTypeName) {
+    if (!selectedVertical || !sensorTypeName) {
       // Handle the case where no vertical or node type name is selected
       // You might want to show an error message here
       return;
@@ -74,7 +74,7 @@ function CreateNodeType() {
 
     axiosAuthInstance
       .post('sensor-types/create', {
-        res_name: nodeTypeName,
+        res_name: sensorTypeName,
         parameters: parameters.map((param) => param.name),
         data_types: parameters.map((param) => param.dataType),
         vertical_id: verticals.find((v) => v.name === selectedVertical).id
@@ -104,15 +104,15 @@ function CreateNodeType() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4">Create New Node Type</Typography>
+      <Typography variant="h4">Create New Sensor Type</Typography>
 
       <FormControl fullWidth margin="normal" disabled={!selectedVertical}>
-        <InputLabel id="select-base-node-type-label">Base Node Type (Optional)</InputLabel>
+        <InputLabel id="select-base-node-type-label">Base Sensor Type (Optional)</InputLabel>
         <Select
-          labelId="select-base-node-type-label"
-          value={baseNodeType}
-          label="Base Node Type (Optional)"
-          onChange={handleBaseNodeTypeChange}>
+          labelId="select-base-sensor-type-label"
+          value={baseSensorType}
+          label="Base Sensor Type (Optional)"
+          onChange={handleBaseSensorTypeChange}>
           <MenuItem value="None">None</MenuItem>
           {selectedVertical &&
             sensorTypes.length > 0 &&
@@ -152,12 +152,12 @@ function CreateNodeType() {
         </FormControl>
 
         <TextField
-          label="Node Type Name"
+          label="Sensor Type Name"
           variant="outlined"
           fullWidth
           margin="normal"
-          value={nodeTypeName}
-          onChange={(e) => setNodeTypeName(e.target.value)}
+          value={sensorTypeName}
+          onChange={(e) => setSensorTypeName(e.target.value)}
         />
 
         {parameters &&
@@ -198,11 +198,11 @@ function CreateNodeType() {
           color="primary"
           sx={{ mt: 2 }}
           onClick={handleSubmit}>
-          Create Node Type
+          Create Sensor Type
         </Button>
       </form>
     </Box>
   );
 }
 
-export default CreateNodeType;
+export default CreateSensorType;
