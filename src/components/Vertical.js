@@ -10,7 +10,6 @@ import PanToolAltIcon from '@mui/icons-material/PanToolAlt'; // Import PanToolAl
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import SweetAlert from 'sweetalert2';
-import { axiosAuthInstance } from '../services/axiosConfig';
 import { DataContext } from '../contexts/DataContext';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -26,23 +25,12 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function Vertical() {
-  const { verticals, setVerticals } = useContext(DataContext);
+  const { verticals, fetchAllVerticals, fetchedVerticals } = useContext(DataContext);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    axiosAuthInstance.get('/verticals/all').then((response) => {
-      const verts = [];
-      response.data.forEach((element) => {
-        verts.push({
-          id: element.id,
-          name: element.res_name,
-          description: element.description,
-          orid: element.orid
-        });
-      });
-      setVerticals(verts);
-    });
+    if (!fetchedVerticals) fetchAllVerticals();
   });
 
   // const updatedData = data;

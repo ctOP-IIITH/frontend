@@ -8,8 +8,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { useLocation, useNavigate } from 'react-router-dom';
-// import { useParams } from 'react-router-dom'; // Import useParams
-// import {  } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import { Button } from '@mui/material';
 import SweetAlert from 'sweetalert2';
@@ -40,16 +38,22 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 export default function Details() {
   // eslint-disable-next-line no-unused-vars
-  const { verticals, nodes, setNodes } = useContext(DataContext);
+  const { verticals, nodes, setNodes, fetchAllVerticals, fetchedVerticals } =
+    useContext(DataContext);
 
   // Uncommented usage
-  const [selectedData, setSelectedData] = useState(null);
-  const [areaFilter, setAreaFilter] = useState('');
-  const [sensorTypeFilter, setSensorTypeFilter] = useState('');
+  const [selectedData, setSelectedData] = useState({
+    id: '',
+    name: '',
+    nodes: []
+  });
+  const [areaFilter, setAreaFilter] = useState('all');
+  const [sensorTypeFilter, setSensorTypeFilter] = useState('all');
   const [nodeAssignmentStatus, setNodeAssignmentStatus] = useState('all'); // 'assigned', 'unassigned', 'all'
   const location = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
+    if (!fetchedVerticals) fetchAllVerticals();
     const params = new URLSearchParams(location.search);
     const filter = params.get('filter');
     // Find the selectedData based on verticalId
@@ -117,6 +121,15 @@ export default function Details() {
     navigate(`/details?filter=${encodeURIComponent(value)}`);
   };
 
+  const filteredNodes = selectedData.nodes.filter(
+    (node) =>
+      (areaFilter === 'all' || node.nodeArea === areaFilter) &&
+      (sensorTypeFilter === 'all' || node.nodeSensorType === sensorTypeFilter) &&
+      (nodeAssignmentStatus === 'all' ||
+        (nodeAssignmentStatus === 'assigned' && node.nodeTokenNumber) ||
+        (nodeAssignmentStatus === 'unassigned' && !node.nodeTokenNumber))
+  );
+
   return (
     <Box sx={{ p: 3 }}>
       <Stack spacing={2} sx={{ marginTop: 2 }}>
@@ -124,7 +137,20 @@ export default function Details() {
         <FormControl fullWidth>
           <InputLabel>Area</InputLabel>
           <Select value={areaFilter} onChange={handleAreaChange} MenuProps={MenuProps}>
-            {/* Map areas to MenuItems */}
+            <MenuItem value="all">All</MenuItem>
+            {selectedData.nodes
+              .reduce(
+                (unique, node) =>
+                  unique.findIndex((uniqueNode) => uniqueNode.nodeArea === node.nodeArea) < 0
+                    ? [...unique, node]
+                    : unique,
+                []
+              )
+              .map((node) => (
+                <MenuItem key={node.nodeOrid} value={node.nodeArea}>
+                  {node.nodeArea}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
 
@@ -132,7 +158,22 @@ export default function Details() {
         <FormControl fullWidth>
           <InputLabel>Sensor Type</InputLabel>
           <Select value={sensorTypeFilter} onChange={handleSensorTypeChange} MenuProps={MenuProps}>
-            {/* Map sensor types to MenuItems */}
+            <MenuItem value="all">All</MenuItem>
+            {selectedData.nodes
+              .reduce(
+                (unique, node) =>
+                  unique.findIndex(
+                    (uniqueNode) => uniqueNode.nodeSensorType === node.nodeSensorType
+                  ) < 0
+                    ? [...unique, node]
+                    : unique,
+                []
+              )
+              .map((node) => (
+                <MenuItem key={node.nodeOrid} value={node.nodeSensorType}>
+                  {node.nodeSensorType}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
 
@@ -171,9 +212,9 @@ export default function Details() {
           </Select>
         </FormControl>
 
-        {selectedData && Array.isArray(selectedData.nodes) && selectedData.nodes.length > 0 ? (
+        {filteredNodes && filteredNodes.length > 0 ? (
           <Stack spacing={3} sx={{ marginTop: 2 }}>
-            {selectedData.nodes.map((node) => (
+            {filteredNodes.map((node) => (
               <StyledPaper key={node.nodeName}>
                 <Typography variant="h6">
                   {/* {node.nodeName}{' '} */}
