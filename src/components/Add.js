@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -6,18 +6,16 @@ import StepButton from '@mui/material/StepButton';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Container } from '@mui/material';
-// import AddIcon from '@mui/icons-material/Add';
-// import { APP_NAME } from '../constants';
-
 import Addnode from './Addnode';
 import Addvertical from './Addvertical';
 import Addsensor from './Addsensor';
+import { DataContext } from '../contexts/DataContext';
 
 const steps = ['Domains', 'Sensor Type', 'Node'];
-
 function Add() {
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [completed, setCompleted] = React.useState({});
+  const { fetchAllVerticals, fetchedVerticals } = useContext(DataContext);
+  const [activeStep, setActiveStep] = useState(0);
+  const [completed, setCompleted] = useState({});
   const totalSteps = () => steps.length;
   const completedSteps = () => Object.keys(completed).length;
   const isLastStep = () => activeStep === totalSteps() - 1;
@@ -59,6 +57,10 @@ function Add() {
   //   setCompleted({});
   //   // setIsAddClicked(false);
   // };
+
+  useEffect(() => {
+    if (!fetchedVerticals) fetchAllVerticals();
+  }, []);
 
   return (
     <Box sx={{ width: '100%', marginTop: '30px' }}>
@@ -106,8 +108,7 @@ function Add() {
                 color="inherit"
                 disabled={activeStep === 0}
                 onClick={handleBack}
-                sx={{ mr: 1, bgcolor: '#b4bce3' }}
-              >
+                sx={{ mr: 1, bgcolor: '#b4bce3' }}>
                 Back
               </Button>
 
@@ -115,16 +116,14 @@ function Add() {
               <Button
                 onClick={handleComplete}
                 sx={{ mr: 1, bgcolor: '#b4bce3' }}
-                style={{ display: activeStep === steps.length - 1 ? 'none' : 'inline-block' }}
-              >
+                style={{ display: activeStep === steps.length - 1 ? 'none' : 'inline-block' }}>
                 SKIP
               </Button>
               {activeStep !== steps.length &&
                 (completed[activeStep] ? (
                   <Typography
                     variant="caption"
-                    sx={{ display: 'inline-block', bgcolor: '#b4bce3' }}
-                  >
+                    sx={{ display: 'inline-block', bgcolor: '#b4bce3' }}>
                     Step {activeStep + 1} already completed
                   </Typography>
                 ) : (
