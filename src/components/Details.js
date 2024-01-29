@@ -44,6 +44,9 @@ export default function Details() {
 
   // Uncommented usage
   const [selectedData, setSelectedData] = useState(null);
+  const [areaFilter, setAreaFilter] = useState('');
+  const [sensorTypeFilter, setSensorTypeFilter] = useState('');
+  const [nodeAssignmentStatus, setNodeAssignmentStatus] = useState('all'); // 'assigned', 'unassigned', 'all'
   const location = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
@@ -57,14 +60,23 @@ export default function Details() {
         name: filter,
         nodes: response.data.map((node) => ({
           nodeName: node.node_name,
-          nodeType: node.node_type,
-          data: node.data
+          nodeSensorType: node.res_name,
+          nodeOrid: node.orid,
+          nodeDataOrid: node.data_orid,
+          nodeArea: node.area,
+          nodeTokenNumber: node.token_num,
+          nodeSensorNumber: node.sensor_node_number
         }))
       };
 
       setSelectedData(selectedItem);
     });
-  }, []);
+  }, [areaFilter, sensorTypeFilter, nodeAssignmentStatus, location]);
+
+  // Handlers for filters
+  const handleAreaChange = (event) => setAreaFilter(event.target.value);
+  const handleSensorTypeChange = (event) => setSensorTypeFilter(event.target.value);
+  const handleAssignmentStatusChange = (event) => setNodeAssignmentStatus(event.target.value);
 
   const handleClickOpen = () => {
     navigate(`/add`);
@@ -107,7 +119,36 @@ export default function Details() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <div>
+      <Stack spacing={2} sx={{ marginTop: 2 }}>
+        {/* Area Filter */}
+        <FormControl fullWidth>
+          <InputLabel>Area</InputLabel>
+          <Select value={areaFilter} onChange={handleAreaChange} MenuProps={MenuProps}>
+            {/* Map areas to MenuItems */}
+          </Select>
+        </FormControl>
+
+        {/* Sensor Type Filter */}
+        <FormControl fullWidth>
+          <InputLabel>Sensor Type</InputLabel>
+          <Select value={sensorTypeFilter} onChange={handleSensorTypeChange} MenuProps={MenuProps}>
+            {/* Map sensor types to MenuItems */}
+          </Select>
+        </FormControl>
+
+        {/* Node Assignment Status Filter */}
+        <FormControl fullWidth>
+          <InputLabel>Node Assignment</InputLabel>
+          <Select
+            value={nodeAssignmentStatus}
+            onChange={handleAssignmentStatusChange}
+            MenuProps={MenuProps}>
+            <MenuItem value="all">All</MenuItem>
+            <MenuItem value="assigned">Assigned</MenuItem>
+            <MenuItem value="unassigned">Unassigned</MenuItem>
+          </Select>
+        </FormControl>
+
         {/* <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}> */}
         <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
           <InputLabel id="demo-multiple-name-label" sx={{ marginRight: 1, marginBottom: 1 }}>
@@ -135,13 +176,19 @@ export default function Details() {
             {selectedData.nodes.map((node) => (
               <StyledPaper key={node.nodeName}>
                 <Typography variant="h6">
-                  {node.nodeName}{' '}
+                  {/* {node.nodeName}{' '} */}
+                  {node.nodeSensorType} {node.nodeSensorNumber}{' '}
                   <Button
                     variant="outlined"
                     color="secondary"
                     onClick={() => handleVerticalClick(node.nodeName)}>
                     View Node Details
                   </Button>
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Node Name:</strong> {node.nodeName}
+                  <br />
+                  SensorType: {node.nodeSensorType}
                 </Typography>
                 <div
                   style={{
@@ -158,7 +205,7 @@ export default function Details() {
         ) : (
           <StyledPaper>No nodes available</StyledPaper>
         )}
-      </div>
+      </Stack>
 
       <Fab
         color="primary"

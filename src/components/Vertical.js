@@ -27,11 +27,6 @@ const Item = styled(Paper)(({ theme }) => ({
 
 function Vertical() {
   const { verticals, setVerticals } = useContext(DataContext);
-  // const [description, setDescription] = useState('');
-  // const [verticalNameError, setVerticalNameError] = React.useState(false);
-  // const [descritionError, setDescriptionError] = React.useState(false);
-  // const [open, setOpen] = React.useState(false);
-  // const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
@@ -121,67 +116,13 @@ function Vertical() {
         )}
       </Grid>
 
-      <>
-        <Fab
-          color="primary"
-          aria-label="add"
-          style={{ position: 'absolute', bottom: 16, right: 16 }}
-          onClick={handleClickOpen}>
-          <Typography variant="button">ADD</Typography>
-        </Fab>
-
-        {/* <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{selectedItem ? selectedItem.name : ''}</DialogTitle>
-        <DialogTitle>Vertical Addition</DialogTitle>
-        <DialogContent>
-           <DialogContent>
-          {selectedItem && (
-            <p>{selectedItem.description}</p>
-          )}
-          </DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="verticalName"
-            label="Vertical Name"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={verticalName}
-              onChange={(e) => {
-                setVerticalName(e.target.value);
-                setVerticalNameError(false); // Reset error on change
-              }}
-              error={verticalNameError}
-              helperText={verticalNameError ? 'Vertical Type is required' : ''}
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="description"
-            label="Description"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={description}
-            onChange={(e) => {
-                setDescription(e.target.value);
-                setDescriptionError(false); // Reset error on change
-              }}
-              error={descritionError}
-              helperText={descritionError ? 'Description is required' : ''}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button style={{ color: 'blue' }} onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button style={{ color: 'blue' }} onClick={handleAddNode}>
-            Add Node
-          </Button>
-        </DialogActions>
-      </Dialog> */}
-      </>
+      <Fab
+        color="primary"
+        aria-label="add"
+        style={{ position: 'fixed', bottom: 16, right: 16 }}
+        onClick={handleClickOpen}>
+        <Typography variant="button">ADD</Typography>
+      </Fab>
     </Box>
   );
 }
