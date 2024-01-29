@@ -1,18 +1,30 @@
-import { useContext, useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
-import { styled } from '@mui/material/styles';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+// React imports
+import { useContext, useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
-import { Button } from '@mui/material';
-import SweetAlert from 'sweetalert2';
+
+// Material UI imports
+import {
+  Box,
+  Button,
+  Paper,
+  Stack,
+  Grid,
+  FormControlLabel,
+  Checkbox,
+  Typography,
+  Fab,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Fab from '@mui/material/Fab';
+import { styled } from '@mui/material/styles';
+
+// Other third-party imports
+import SweetAlert from 'sweetalert2';
+
+// Local imports
 import { DataContext } from '../contexts/DataContext';
 import { axiosAuthInstance } from '../services/axiosConfig';
 
@@ -36,10 +48,36 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   //   fontSize: '30px',
 }));
 
+function CheckboxFilter({ title, options, selectedOptions, onChange }) {
+  return (
+    <div>
+      <Typography variant="subtitle1">
+        <strong>{title}</strong>
+      </Typography>
+      <Box style={{ maxHeight: '200px', overflow: 'auto' }}>
+        {options.length === 0 && <Typography variant="body2">No options available</Typography>}
+        {options.length > 0 &&
+          options.map((option) => (
+            <FormControlLabel
+              key={option.value}
+              style={{ display: 'block' }}
+              control={
+                <Checkbox
+                  checked={selectedOptions.includes(option.value)}
+                  onChange={(e) => onChange(option.value, e.target.checked)}
+                  name={option.value}
+                />
+              }
+              label={option.label}
+            />
+          ))}
+      </Box>
+    </div>
+  );
+}
+
 export default function Details() {
-  // eslint-disable-next-line no-unused-vars
-  const { verticals, nodes, setNodes, fetchAllVerticals, fetchedVerticals } =
-    useContext(DataContext);
+  const { verticals, fetchAllVerticals, fetchedVerticals } = useContext(DataContext);
 
   // Uncommented usage
   const [selectedData, setSelectedData] = useState({
@@ -47,9 +85,8 @@ export default function Details() {
     name: '',
     nodes: []
   });
-  const [areaFilter, setAreaFilter] = useState('all');
-  const [sensorTypeFilter, setSensorTypeFilter] = useState('all');
-  const [nodeAssignmentStatus, setNodeAssignmentStatus] = useState('all'); // 'assigned', 'unassigned', 'all'
+
+  const [filters, setFilters] = useState({ area: [], sensorType: [], nodeAssignment: [] });
   const location = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
@@ -75,16 +112,77 @@ export default function Details() {
 
       setSelectedData(selectedItem);
     });
-  }, [areaFilter, sensorTypeFilter, nodeAssignmentStatus, location]);
+  }, [location]);
 
-  // Handlers for filters
-  const handleAreaChange = (event) => setAreaFilter(event.target.value);
-  const handleSensorTypeChange = (event) => setSensorTypeFilter(event.target.value);
-  const handleAssignmentStatusChange = (event) => setNodeAssignmentStatus(event.target.value);
-
-  const handleClickOpen = () => {
-    navigate(`/add`);
+  const handleCheckboxChange = (filterName, value, checked) => {
+    setFilters((prevFilters) => {
+      const updatedOptions = checked
+        ? [...prevFilters[filterName], value]
+        : prevFilters[filterName].filter((item) => item !== value);
+      return { ...prevFilters, [filterName]: updatedOptions };
+    });
   };
+
+  const filterOptions = {
+    area: [
+      ...selectedData.nodes
+        .reduce(
+          (unique, node) =>
+            unique.findIndex((uniqueNode) => uniqueNode.nodeArea === node.nodeArea) < 0
+              ? [...unique, node]
+              : unique,
+          []
+        )
+        .map((node) => ({
+          value: node.nodeArea,
+          label: node.nodeArea
+        }))
+      // { value: 'unassigned', label: 'Unassigned' },
+      // { value: 'assigned', label: 'Assigned' },
+      // { value: 'all', label: 'All' },
+      // { value: 'test1', label: 'Test1' },
+      // { value: 'test2', label: 'Test2' },
+      // { value: 'test3', label: 'Test3' }
+    ],
+    sensorType: selectedData.nodes
+      .reduce(
+        (unique, node) =>
+          unique.findIndex((uniqueNode) => uniqueNode.nodeSensorType === node.nodeSensorType) < 0
+            ? [...unique, node]
+            : unique,
+        []
+      )
+      .map((node) => ({
+        value: node.nodeSensorType,
+        label: node.nodeSensorType
+      })),
+    nodeAssignment: [
+      selectedData.nodes.filter((node) => node.nodeTokenNumber).length > 0 && {
+        // If there are assigned nodes
+        value: 'assigned',
+        label: 'Assigned'
+      },
+      selectedData.nodes.filter((node) => !node.nodeTokenNumber).length > 0 && {
+        // If there are unassigned nodes
+        value: 'unassigned',
+        label: 'Unassigned'
+      }
+    ].filter(Boolean) // Remove the falsy values
+  };
+
+  const filteredNodes = useMemo(
+    () =>
+      selectedData.nodes.filter(
+        (node) =>
+          (filters.area.length === 0 || filters.area.includes(node.nodeArea)) &&
+          (filters.sensorType.length === 0 || filters.sensorType.includes(node.nodeSensorType)) &&
+          (filters.nodeAssignment.length === 0 ||
+            (filters.nodeAssignment.includes('assigned') && node.nodeTokenNumber) ||
+            (filters.nodeAssignment.includes('unassigned') && !node.nodeTokenNumber))
+      ),
+    [selectedData.nodes, filters]
+  );
+
   const handleVerticalClick = (nodeID) => {
     navigate(`/nodedata?filter=${encodeURIComponent(nodeID)}`);
   };
@@ -121,138 +219,98 @@ export default function Details() {
     navigate(`/details?filter=${encodeURIComponent(value)}`);
   };
 
-  const filteredNodes = selectedData.nodes.filter(
-    (node) =>
-      (areaFilter === 'all' || node.nodeArea === areaFilter) &&
-      (sensorTypeFilter === 'all' || node.nodeSensorType === sensorTypeFilter) &&
-      (nodeAssignmentStatus === 'all' ||
-        (nodeAssignmentStatus === 'assigned' && node.nodeTokenNumber) ||
-        (nodeAssignmentStatus === 'unassigned' && !node.nodeTokenNumber))
-  );
-
   return (
     <Box sx={{ p: 3 }}>
-      <Stack spacing={2} sx={{ marginTop: 2 }}>
-        {/* Area Filter */}
-        <FormControl fullWidth>
-          <InputLabel>Area</InputLabel>
-          <Select value={areaFilter} onChange={handleAreaChange} MenuProps={MenuProps}>
-            <MenuItem value="all">All</MenuItem>
-            {selectedData.nodes
-              .reduce(
-                (unique, node) =>
-                  unique.findIndex((uniqueNode) => uniqueNode.nodeArea === node.nodeArea) < 0
-                    ? [...unique, node]
-                    : unique,
-                []
-              )
-              .map((node) => (
-                <MenuItem key={node.nodeOrid} value={node.nodeArea}>
-                  {node.nodeArea}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
-
-        {/* Sensor Type Filter */}
-        <FormControl fullWidth>
-          <InputLabel>Sensor Type</InputLabel>
-          <Select value={sensorTypeFilter} onChange={handleSensorTypeChange} MenuProps={MenuProps}>
-            <MenuItem value="all">All</MenuItem>
-            {selectedData.nodes
-              .reduce(
-                (unique, node) =>
-                  unique.findIndex(
-                    (uniqueNode) => uniqueNode.nodeSensorType === node.nodeSensorType
-                  ) < 0
-                    ? [...unique, node]
-                    : unique,
-                []
-              )
-              .map((node) => (
-                <MenuItem key={node.nodeOrid} value={node.nodeSensorType}>
-                  {node.nodeSensorType}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
-
-        {/* Node Assignment Status Filter */}
-        <FormControl fullWidth>
-          <InputLabel>Node Assignment</InputLabel>
-          <Select
-            value={nodeAssignmentStatus}
-            onChange={handleAssignmentStatusChange}
-            MenuProps={MenuProps}>
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="assigned">Assigned</MenuItem>
-            <MenuItem value="unassigned">Unassigned</MenuItem>
-          </Select>
-        </FormControl>
-
-        {/* <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}> */}
-        <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
-          <InputLabel id="demo-multiple-name-label" sx={{ marginRight: 1, marginBottom: 1 }}>
-            Select Domain
-          </InputLabel>
-          <Select
-            labelId="demo-multiple-name-label"
-            id="demo-multiple-name"
-            multiple={false}
-            value={selectedData ? selectedData.name : ''}
-            onChange={handleChange}
-            MenuProps={MenuProps}
-            sx={{ flex: 1 }}
-            label="Select Domain">
-            {verticals.map((item) => (
-              <MenuItem key={item.id} value={item.name}>
-                {item.name}
-              </MenuItem>
+      <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
+        <InputLabel id="demo-multiple-name-label" sx={{ marginRight: 1, marginBottom: 1 }}>
+          Select Domain
+        </InputLabel>
+        <Select
+          labelId="demo-multiple-name-label"
+          id="demo-multiple-name"
+          multiple={false}
+          value={selectedData ? selectedData.name : ''}
+          onChange={handleChange}
+          MenuProps={MenuProps}
+          sx={{ flex: 1 }}
+          label="Select Domain">
+          {verticals.map((item) => (
+            <MenuItem key={item.id} value={item.name}>
+              {item.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Grid container spacing={2}>
+        {/* Filter section */}
+        <Grid item xs={12} md={3}>
+          <Paper sx={{ padding: 2, height: 'fit-content', marginTop: 2 }}>
+            <Typography
+              variant="h5"
+              style={{
+                paddingBottom: '5px',
+                marginBottom: '5px',
+                borderBottom: '1px solid #e0e0e0'
+              }}>
+              <strong>Filters</strong>
+            </Typography>
+            {Object.entries(filterOptions).map(([filterName, options]) => (
+              <CheckboxFilter
+                key={filterName}
+                title={filterName.charAt(0).toUpperCase() + filterName.slice(1)}
+                options={options}
+                selectedOptions={filters[filterName]}
+                onChange={(value, checked) => handleCheckboxChange(filterName, value, checked)}
+              />
             ))}
-          </Select>
-        </FormControl>
-
-        {filteredNodes && filteredNodes.length > 0 ? (
-          <Stack spacing={3} sx={{ marginTop: 2 }}>
-            {filteredNodes.map((node) => (
-              <StyledPaper key={node.nodeName}>
-                <Typography variant="h6">
-                  {/* {node.nodeName}{' '} */}
-                  {node.nodeSensorType} {node.nodeSensorNumber}{' '}
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => handleVerticalClick(node.nodeName)}>
-                    View Node Details
-                  </Button>
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Node Name:</strong> {node.nodeName}
-                  <br />
-                  SensorType: {node.nodeSensorType}
-                </Typography>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    marginTop: '-20px',
-                    paddingRight: '8px'
-                  }}>
-                  <DeleteIcon onClick={handleDeleteClick} />
-                </div>
-              </StyledPaper>
-            ))}
+          </Paper>
+        </Grid>
+        {/* Node display section */}
+        <Grid item xs={12} md={9}>
+          <Stack spacing={2} sx={{ marginTop: 2 }}>
+            {filteredNodes && filteredNodes.length > 0 ? (
+              <Stack spacing={3} sx={{ marginTop: 2 }}>
+                {filteredNodes.map((node) => (
+                  <StyledPaper key={node.nodeName}>
+                    <Typography variant="h6">
+                      {/* {node.nodeName}{' '} */}
+                      {node.nodeSensorType} {node.nodeSensorNumber}{' '}
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => handleVerticalClick(node.nodeName)}>
+                        View Node Details
+                      </Button>
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Node Name:</strong> {node.nodeName}
+                      <br />
+                      SensorType: {node.nodeSensorType}
+                    </Typography>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        marginTop: '-20px',
+                        paddingRight: '8px'
+                      }}>
+                      <DeleteIcon onClick={handleDeleteClick} />
+                    </div>
+                  </StyledPaper>
+                ))}
+              </Stack>
+            ) : (
+              <StyledPaper>No nodes available</StyledPaper>
+            )}
           </Stack>
-        ) : (
-          <StyledPaper>No nodes available</StyledPaper>
-        )}
-      </Stack>
+        </Grid>
+      </Grid>
 
       <Fab
         color="primary"
         aria-label="add"
         style={{ position: 'fixed', bottom: 16, right: 16 }}
-        onClick={handleClickOpen}>
+        onClick={() => navigate(`/add`)}>
         <Typography variant="button">ADD</Typography>
       </Fab>
     </Box>
