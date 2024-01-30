@@ -105,7 +105,7 @@ export default function Details() {
             </Card>
           </Grid>
           <CodeComponent
-            token={selectedData.token}
+            token={selectedData.token_num}
             nodeParams={selectedData.parameters}
             dataTypes={selectedData.data_types}
           />
