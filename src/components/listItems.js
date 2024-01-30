@@ -4,6 +4,9 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import AppsIcon from '@mui/icons-material/Apps';
+import SettingsIcon from '@mui/icons-material/Settings';
+import AccountTreeIcon from '@mui/icons-material/AccountTree'; // New icon for Nodes
+
 // import LockIcon from '@mui/icons-material/Lock';
 // import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
 // import AddToQueueIcon from '@mui/icons-material/AddToQueue';
@@ -25,12 +28,25 @@ function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="Home" />
       </ListItemButton>
+      <ListItemButton onClick={() => handleItemClick('/add')}>
+        <ListItemIcon>
+          <SettingsIcon />
+        </ListItemIcon>
+        <ListItemText primary="Setup" />
+      </ListItemButton>
       <ListItemButton onClick={() => handleItemClick('/verticals')}>
         <ListItemIcon>
           <AppsIcon />
         </ListItemIcon>
         <ListItemText primary="Domains" />
       </ListItemButton>
+      <ListItemButton onClick={() => handleItemClick('/details?filter=WQ')}>
+        <ListItemIcon>
+          <AccountTreeIcon />
+        </ListItemIcon>
+        <ListItemText primary="Nodes" />
+      </ListItemButton>
+
       {/* <ListItemButton onClick={() => handleItemClick('/addvertical')}>
         <ListItemIcon>
           <AddToQueueIcon />

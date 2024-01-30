@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useContext, useState } from 'react';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -6,12 +6,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-// import IconButton from '@mui/material/IconButton';
-// import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-// import DeleteIcon from '@mui/icons-material/Delete';
 import { Typography } from '@mui/material';
 import withReactContent from 'sweetalert2-react-content';
 import Swal from 'sweetalert2';
+import { DataContext } from '../contexts/DataContext';
+import { axiosAuthInstance } from '../services/axiosConfig';
 
 const MySwal = withReactContent(Swal);
 
@@ -26,111 +25,34 @@ const MenuProps = {
   }
 };
 
-const data = [
-  {
-    id: 'airQuality',
-    name: 'Air Quality',
-    description: 'Information about air quality',
-    nodes: [
-      {
-        nodeName: 'AE-AQ1',
-        nodeType: 'kristnam',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      },
-      {
-        nodeName: 'AE-AQ2',
-        nodeType: 'shenitech',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      }
-    ]
-  },
-  // { id: 'airQuality', name: 'Air Quality', description: 'Information about air quality', nodes:'' },
-  {
-    id: 'waterQuality',
-    name: 'Water Quality',
-    description: 'Information about water quality',
-    nodes: [
-      {
-        nodeName: 'AE-WM1',
-        nodeType: 'kristnam',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      },
-      {
-        nodeName: 'AE-WM2',
-        nodeType: 'shenitech',
-        data: {
-          pm25: 10,
-          pm10: 12
-        }
-      }
-    ]
-  },
-  {
-    id: 'weatherMonitoring',
-    name: 'Weather Monitoring',
-    description: 'Information about weather monitoring'
-  }
-];
-
-// ... (previous imports)
-
 export default function MultipleSelect() {
-  const [selectedData, setSelectedData] = React.useState(null);
-  const [selectedDataError, setSelectedDataError] = React.useState(false);
-  const [parameters, setParameters] = React.useState([]);
-  // const [nodeType, setNodeType] = React.useState('');
-  const [latitude, setlatitude] = React.useState('');
-  const [longitude, setlongitude] = React.useState('');
-  const [latitudeError, setlatitudeError] = React.useState('');
-  const [longitudeError, setlongitudeError] = React.useState('');
-  // const [sensorName, setSensorName] = React.useState('');
-  // const [nodeTypeError, setNodeTypeError] = React.useState(false);
-  // const [sensorNameError, setSensorNameError] = React.useState(false);
-  const [selectedNodeType, setSelectedNodeType] = React.useState('');
+  const { verticals } = useContext(DataContext);
+
+  const [selectedData, setSelectedData] = useState(null);
+  const [selectedDataError, setSelectedDataError] = useState(false);
+  const [area, setArea] = useState('');
+  const [latitude, setlatitude] = useState('');
+  const [longitude, setlongitude] = useState('');
+  const [areaError, setAreaError] = useState(false);
+  const [latitudeError, setlatitudeError] = useState(false);
+  const [longitudeError, setlongitudeError] = useState(false);
+  const [sensorTypes, setSensorTypes] = useState([]);
+  const [selectedSensorType, setSelectedSensorType] = useState('');
 
   const handleChange = (event) => {
     const {
       target: { value }
     } = event;
-    const selectedItem = data.find((item) => item.id === value);
+    const selectedItem = verticals.find((item) => item.id === value);
     setSelectedData(selectedItem);
     setSelectedDataError(false);
 
-    const selectedNodeId = event.target.value;
-    const selectedNode = data.find((item) => item.id === selectedNodeId);
-
-    if (selectedNode && selectedNode.nodes && selectedNode.nodes.length > 0) {
-      setParameters([]); // Clear parameters when the vertical changes
-      setSelectedNodeType(selectedNode.nodes[0].nodeType);
-    } else {
-      setSelectedNodeType('');
-    }
+    axiosAuthInstance.get(`/sensor-types/get/${value}`).then((response) => {
+      setSensorTypes(response.data);
+    });
   };
 
-  // const handleParameterChange = (index, key, value) => {
-  //   setParameters([...parameters, { name: '', dataType: '' }]);
-  //   const newParameters = [...parameters];
-  //   newParameters[index][key] = value;
-  //   setParameters(newParameters);
-  // };
-
   const handleAddNodeType = () => {
-    //  if (!nodeType) {
-    //   setNodeTypeError(true);
-    // }
-    // else{
-    //   setNodeTypeError(false);
-    // }
-
     if (!selectedData) {
       setSelectedDataError(true);
     } else {
@@ -149,35 +71,55 @@ export default function MultipleSelect() {
       setlongitudeError(false);
     }
 
-    if (!selectedData || !latitude || !longitude) {
+    if (!area) {
+      setAreaError(true);
+    } else {
+      setAreaError(false);
+    }
+
+    if (!selectedData || !latitude || !longitude || !area) {
       return;
     }
 
     // Log selected vertical, node type, and added parameters to the console
     console.log('Selected Domain:', selectedData);
-    console.log('Node Type:', document.getElementById('text-field').value);
-    console.log('Added Parameters:', parameters);
+    console.log('Sensor Type:', document.getElementById('text-field').value);
     console.log('latitude:', latitude);
     console.log('longitude:', longitude);
+    console.log('area:', area);
 
-    MySwal.fire({
-      icon: 'success',
-      title: 'Success!',
-      text: 'Node added successfully.',
-      showConfirmButton: false,
-      timer: 1500 // Auto close after 1.5 seconds
-    });
+    //     "sensor_type_id": 1,
+    // "latitude": 17.446920,
+    // "longitude": 78.348122,
+    // "area": "Miyapur"
+    axiosAuthInstance
+      .post('nodes/create-node', {
+        sensor_type_id: sensorTypes.find((type) => type.res_name === selectedSensorType).id,
+        latitude,
+        longitude,
+        area
+      })
+      .then((response) => {
+        if (response.data.detail === 'Node created') {
+          MySwal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Node added successfully.',
+            showConfirmButton: false,
+            timer: 1500 // Auto close after 1.5 seconds
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        MySwal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+          footer: '<p>Check console for more details</p>'
+        });
+      });
   };
-
-  // const handleRemoveParameter = (index) => {
-  //   const newParameters = [...parameters];
-  //   newParameters.splice(index, 1);
-  //   setParameters(newParameters);
-  // };
-
-  // const handleAddParameter = () => {
-  //   setParameters([...parameters, { name: '', dataType: '' }]);
-  // };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -206,7 +148,7 @@ export default function MultipleSelect() {
             label="Select Domain" // Added label prop to ensure space for label
             error={selectedDataError} // Add error prop based on selectedDataError
           >
-            {data.map((item) => (
+            {verticals.map((item) => (
               <MenuItem key={item.id} value={item.id}>
                 {item.name}
               </MenuItem>
@@ -231,20 +173,18 @@ export default function MultipleSelect() {
             labelId="demo-multiple-name-label"
             id="demo-multiple-name"
             multiple={false}
-            value={selectedNodeType}
-            onChange={(e) => setSelectedNodeType(e.target.value)}
+            value={selectedSensorType}
+            onChange={(e) => setSelectedSensorType(e.target.value)}
             MenuProps={MenuProps}
             sx={{ flex: 1 }}
             label="Select Sensor Type"
-            error={selectedDataError}
-          >
+            error={selectedDataError}>
             <MenuItem value="None">None</MenuItem>
-            {selectedData &&
-              selectedData.nodes &&
-              selectedData.nodes.length > 0 &&
-              selectedData.nodes.map((node) => (
-                <MenuItem key={node.nodeType} value={node.nodeType}>
-                  {node.nodeType}
+            {sensorTypes &&
+              sensorTypes.length > 0 &&
+              sensorTypes.map((node) => (
+                <MenuItem key={node.res_name} value={node.res_name}>
+                  {node.res_name}
                 </MenuItem>
               ))}
           </Select>
@@ -259,69 +199,54 @@ export default function MultipleSelect() {
           </Typography>
         </FormControl>
 
+        {/* Field for Area */}
         <TextField
           id="text-field"
-          label="Latitude"
+          error={areaError}
+          helperText={areaError ? 'Area is required' : ''}
+          label="Area"
           variant="outlined"
           fullWidth
           sx={{ m: 1 }}
-          value={latitude}
+          value={area}
           onChange={(e) => {
-            setlatitude(e.target.value);
-            setlatitudeError(false); // Reset error on change
+            setArea(e.target.value);
+            setAreaError(false); // Reset error on change
           }}
-          error={latitudeError}
-          helperText={latitudeError ? 'Latitude is required' : ''}
         />
 
-        <TextField
-          id="text-field"
-          label="Longitude"
-          variant="outlined"
-          fullWidth
-          sx={{ m: 1 }}
-          value={longitude}
-          onChange={(e) => {
-            setlongitude(e.target.value);
-            setlongitudeError(false); // Reset error on change
-          }}
-          error={longitudeError}
-          helperText={longitudeError ? 'Longitude is required' : ''}
-        />
-      </div>
-
-      {/* Parameter input fields */}
-      {/* {parameters.map((param, index) => (
-        <Box key={param.name} sx={{ display: 'flex', alignItems: 'center', mt: 2, width: '100%', m: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
           <TextField
-            label="Parameter Name"
+            id="text-field"
+            label="Latitude"
             variant="outlined"
-            value={param.name}
-            onChange={(e) => handleParameterChange(index, 'name', e.target.value)}
-            sx={{ mr: 1, flex: 1 }}
+            fullWidth
+            sx={{ m: 1, flex: '1 0 calc(50% - 16px)' }} // Adjust the width to less than 50% to account for margins
+            value={latitude}
+            onChange={(e) => {
+              setlatitude(e.target.value);
+              setlatitudeError(false); // Reset error on change
+            }}
+            error={latitudeError}
+            helperText={latitudeError ? 'Latitude is required' : ''}
           />
-          <FormControl variant="outlined" sx={{ mr: 1, flex: 1, m: 1 }}>
-            <InputLabel>Data Type</InputLabel>
-            <Select
-              value={param.dataType}
-              onChange={(e) => handleParameterChange(index, 'dataType', e.target.value)}
-              label="Data Type"
-              sx={{ width: '100%' }}
-            >
-              <MenuItem value="Number">Number</MenuItem>
-              <MenuItem value="String">String</MenuItem>
-              <MenuItem value="Boolean">Boolean</MenuItem>
-            </Select>
-          </FormControl>
-          <IconButton onClick={() => handleRemoveParameter(index)}>
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      ))} */}
 
-      {/* <Button startIcon={<AddCircleOutlineIcon />} onClick={handleAddParameter} sx={{ mt: 2, m: 1 }}>
-        Add Parameter
-      </Button> */}
+          <TextField
+            id="text-field"
+            label="Longitude"
+            variant="outlined"
+            fullWidth
+            sx={{ m: 1, flex: '1 0 calc(50% - 16px)' }} // Adjust the width to less than 50% to account for margins
+            value={longitude}
+            onChange={(e) => {
+              setlongitude(e.target.value);
+              setlongitudeError(false); // Reset error on change
+            }}
+            error={longitudeError}
+            helperText={longitudeError ? 'Longitude is required' : ''}
+          />
+        </Box>
+      </div>
 
       {/* Submit button */}
       <Button
@@ -329,8 +254,7 @@ export default function MultipleSelect() {
         variant="contained"
         color="primary"
         onClick={handleAddNodeType}
-        sx={{ mt: 2, m: 1 }}
-      >
+        sx={{ mt: 2, m: 1 }}>
         Add Node
       </Button>
     </Box>
