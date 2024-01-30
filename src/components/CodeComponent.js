@@ -26,21 +26,20 @@ export default function CodeComponent({ token, nodeParams, dataTypes }) {
   const generateExampleValue = (type) => {
     const exampleValues = {
       int: Math.round(Math.random() * 100),
-      float: Math.random() * 100,
+      float: Math.round(Math.random() * 10000) / 100,
       string: 'example'
     };
     return exampleValues[type] || 'example';
   };
 
-  const generateRequestBody = () =>
-    JSON.stringify(
-      nodeParams.reduce((acc, param, index) => {
-        acc[param] = generateExampleValue(dataTypes[index]);
-        return acc;
-      }, {}),
-      null,
-      4
-    );
+  const generateRequestBody = () => {
+    const requestBody = nodeParams.reduce((acc, param, index) => {
+      acc[param] = generateExampleValue(dataTypes[index]);
+      return acc;
+    }, {});
+
+    return JSON.stringify(requestBody, null, '\t\t').replace(/}\s*$/, '\t    }');
+  };
 
   const generateArduinoCode = (requestBody) =>
     `#include <ESP8266WiFi.h>\n#include <ESP8266HTTPClient.h>\n#include <WiFiClient.h>\n\nconst char* ssid = "yourSSID";\nconst char* password = "yourPASSWORD";\n\nvoid setup() {\n    Serial.begin(115200);\n    WiFi.begin(ssid, password);\n\n    while (WiFi.status() != WL_CONNECTED) {\n        delay(1000);\n        Serial.println("Connecting to WiFi...");\n    }\n\n    Serial.println("Connected to WiFi");\n}\n\nvoid loop() {\n    if (WiFi.status() == WL_CONNECTED) {\n        WiFiClient client;\n        HTTPClient http;\n\n        http.begin(client, "${url}");\n        http.addHeader("Content-Type", "application/json");\n\n        String requestBody = ${requestBody};\n        int httpResponseCode = http.POST(requestBody);\n\n        if (httpResponseCode > 0) {\n            String response = http.getString();\n            Serial.println(httpResponseCode);\n            Serial.println(response);\n        } else {\n            Serial.print("Error on sending POST: ");\n            Serial.println(httpResponseCode);\n        }\n\n        http.end();\n    }\n\n    delay(10000); // Delay between POST requests\n}`;
@@ -58,6 +57,7 @@ export default function CodeComponent({ token, nodeParams, dataTypes }) {
   };
 
   const generateCodeSnippet = (type) => {
+    if (!token) return '// Please assign a token';
     const generator = codeGenerators[type];
     return generator ? generator(generateRequestBody()) : '// Select a device type';
   };
