@@ -108,6 +108,7 @@ export default function Details() {
       setSelectedData(selectedItem);
     });
   };
+
   useEffect(() => {
     if (!fetchedVerticals) fetchAllVerticals();
     const params = new URLSearchParams(location.search);

@@ -151,6 +151,9 @@ export default function TopBar({ children }) {
                 '&:hover': {
                   color: '#b4bce3'
                 }
+              }}
+              onClick={() => {
+                navigate('/profile');
               }}>
               <AccountCircle />
             </IconButton>
