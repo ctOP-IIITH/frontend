@@ -1,6 +1,21 @@
-import { useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Card, CardContent, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  TextField,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  CardHeader,
+  IconButton
+} from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
 import { axiosAuthInstance } from '../services/axiosConfig';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -14,6 +29,7 @@ const UserProfile = () => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [users, setUsers] = useState([]);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -31,6 +47,15 @@ const UserProfile = () => {
       })
       .catch((error) => {
         console.error('Error fetching user data', error);
+      });
+
+    axiosAuthInstance
+      .get('/user/getusers')
+      .then((response) => {
+        setUsers(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching users', error);
       });
   }, []);
 
@@ -79,6 +104,40 @@ const UserProfile = () => {
           </Box>
         </CardContent>
       </Card>
+      {user.user_type === USER_TYPES.ADMIN && (
+        <Card sx={{ mb: 2 }}>
+          <CardHeader
+            title={
+              <Typography variant="h5" component="div">
+                All Users
+              </Typography>
+            }
+          />
+          <CardContent>
+            <List>
+              {users.map((cuser, index) => (
+                <Fragment key={cuser.id}>
+                  <ListItem>
+                    <ListItemText
+                      primary={`Name: ${cuser.username}`}
+                      secondary={`Email: ${cuser.email}, Type: ${cuser.user_type}`}
+                    />
+                  </ListItem>
+                  {index < users.length - 1 && <Divider />}
+                </Fragment>
+              ))}
+            </List>
+          </CardContent>
+          <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton color="primary" aria-label="info about upcoming feature">
+              <InfoOutlinedIcon />
+            </IconButton>
+            <Typography variant="body2" color="text.secondary">
+              Option coming soon to allow modifying user details
+            </Typography>
+          </CardContent>
+        </Card>
+      )}
       <Box display="flex" justifyContent="space-between" mt={2}>
         {user.user_type === USER_TYPES.ADMIN && (
           <Button variant="contained" color="secondary" onClick={() => navigate('/create-user')}>
