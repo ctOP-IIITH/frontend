@@ -9,7 +9,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
+// import Badge from '@mui/material/Badge';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { useState } from 'react';
@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 
 // import logos
 
-import IIITHLogo from '../assets/images/iiithlogo.png';
+import IIITHLogo from '../assets/images/iiithlogo_white.png';
 import SCRCLogo from '../assets/images/scrclogo.png';
 import MainListItems from './listItems';
 
@@ -97,7 +97,14 @@ export default function TopBar({ children }) {
         bgcolor: '#eceef8'
       }}>
       <CssBaseline />
-      <AppBar position="absolute" open={open}>
+      <AppBar
+        position="absolute"
+        open={open}
+        sx={{
+          backgroundColor: '#123462',
+          color: '#ffffff',
+          boxShadow: 'none'
+        }}>
         <Toolbar
           sx={{
             pr: '24px', // keep right padding when drawer closed
@@ -138,10 +145,14 @@ export default function TopBar({ children }) {
             City IoT Operating Platform (ctOP)
           </Typography>
           {isLoggedIn ? (
-            <IconButton color=" inherit ">
-              <Badge color="secondary">
-                <AccountCircle />
-              </Badge>
+            <IconButton
+              sx={{
+                color: '#ffffff',
+                '&:hover': {
+                  color: '#b4bce3'
+                }
+              }}>
+              <AccountCircle />
             </IconButton>
           ) : (
             <Button
