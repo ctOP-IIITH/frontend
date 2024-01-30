@@ -11,6 +11,9 @@ const MySwal = withReactContent(Swal);
 
 export default function MultipleSelect() {
   const [VerticalName, setVerticalName] = React.useState('');
+  const [VerticalShortName, setVerticalShortName] = React.useState('');
+  // 0 is no error, 1 is not filled, 2 is greater than 2 characters
+  const [VerticalShortNameError, setVerticalShortNameError] = React.useState(0);
   const [Description, setDescription] = React.useState('');
   const [VerticalNameError, setVerticalNameError] = React.useState(false);
   const [DescriptionError, setDescriptionError] = React.useState(false);
@@ -29,6 +32,14 @@ export default function MultipleSelect() {
       setDescriptionError(false);
     }
 
+    if (!VerticalShortName) {
+      setVerticalShortNameError(1);
+    } else if (VerticalShortName.length > 2) {
+      setVerticalShortNameError(2);
+    } else {
+      setVerticalShortNameError(0);
+    }
+
     if (!VerticalName || !Description) {
       return;
     }
@@ -40,6 +51,7 @@ export default function MultipleSelect() {
     axiosAuthInstance
       .post('/verticals/create-ae', {
         ae_name: VerticalName,
+        ae_short_name: VerticalShortName,
         ae_description: Description,
         path: ''
       })
@@ -53,23 +65,22 @@ export default function MultipleSelect() {
             showConfirmButton: false,
             timer: 1500 // Auto close after 1.5 seconds
           });
+        }
+      })
+      .catch((error) => {
+        console.log(error, error.response.data);
+        if (error.response.data.detail === 'AE already exists') {
+          MySwal.fire({
+            icon: 'warning',
+            title: 'Domain already exists!'
+          });
         } else {
           MySwal.fire({
             icon: 'error',
             title: 'Oops...',
-            text: 'Something went wrong!',
-            footer: '<a href="">Why do I have this issue?</a>'
+            text: 'Something went wrong!'
           });
         }
-      })
-      .catch((error) => {
-        console.log(error);
-        MySwal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Something went wrong!',
-          footer: '<a href="">Why do I have this issue?</a>'
-        });
       });
   };
 
@@ -97,6 +108,24 @@ export default function MultipleSelect() {
           helperText={VerticalNameError ? 'Domain Name is required' : ''}
         />
 
+        <TextField
+          id="text-field2"
+          label="Domain Short Name"
+          variant="outlined"
+          fullWidth
+          sx={{ m: 1 }}
+          value={VerticalShortName}
+          onChange={(e) => {
+            setVerticalShortName(e.target.value);
+            setVerticalShortNameError(0); // Reset error on change
+          }}
+          error={VerticalShortNameError > 0}
+          helperText={() => {
+            if (VerticalShortNameError === 1) return 'Domain Short Name is required';
+            if (VerticalShortNameError === 2) return 'Domain Short Name should be 2 characters';
+            return '';
+          }}
+        />
         <TextField
           id="text-field1"
           label="Description"
