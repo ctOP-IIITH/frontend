@@ -26,7 +26,33 @@ function CreateSensorType() {
   const [parameters, setParameters] = useState([]); // [{ name: '', dataType: '' }
   const [sensorTypes, setSensorTypes] = useState([]);
   const [baseSensorType, setBaseSensorType] = useState('');
+  const [errors, setErrors] = useState({
+    sensorTypeName: false,
+    selectedVertical: false,
+    parameters: [] // Array of booleans, one for each parameter
+  });
+
   const { verticals } = useContext(DataContext);
+
+  const validate = () => {
+    let isValid = true;
+    let newErrors = {
+      sensorTypeName: !sensorTypeName,
+      selectedVertical: !selectedVertical,
+      parameters: parameters.map((param) => !param.name || !param.dataType)
+    };
+
+    if (
+      newErrors.sensorTypeName ||
+      newErrors.selectedVertical ||
+      newErrors.parameters.includes(true)
+    ) {
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleAddParameter = () => {
     setParameters([...parameters, { name: '', dataType: '' }]);
@@ -66,9 +92,8 @@ function CreateSensorType() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!selectedVertical || !sensorTypeName) {
-      // Handle the case where no vertical or node type name is selected
-      // You might want to show an error message here
+    if (!validate()) {
+      // Handle the case where validation fails
       return;
     }
 
@@ -130,8 +155,8 @@ function CreateSensorType() {
       </FormControl>
 
       <form onSubmit={handleSubmit}>
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="select-vertical-label">Select Vertical</InputLabel>
+        <FormControl error={errors.selectedVertical} fullWidth margin="normal">
+          <InputLabel id="select-vertical-label">Select Domain</InputLabel>
           <Select
             labelId="select-vertical-label"
             value={selectedVertical}
@@ -150,8 +175,15 @@ function CreateSensorType() {
             ))}
           </Select>
         </FormControl>
+        {errors.selectedVertical && (
+          <Typography variant="caption" color="error" sx={{ mt: 1 }}>
+            Selecting a domain is required.
+          </Typography>
+        )}
 
         <TextField
+          error={errors.sensorTypeName}
+          helperText={errors.sensorTypeName && 'Sensor Type Name is required'}
           label="Sensor Type Name"
           variant="outlined"
           fullWidth
@@ -165,12 +197,17 @@ function CreateSensorType() {
             <Box key={param} sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
               <TextField
                 label="Parameter Name"
+                error={errors.parameters[index]}
+                helperText={errors.parameters[index] && 'This field is required'}
                 variant="outlined"
                 value={param.name}
                 onChange={(e) => handleParameterChange(index, 'name', e.target.value)}
                 sx={{ mr: 1, flex: 1 }}
               />
-              <FormControl variant="outlined" sx={{ mr: 1, flex: 1 }}>
+              <FormControl
+                error={errors.parameters[index]}
+                variant="outlined"
+                sx={{ mr: 1, flex: 1, marginBottom: errors.parameters[index] ? '1.5rem' : 0 }}>
                 <InputLabel>Data Type</InputLabel>
                 <Select
                   value={param.dataType}
@@ -182,6 +219,7 @@ function CreateSensorType() {
                   {/* Add more data types as needed */}
                 </Select>
               </FormControl>
+
               <IconButton onClick={() => handleRemoveParameter(index)}>
                 <DeleteIcon />
               </IconButton>
