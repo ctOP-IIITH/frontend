@@ -89,16 +89,12 @@ export default function Details() {
   const [filters, setFilters] = useState({ area: [], sensorType: [], nodeAssignment: [] });
   const location = useLocation();
   const navigate = useNavigate();
-  useEffect(() => {
-    if (!fetchedVerticals) fetchAllVerticals();
-    const params = new URLSearchParams(location.search);
-    const filter = params.get('filter');
-    // Find the selectedData based on verticalId
-    console.log(filter);
-    axiosAuthInstance.get(`/nodes/${filter}`).then((response) => {
+
+  const fetchNodes = (curFilter) => {
+    axiosAuthInstance.get(`/nodes/${curFilter}`).then((response) => {
       const selectedItem = {
-        id: filter,
-        name: filter,
+        id: curFilter,
+        name: curFilter,
         nodes: response.data.map((node) => ({
           nodeName: node.node_name,
           nodeSensorType: node.res_name,
@@ -109,9 +105,16 @@ export default function Details() {
           nodeSensorNumber: node.sensor_node_number
         }))
       };
-
       setSelectedData(selectedItem);
     });
+  };
+  useEffect(() => {
+    if (!fetchedVerticals) fetchAllVerticals();
+    const params = new URLSearchParams(location.search);
+    const filter = params.get('filter');
+    // Find the selectedData based on verticalId
+    fetchNodes(filter);
+    console.log(filter);
   }, [location]);
 
   const handleCheckboxChange = (filterName, value, checked) => {
@@ -188,9 +191,23 @@ export default function Details() {
   };
 
   const handleDeleteItem = (itemId) => {
-    console.log(itemId);
-    // data.filter((item) => item.id !== itemId);
-    // TO DO to refresh AE in frontned write API fro get node of that AE
+    axiosAuthInstance
+      .delete(`/nodes/delete-node/${itemId}`)
+      .then((response) => {
+        console.log(response);
+        if (response.status === 204) {
+          SweetAlert.fire({
+            icon: 'success',
+            title: 'Vertical Deleted Successfully',
+            showConfirmButton: false,
+            timer: 1500
+          });
+          fetchNodes(selectedData.name);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleDeleteClick = (itemId) => {
@@ -294,7 +311,7 @@ export default function Details() {
                         marginTop: '-20px',
                         paddingRight: '8px'
                       }}>
-                      <DeleteIcon onClick={handleDeleteClick} />
+                      <DeleteIcon onClick={() => handleDeleteClick(node.nodeName)} />
                     </div>
                   </StyledPaper>
                 ))}
