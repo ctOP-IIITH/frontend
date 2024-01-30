@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Typography, Container } from '@mui/material';
 import StatCard from './StatCard';
 import DomainCard from './DomainCard';
@@ -22,6 +22,7 @@ import domainsImage from './assets/stats/domains.png';
 import nodesImage from './assets/stats/nodes.png';
 import regionsImage from './assets/stats/regions.png';
 import sensorsImage from './assets/stats/sensors.png';
+import { axiosAuthInstance } from '../services/axiosConfig';
 
 const domainData = [
   { icon: domainImage, label: 'All Domains' },
@@ -35,10 +36,22 @@ const domainData = [
 
 function Home() {
   const [selectedSegment, setSelectedSegment] = useState(0);
+  const [lonerStats, setLonerStats] = useState({
+    total_areas: 0,
+    total_domains: 0,
+    total_sensor_types: 0,
+    total_nodes: 0
+  });
 
   const handleSegmentClick = (index) => {
     setSelectedSegment(index);
   };
+
+  useEffect(() => {
+    axiosAuthInstance.get('/stats/loners').then((response) => {
+      setLonerStats(response.data);
+    });
+  }, []);
 
   return (
     <div className="home">
@@ -51,10 +64,14 @@ function Home() {
         {/* <Header /> */}
 
         <div className="stats-container">
-          <StatCard number="37" label="Regions" imageUrl={regionsImage} />
-          <StatCard number="9" label="Domains" imageUrl={domainsImage} />
-          <StatCard number="48" label="Nodes" imageUrl={nodesImage} />
-          <StatCard number="167" label="Sensors" imageUrl={sensorsImage} />
+          <StatCard number={lonerStats.total_areas} label="Areas" imageUrl={regionsImage} />
+          <StatCard number={lonerStats.total_domains} label="Domains" imageUrl={domainsImage} />
+          <StatCard
+            number={lonerStats.total_sensor_types}
+            label="Sensor Types"
+            imageUrl={nodesImage}
+          />
+          <StatCard number={lonerStats.total_nodes} label="Nodes" imageUrl={sensorsImage} />
         </div>
       </div>
       {/* <MainImage /> */}
