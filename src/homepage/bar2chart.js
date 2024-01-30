@@ -31,7 +31,7 @@ function Bar2Chart() {
     plugins: {
       title: {
         display: true,
-        text: 'Working of Nodes in a Region'
+        text: 'Domains per Area'
       },
       legend: {
         display: true,
@@ -49,7 +49,7 @@ function Bar2Chart() {
   return (
     <div className="bar2-chart">
       <Bar data={data} options={options} />
-      <h5>REGION</h5>
+      <h5>AREA</h5>
     </div>
   );
 }

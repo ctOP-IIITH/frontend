@@ -8,43 +8,28 @@ ChartJS.register(ArcElement, Tooltip, Legend, PieController);
 function PieChart({ onSegmentClick }) {
   const chartRef = useRef();
 
-  const data = [
-    {
-      label: 'Gachibowli',
-      data: 300,
-      backgroundColor: ['#FF6384']
-    },
-    {
-      label: 'Madhapur',
-      data: 50,
-      backgroundColor: ['#36A2EB']
-    },
-    {
-      label: 'Miyapur',
-      data: 100,
-      backgroundColor: ['#FFCE56']
-    },
-    {
-      label: 'KPHB',
-      data: 80,
-      backgroundColor: ['#4BC0C0']
-    },
-    {
-      label: 'JNTU',
-      data: 60,
-      backgroundColor: ['#9966FF']
-    },
-    {
-      label: 'Jubilee Hills',
-      data: 70,
-      backgroundColor: ['#FF9F40']
-    },
-    {
-      label: 'Abids',
-      data: 45,
-      backgroundColor: ['#C9CBCF']
-    }
+  const labels = [
+    'Air Quality',
+    'Water Quality',
+    'Water Quantity',
+    'Waste Management',
+    'Energy Monitoring'
   ];
+  const backgroundColors = [
+    '#FF6384',
+    '#36A2EB',
+    '#FFCE56',
+    '#4BC0C0',
+    '#9966FF',
+    '#FF9F40',
+    '#C9CBCF'
+  ];
+
+  const data = labels.map((label, index) => ({
+    label,
+    data: 1,
+    backgroundColor: [backgroundColors[index]]
+  }));
 
   const segmentData = {
     labels: data.map((segment) => segment.label),
@@ -58,9 +43,14 @@ function PieChart({ onSegmentClick }) {
   };
 
   const handleSegmentClick = (e) => {
-    const { index } = getElementAtEvent(chartRef.current, e)[0];
-    console.log('Clicked segment index:', index);
-    onSegmentClick(index);
+    let index;
+    const elements = getElementAtEvent(chartRef.current, e);
+
+    if (elements.length > 0) {
+      index = elements[0].index;
+      onSegmentClick(index);
+      console.log('Clicked segment index:', index);
+    }
   };
 
   const options = {
@@ -68,7 +58,7 @@ function PieChart({ onSegmentClick }) {
     plugins: {
       title: {
         display: true,
-        text: 'Regions'
+        text: 'Verticals'
       }
     },
     responsive: true

@@ -40,7 +40,7 @@ function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="Domains" />
       </ListItemButton>
-      <ListItemButton onClick={() => handleItemClick('/details?filter=WQ')}>
+      <ListItemButton onClick={() => handleItemClick('/details?filter=Water Quality')}>
         <ListItemIcon>
           <AccountTreeIcon />
         </ListItemIcon>

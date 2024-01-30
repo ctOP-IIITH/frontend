@@ -38,7 +38,7 @@ function Bar3Chart() {
     plugins: {
       title: {
         display: true,
-        text: 'Domains in a Region'
+        text: 'Nodes in an Area'
       }
     },
     responsive: true,
@@ -55,7 +55,7 @@ function Bar3Chart() {
   return (
     <div className="bar3-chart">
       <Bar data={data} options={options} />
-      <h5>REGIONS</h5>
+      <h5>AREA</h5>
     </div>
   );
 }
