@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useContext } from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -6,17 +6,19 @@ import Typography from '@mui/material/Typography';
 import withReactContent from 'sweetalert2-react-content';
 import Swal from 'sweetalert2';
 import { axiosAuthInstance } from '../services/axiosConfig';
+import { DataContext } from '../contexts/DataContext';
 
 const MySwal = withReactContent(Swal);
 
 export default function MultipleSelect() {
-  const [VerticalName, setVerticalName] = React.useState('');
-  const [VerticalShortName, setVerticalShortName] = React.useState('');
+  const { fetchAllVerticals } = useContext(DataContext);
+  const [VerticalName, setVerticalName] = useState('');
+  const [VerticalShortName, setVerticalShortName] = useState('');
   // 0 is no error, 1 is not filled, 2 is greater than 2 characters
-  const [VerticalShortNameError, setVerticalShortNameError] = React.useState(0);
-  const [Description, setDescription] = React.useState('');
-  const [VerticalNameError, setVerticalNameError] = React.useState(false);
-  const [DescriptionError, setDescriptionError] = React.useState(false);
+  const [VerticalShortNameError, setVerticalShortNameError] = useState(0);
+  const [Description, setDescription] = useState('');
+  const [VerticalNameError, setVerticalNameError] = useState(false);
+  const [DescriptionError, setDescriptionError] = useState(false);
 
   // const handleAddVerticalName = () => {
   const handleAddVerticalName = () => {
@@ -66,10 +68,11 @@ export default function MultipleSelect() {
             timer: 1500 // Auto close after 1.5 seconds
           });
         }
+        fetchAllVerticals();
       })
       .catch((error) => {
         console.log(error, error.response.data);
-        if (error.response.data.detail === 'AE already exists') {
+        if (error.response.status === 409) {
           MySwal.fire({
             icon: 'warning',
             title: 'Domain already exists!'
