@@ -81,7 +81,7 @@ const UserProfile = () => {
       </Card>
       <Box display="flex" justifyContent="space-between" mt={2}>
         {user.user_type === USER_TYPES.ADMIN && (
-          <Button variant="contained" color="secondary">
+          <Button variant="contained" color="secondary" onClick={() => navigate('/create-user')}>
             Create User
           </Button>
         )}
