@@ -1,4 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -20,6 +22,8 @@ function Add() {
   const completedSteps = () => Object.keys(completed).length;
   const isLastStep = () => activeStep === totalSteps() - 1;
   const allStepsCompleted = () => completedSteps() === totalSteps();
+
+  const navigate = useNavigate();
 
   const handleNext = () => {
     const newActiveStep =
@@ -73,10 +77,21 @@ function Add() {
       {/* // <Container maxWidth="sm"> */}
       <Stepper nonLinear activeStep={activeStep}>
         {steps.map((label, index) => (
-          <Step key={label} completed={completed[index]}>
-            <StepButton color="inherit" onClick={handleStep(index)}>
-              {label}
-            </StepButton>
+          <Step
+            key={label}
+            completed={completed[index]}
+            sx={{
+              '& .MuiStepLabel-root .Mui-active': {
+                color: 'orange' // circle color (ACTIVE)
+              },
+              '& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel': {
+                color: 'white' // Just text label (ACTIVE)
+              },
+              '& .MuiStepLabel-root .Mui-completed': {
+                color: 'green' // circle color (COMPLETED)
+              }
+            }}>
+            <StepButton onClick={handleStep(index)}>{label}</StepButton>
           </Step>
         ))}
       </Stepper>
@@ -113,24 +128,20 @@ function Add() {
               </Button>
 
               <Box sx={{ flex: '1 1 auto' }} />
+              <Button onClick={() => navigate('/')} sx={{ mr: 1, bgcolor: '#b4bce3' }}>
+                CANCEL
+              </Button>
               <Button
                 onClick={handleComplete}
                 sx={{ mr: 1, bgcolor: '#b4bce3' }}
                 style={{ display: activeStep === steps.length - 1 ? 'none' : 'inline-block' }}>
                 SKIP
               </Button>
-              {activeStep !== steps.length &&
-                (completed[activeStep] ? (
-                  <Typography
-                    variant="caption"
-                    sx={{ display: 'inline-block', bgcolor: '#b4bce3' }}>
-                    Step {activeStep + 1} already completed
-                  </Typography>
-                ) : (
-                  <Button onClick={handleComplete} sx={{ bgcolor: '#b4bce3' }}>
-                    {activeStep === steps.length - 1 ? 'Finish' : 'NEXT'}
-                  </Button>
-                ))}
+              {activeStep !== steps.length && (
+                <Button onClick={handleComplete} sx={{ bgcolor: '#b4bce3' }}>
+                  {activeStep === steps.length - 1 ? 'Finish' : 'NEXT'}
+                </Button>
+              )}
             </Box>
           </>
         )}
