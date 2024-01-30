@@ -11,6 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import SweetAlert from 'sweetalert2';
 import { DataContext } from '../contexts/DataContext';
+import { axiosAuthInstance } from '../services/axiosConfig';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -43,12 +44,26 @@ const Vertical = () => {
   };
 
   const handleDeleteItem = (itemId) => {
-    verticals.filter((item) => item.id !== itemId);
-    // TO DO to refresh AE in frontned write API fro get AE
+    axiosAuthInstance
+      .delete(`/verticals/delete-ae/${itemId}`)
+      .then((response) => {
+        console.log(response);
+        if (response.status === 204) {
+          SweetAlert.fire({
+            icon: 'success',
+            title: 'Vertical Deleted Successfully',
+            showConfirmButton: false,
+            timer: 1500
+          });
+          fetchAllVerticals();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleDeleteClick = (itemId) => {
-    verticals.filter((item) => item.id !== itemId);
     // navigate(`/details?filter=${encodeURIComponent(verticalId)}`);
     SweetAlert.fire({
       title: 'Are you sure?',
