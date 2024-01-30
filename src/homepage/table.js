@@ -8,20 +8,11 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import { styled } from '@mui/material/styles';
+import { lighten, darken } from '@mui/system';
 
 import './barchart.css';
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  // hide last border
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
-
-function BarChart({ selectedSegment }) {
+function AreaTable({ selectedSegment }) {
   console.log('selectedSegment:', selectedSegment);
 
   const verticals = [
@@ -54,11 +45,25 @@ function BarChart({ selectedSegment }) {
     '#C9CBCF'
   ];
   const numNodes = [15, 59, 80, 81, 56, 55, 40];
+  const color = backgroundColors[selectedSegment];
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+      backgroundColor: lighten(color, 0.5) // lighter shade of the selected color
+    },
+    '&:nth-of-type(even)': {
+      backgroundColor: darken(color, 0.5) // darker shade of the selected color,
+    },
+    // hide last border
+    '&:last-child td, &:last-child th': {
+      border: 0
+    },
+    backgroundColor: theme.palette.grey[500]
+  }));
 
   const segmentData = labels.map((label, index) => ({
     label,
-    data: numNodes[index],
-    color: backgroundColors[index % backgroundColors.length]
+    data: numNodes[index]
   }));
 
   // const data = segmentData[selectedSegment];
@@ -98,4 +103,4 @@ function BarChart({ selectedSegment }) {
   );
 }
 
-export default BarChart;
+export default AreaTable;

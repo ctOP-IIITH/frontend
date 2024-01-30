@@ -129,13 +129,7 @@ function Add() {
 
               <Box sx={{ flex: '1 1 auto' }} />
               <Button onClick={() => navigate('/')} sx={{ mr: 1, bgcolor: '#b4bce3' }}>
-                CANCEL
-              </Button>
-              <Button
-                onClick={handleComplete}
-                sx={{ mr: 1, bgcolor: '#b4bce3' }}
-                style={{ display: activeStep === steps.length - 1 ? 'none' : 'inline-block' }}>
-                SKIP
+                Cancel
               </Button>
               {activeStep !== steps.length && (
                 <Button onClick={handleComplete} sx={{ bgcolor: '#b4bce3' }}>
