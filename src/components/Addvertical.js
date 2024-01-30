@@ -81,7 +81,7 @@ export default function MultipleSelect() {
           MySwal.fire({
             icon: 'error',
             title: 'Oops...',
-            text: 'Something went wrong!'
+            text: error.response.data.detail
           });
         }
       });

@@ -1,225 +1,140 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
+import { useEffect, useState } from 'react';
 import Paper from '@mui/material/Paper';
-// import Stack from '@mui/material/Stack';
-import { styled } from '@mui/material/styles';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { Typography, Box, Chip, Grid, Card, CardContent, Link } from '@mui/material';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250
-    }
-  }
-};
-
-const data = [
-  {
-    name: 'AE-AQ1',
-    nodeType: 'kristnam',
-    data: [
-      {
-        pm25: 12,
-        pm10: 13
-      }
-    ]
-  },
-
-  {
-    name: 'AE-AQ2',
-    nodeType: 'shenitech',
-    data: [
-      {
-        pm25: 56,
-        pm10: 12,
-        co2: 80
-      },
-      {
-        pm25: 12,
-        pm10: 13,
-        co2: 70
-      },
-      {
-        pm25: 56,
-        pm10: 12,
-        co2: 80
-      },
-      {
-        pm25: 12,
-        pm10: 13,
-        co2: 70
-      },
-      {
-        pm25: 56,
-        pm10: 12,
-        co2: 80
-      },
-      {
-        pm25: 12,
-        pm10: 13,
-        co2: 70
-      }
-    ]
-  },
-
-  {
-    name: 'AE-WM1',
-    nodeType: 'kristnam',
-    data: [
-      {
-        ph: 10,
-        turbidity: 12
-      },
-      {
-        ph: 13,
-        turbidity: 12
-      },
-      {
-        ph: 14,
-        turbidity: 12
-      },
-      {
-        ph: 1,
-        turbidity: 12
-      }
-    ]
-  },
-  {
-    name: 'AE-WM2',
-    nodeType: 'shenitech',
-    data: [{}]
-  }
-];
-function generateUniqueKey(index) {
-  return `${index}-${Date.now()}`;
-}
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? 'black' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(2),
-  textAlign: 'left',
-  color: 'black'
-  //   fontSize: '30px',
-}));
+import { axiosAuthInstance } from '../services/axiosConfig';
+import { BACKEND_API_URL } from '../constants';
+import CodeComponent from './CodeComponent';
 
 export default function Details() {
-  const [selectedData, setSelectedData] = React.useState(null);
+  const [selectedData, setSelectedData] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(location.search);
     const filter = params.get('filter');
-    const selectedItem = data.find((item) => item.name === filter);
-    setSelectedData(selectedItem);
+    axiosAuthInstance
+      .get(`/nodes/get-node/${filter}`)
+      .then((response) => {
+        const selectedItem = response.data.detail;
+        if (!selectedItem) {
+          Swal.fire({
+            icon: 'error',
+            title: 'No node with the specified name exists!',
+            text: 'Redirecting to homepage',
+            timer: 2000
+          }).then(() => {
+            setTimeout(() => {
+              navigate('/');
+            }, 2000);
+          });
+        }
+        setSelectedData(selectedItem);
+      })
+      .catch((error) => {
+        console.log(error);
+        Swal.fire({
+          icon: 'error',
+          title: error?.response?.data?.detail,
+          text: 'Redirecting to homepage',
+          timer: 2000
+        }).then(() => {
+          setTimeout(() => {
+            navigate('/');
+          }, 2000);
+        });
+      });
   }, [location.search]);
-
-  const handleChange = (event) => {
-    const {
-      target: { value }
-    } = event;
-    const selectedItem = data.find((item) => item.name === value);
-    setSelectedData(selectedItem);
-  };
 
   return (
     <Box sx={{ p: 3, m: 3 }}>
-      <div>
-        <Grid item xs>
-          <Typography>
-            {selectedData ? (
-              <div style={{ fontSize: '1rem' }}>
-                <strong style={{ fontSize: '1.5rem', marginBottom: '10px' }}>
+      {selectedData ? (
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h5" gutterBottom>
                   Device Information
-                </strong>{' '}
-                <br />
-                Node ID:{selectedData.name} <br />
-                Node Type: {selectedData.nodeType} <br />
-                Parameters:
-                {Object.keys(selectedData.data[0]).map((param) => (
-                  <span key={param}>{param} &nbsp;</span>
-                ))}
-                <br />
-                <br />
-                <strong style={{ fontSize: '1.5rem' }}>Subscriptions:</strong>
-                <p>To DO subscription url</p>
-                <br />
-              </div>
-            ) : (
-              'No nodes available'
-            )}
-
-            {/* write subscription here TO DO */}
-            <strong style={{ fontSize: '1.5rem' }}>Node Data:</strong>
-          </Typography>
-        </Grid>
-
-        <FormControl sx={{ m: 1, display: 'flex', width: '100%' }}>
-          <InputLabel id="demo-multiple-name-label" sx={{ marginRight: 1, marginBottom: 1 }}>
-            Select Domain
-          </InputLabel>
-          <Select
-            labelId="demo-multiple-name-label"
-            id="demo-multiple-name"
-            multiple={false}
-            value={selectedData ? selectedData.name : ''}
-            onChange={handleChange}
-            MenuProps={MenuProps}
-            sx={{ flex: 1 }}
-            label="Select Domain"
-          >
-            {data.map((item) => (
-              <MenuItem key={item.name} value={item.name}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {selectedData ? (
-          <div>
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Node ID:</strong> {selectedData.node_name}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Node Type:</strong> {selectedData.res_name}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Parameters:</strong>
+                  {selectedData.parameters.map((param) => (
+                    <Chip key={param} label={param} sx={{ m: 1 }} />
+                  ))}
+                </Typography>
+                <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>
+                  Subscriptions:
+                </Typography>
+                <Typography variant="body1">To DO subscription url</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <CodeComponent
+            token={selectedData.token}
+            nodeParams={selectedData.parameters}
+            dataTypes={selectedData.data_types}
+          />
+          <Grid item xs={12}>
             <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+              <Table aria-label="custom pagination table">
                 <TableBody>
                   <TableRow>
-                    {Object.keys(selectedData.data[0]).map((param) => (
-                      <TableCell key={param} align="right">
-                        {param}
-                      </TableCell>
+                    {selectedData.parameters.map((param) => (
+                      <TableCell key={param}>{param}</TableCell>
                     ))}
+                    <TableCell>Timestamp</TableCell>
                   </TableRow>
-                  {selectedData.data.map((entry, entryIndex) => (
-                    <TableRow key={generateUniqueKey(entryIndex)}>
-                      {Object.keys(entry).map((param) => (
-                        <TableCell key={param} align="right">
-                          {entry[param]} {/* Display the value of the parameter */}
-                        </TableCell>
+                  {selectedData.cins.map((cin) => (
+                    <TableRow key={cin[1]}>
+                      {cin[0].map((value) => (
+                        <TableCell key={value}>{value}</TableCell>
                       ))}
+                      <TableCell>{cin[1]}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
-          </div>
-        ) : (
-          <StyledPaper>No nodes available</StyledPaper>
-        )}
-      </div>
+          </Grid>
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h5" gutterBottom>
+                  Fetch Latest Data
+                </Typography>
+                <Typography variant="body1">
+                  <strong>URL: </strong>
+                  <Link
+                    href={`${BACKEND_API_URL}/nodes/get-node/${selectedData.node_name}/latest`}
+                    target="_blank"
+                    rel="noopener"
+                    sx={{ color: 'blue' }}>
+                    {`${BACKEND_API_URL}/nodes/get-node/${selectedData.node_name}/latest`}
+                  </Link>
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      ) : (
+        <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
+          No data found!
+        </Typography>
+      )}
     </Box>
   );
 }
