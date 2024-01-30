@@ -24,10 +24,10 @@ const Item = styled(Paper)(({ theme }) => ({
   }
 }));
 
-function Vertical() {
-  const { verticals, fetchAllVerticals, fetchedVerticals } = useContext(DataContext);
+const Vertical = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const { verticals, fetchAllVerticals, fetchedVerticals } = useContext(DataContext);
 
   useEffect(() => {
     if (!fetchedVerticals) fetchAllVerticals();
@@ -113,6 +113,6 @@ function Vertical() {
       </Fab>
     </Box>
   );
-}
+};
 
 export default Vertical;
