@@ -18,6 +18,7 @@ import Login from './components/Login';
 import AllNodes from './components/Allnodes';
 import UserProfile from './components/UserProfile';
 import CreateUser from './components/CreateUser';
+import AddAdvanced from './components/AddAdvanced';
 
 function PrivateRoute() {
   const { isLoggedIn } = useAuth();
@@ -77,6 +78,9 @@ function App() {
           </Route>
           <Route path="add" element={<PrivateRoute />}>
             <Route path="/add" element={<Add />} />
+          </Route>
+          <Route path="add-advanced" element={<PrivateRoute />}>
+            <Route path="/add-advanced" element={<AddAdvanced />} />
           </Route>
 
           <Route path="/404" element={<NotFound />} />
