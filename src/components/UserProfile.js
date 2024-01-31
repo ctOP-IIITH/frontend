@@ -60,7 +60,33 @@ const UserProfile = () => {
   }, []);
 
   const handlePasswordChange = () => {
-    // Handle password change
+    // check if new password and confirm password match
+    if (newPassword !== confirmPassword) {
+      alert('New password and confirm password do not match');
+      return;
+    }
+    // if one of the fields is empty
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      alert('Please fill all the fields');
+      return;
+    }
+
+    axiosAuthInstance
+      .post('/user/change-password', {
+        email: user.email,
+        old_password: oldPassword,
+        new_password: newPassword
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          alert('Password changed successfully');
+        }
+      })
+      .catch((error) => {
+        console.error('Error changing password', error);
+        if (error.response) alert(error.response.data.detail);
+        else alert('Error changing password');
+      });
   };
 
   if (!user) {
