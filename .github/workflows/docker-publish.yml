@@ -27,4 +27,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: vjspranav/ctop-frontend:${{ github.sha }}
+          tags: vjspranav/ctop-frontend:${{ github.sha }}, vjspranav/ctop-frontend
