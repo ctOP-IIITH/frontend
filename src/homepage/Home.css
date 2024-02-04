@@ -1,0 +1,52 @@
+.stats-container {
+  display: flex;
+  justify-content: center;
+}
+
+.home {
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.explore-button-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 0px;
+  width: 1150px;
+  height: 50px; /* Increase the height to your desired value */
+  margin: 0px 0;
+}
+
+.domain-cards-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.domain-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-container {
+  flex: 1; /* Each chart container will take equal space */
+  padding: 10px; /* Optional: to give some padding inside the chart containers */
+}
+
+.chart-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-bottom: 20px;
+}

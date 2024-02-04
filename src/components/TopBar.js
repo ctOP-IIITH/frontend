@@ -9,7 +9,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
+// import Badge from '@mui/material/Badge';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { useState } from 'react';
@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 
 // import logos
 
-import IIITHLogo from '../assets/images/iiithlogo.png';
+import IIITHLogo from '../assets/images/iiithlogo_white.png';
 import SCRCLogo from '../assets/images/scrclogo.png';
 import MainListItems from './listItems';
 
@@ -73,8 +73,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const MainContent = styled('main')(({ theme }) => ({
   flexGrow: 1,
-  height: '100vh',
-  overflow: 'auto',
+  minHeight: '100vh',
+  width: '100%',
   paddingTop: theme.spacing(8),
   paddingLeft: theme.spacing(9),
   paddingRight: theme.spacing(2)
@@ -89,9 +89,22 @@ export default function TopBar({ children }) {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        marginRight: 0,
+        bgcolor: '#eceef8'
+      }}>
       <CssBaseline />
-      <AppBar position="absolute" open={open}>
+      <AppBar
+        position="absolute"
+        open={open}
+        sx={{
+          backgroundColor: '#123462',
+          color: '#ffffff',
+          boxShadow: 'none'
+        }}>
         <Toolbar
           sx={{
             pr: '24px', // keep right padding when drawer closed
@@ -125,17 +138,24 @@ export default function TopBar({ children }) {
           />
           <Typography
             component="h1"
-            variant="h3"
-            color="inherit"
+            variant="h4"
+            color="#ffffff"
             noWrap
             sx={{ flexGrow: 1, textAlign: 'center', paddingRight: '100px' }}>
-            CTOP
+            City IoT Operating Platform (ctOP)
           </Typography>
           {isLoggedIn ? (
-            <IconButton color="inherit">
-              <Badge color="secondary">
-                <AccountCircle />
-              </Badge>
+            <IconButton
+              sx={{
+                color: '#ffffff',
+                '&:hover': {
+                  color: '#b4bce3'
+                }
+              }}
+              onClick={() => {
+                navigate('/profile');
+              }}>
+              <AccountCircle />
             </IconButton>
           ) : (
             <Button
@@ -167,7 +187,7 @@ export default function TopBar({ children }) {
           {secondaryListItems} */}
         </List>
       </Drawer>
-      <MainContent>{children}</MainContent>
+      <MainContent className="main-content">{children}</MainContent>
       <Toolbar />
     </Box>
   );

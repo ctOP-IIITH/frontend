@@ -14,14 +14,16 @@ function PrivateComponent() {
           display: 'flex',
           // flexDirection: 'column',
           gap: '10px'
-        }}>
+        }}
+      >
         <Button
           onClick={async () => {
             const res = await axiosAuthInstance.get('/user/am-i-admin');
             alert(res.data);
           }}
           variant="contained"
-          color="primary">
+          color="primary"
+        >
           AM I ADMIN
         </Button>
         {/* get all users */}
@@ -31,7 +33,8 @@ function PrivateComponent() {
             alert(JSON.stringify(res.data));
           }}
           variant="contained"
-          color="primary">
+          color="primary"
+        >
           GET ALL USERS
         </Button>
         {/* Let's also add logout button */}
@@ -40,7 +43,8 @@ function PrivateComponent() {
             logout();
           }}
           variant="contained"
-          color="secondary">
+          color="secondary"
+        >
           Logout
         </Button>
       </div>

@@ -1,0 +1,268 @@
+[
+  {
+    "Vertical": "Air Quality",
+    "description": "AE-AQ",
+    "Nodes": [
+      {
+        "nodeName": "AQ-MG00-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-BN00-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-KN00-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-SN00-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-VN90-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-KH00-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-AN00-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-PH03-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-PL00-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-FG00-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      },
+      {
+        "nodeName": "AQ-PH04-00",
+        "nodeType": "kristnam",
+        "data": {
+          "PM2.5": 44,
+          "PM10": 98
+        }
+      }
+    ]
+  },
+
+  {
+    "Vertical": "Water Quality",
+    "description": "WM-WD",
+    "Nodes": [
+      {
+        "nodeName": "WM-WD-VN00-00"
+      },
+      {
+        "nodeName": "WM-WD-VN90-00"
+      },
+      {
+        "nodeName": "WM-WD-VN01-00"
+      },
+      {
+        "nodeName": "WM-WD-VN01-01"
+      },
+      {
+        "nodeName": "WM-WD-PH01-00"
+      },
+      {
+        "nodeName": "WM-WD-BN04-00"
+      },
+      {
+        "nodeName": "WM-WD-AD98-00"
+      },
+      {
+        "nodeName": "WM-WD-PL00-00"
+      },
+      {
+        "nodeName": "WM-WD-PH02-00"
+      },
+      {
+        "nodeName": "WM-WD-PH03-00"
+      },
+      {
+        "nodeName": "WM-WD-KN00-00"
+      },
+      {
+        "nodeName": "WM-WD-BN01-00"
+      },
+      {
+        "nodeName": "WM-WD-KH01-00"
+      },
+      {
+        "nodeName": "WM-WD-KH03-00"
+      },
+      {
+        "nodeName": "WM-WD-NI00-00"
+      },
+      {
+        "nodeName": "WM-WD-BN00-00"
+      },
+      {
+        "nodeName": "WM-WD-PL04-01"
+      },
+      {
+        "nodeName": "WM-WD-BK04-00"
+      },
+      {
+        "nodeName": "WM-WD-PL04-00"
+      },
+      {
+        "nodeName": "WM-WD-PR04-00"
+      },
+      {
+        "nodeName": "WM-WD-PR00-00"
+      },
+      {
+        "nodeName": "WM-WD-KH95-00"
+      },
+      {
+        "nodeName": "WM-WD-PR96-00"
+      },
+      {
+        "nodeName": "WM-WD-KH96-00"
+      }
+    ]
+  },
+  {
+    "Vertical": "Water-Quantity-Monitoring",
+    "description": "WM-WF",
+    "Nodes": [
+      {
+        "nodeName": "WM-WF-PH01-00"
+      },
+      {
+        "nodeName": "WM-WF-PH03-00"
+      },
+      {
+        "nodeName": "WM-WF-PH03-01"
+      },
+      {
+        "nodeName": "WM-WF-PH03-02"
+      },
+      {
+        "nodeName": "WM-WF-PH03-03"
+      },
+      {
+        "nodeName": "WM-WF-VN01-00"
+      },
+      {
+        "nodeName": "WM-WF-PH02-70"
+      },
+      {
+        "nodeName": "WM-WF-PH01-00"
+      },
+      {
+        "nodeName": "WM-WF-PH01-00"
+      },
+      {
+        "nodeName": "WM-WF-PH01-00"
+      },
+      {
+        "nodeName": "WM-WF-PH01-00"
+      },
+      {
+        "nodeName": "WM-WF-PH01-00"
+      }
+    ]
+  },
+  {
+    "Vertical": "Water-Level-Monitoring",
+    "description": "WM-WL",
+    "Nodes": [
+      {
+        "nodeName": "WM-WL-PH03-00"
+      },
+      {
+        "nodeName": "WM-WL-PH03-01"
+      },
+      {
+        "nodeName": "WM-WL-KH00-00"
+      },
+      {
+        "nodeName": "WM-WL-VN00-00"
+      },
+      {
+        "nodeName": "WM-WL-VN00-01"
+      },
+      {
+        "nodeName": "WM-WL-BK00-00"
+      },
+      {
+        "nodeName": "WM-WL-TH00-00"
+      },
+      {
+        "nodeName": "WM-WL-BK00-02"
+      }
+    ]
+  },
+  {
+    "Vertical": "Crowd Monitoring",
+    "description": "AE-CM",
+    "Nodes": [
+      {
+        "nodeName": "CM-MG00-00"
+      },
+      {
+        "nodeName": "CM-VN90-00"
+      },
+      {
+        "nodeName": "CM-MG99-00"
+      },
+      {
+        "nodeName": "CM-VN90-01"
+      },
+      {
+        "nodeName": "CM-VN91-00"
+      }
+    ]
+  }
+]
