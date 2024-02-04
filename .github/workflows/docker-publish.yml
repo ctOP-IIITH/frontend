@@ -28,11 +28,3 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: vjspranav/ctop-frontend:${{ github.sha }}
-
-      - name: Build and push with custom tag
-        run: |
-          docker build -t vjspranav/ctop-frontend:${{ github.sha }} .
-          docker push vjspranav/ctop-frontend:${{ github.sha }}
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
