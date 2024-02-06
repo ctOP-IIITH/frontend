@@ -11,7 +11,8 @@ import {
   InputLabel
 } from '@mui/material';
 import { CodeBlock, dracula } from 'react-code-blocks';
-import { BACKEND_API_URL } from '../constants';
+
+import { BACKEND_API_URL } from '../services/axiosConfig';
 
 export default function CodeComponent({ token, nodeParams, dataTypes }) {
   const [deviceType, setDeviceType] = useState('arduino');
