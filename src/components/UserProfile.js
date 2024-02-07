@@ -28,11 +28,12 @@ const USER_TYPES = {
 const UserProfile = () => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [users, setUsers] = useState([]);
+  // const [user, setUser] = useState(null);
+  // const [users, setUsers] = useState([]);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const {user, users, fetchedUser, fetchedUsers, fetchUserDetails, fetchUsers} = useContext(AuthContext)
 
   const handleLogout = () => {
     logout();
@@ -40,24 +41,9 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    axiosAuthInstance
-      .get('/user/profile')
-      .then((response) => {
-        setUser(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching user data', error);
-      });
-
-    axiosAuthInstance
-      .get('/user/getusers')
-      .then((response) => {
-        setUsers(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching users', error);
-      });
-  }, []);
+    if(!fetchedUser) fetchUserDetails()
+    if(!fetchedUsers) fetchUsers()
+  })
 
   const handlePasswordChange = () => {
     // check if new password and confirm password match
