@@ -12,8 +12,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import { axiosAuthInstance } from '../services/axiosConfig';
-import { BACKEND_API_URL } from '../constants';
+import { axiosAuthInstance, BACKEND_API_URL } from '../services/axiosConfig';
 import CodeComponent from './CodeComponent';
 
 export default function Details() {
