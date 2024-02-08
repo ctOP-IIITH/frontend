@@ -76,7 +76,6 @@ export default function Details() {
           });
         }
         setSelectedData(selectedItem);
-        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -94,18 +93,23 @@ export default function Details() {
 
     // TODO: FETCH VENDOR ASSIGNED TO NODE
     setVendorAssigned(false);
-
-    if (user.user_type === USER_TYPES.ADMIN) {
-      setShowCodeComponent(true);
-    }
-    if (user.user_type === USER_TYPES.VENDOR) {
-      // Check if vendor is assigned to the node
-      setShowCodeComponent(false);
-    }
-    if (user.user_type === USER_TYPES.USER) {
-      setShowCodeComponent(false);
-    }
   }, [location.search]);
+
+  useEffect(() => {
+    if (isUserfetched) {
+      setLoading(false);
+      if (user.user_type === USER_TYPES.ADMIN) {
+        setShowCodeComponent(true);
+      }
+      if (user.user_type === USER_TYPES.VENDOR) {
+        // Check if vendor is assigned to the node
+        setShowCodeComponent(false);
+      }
+      if (user.user_type === USER_TYPES.USER) {
+        setShowCodeComponent(false);
+      }
+    }
+  }, [isUserfetched]);
 
   const adminVendorAssignment = (
     <Grid item xs={12}>
@@ -140,9 +144,11 @@ export default function Details() {
   );
 
   return loading ? (
-    <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
-      Loading...
-    </Typography>
+    <Box sx={{ p: 3, m: 3 }}>
+      <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
+        Loading...
+      </Typography>
+    </Box>
   ) : (
     <Box sx={{ p: 3, m: 3 }}>
       {selectedData ? (
@@ -264,7 +270,7 @@ export default function Details() {
         </Grid>
       ) : (
         <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
-          No data found!
+          Loading...
         </Typography>
       )}
     </Box>
