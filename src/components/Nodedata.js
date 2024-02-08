@@ -76,6 +76,17 @@ export default function Details() {
           });
         }
         setSelectedData(selectedItem);
+        console.log(selectedItem);
+        axiosAuthInstance
+          .get(`/nodes/get-vendor/${selectedItem.node_name}`)
+          .then((res) => {
+            setVendorAssigned(res.data);
+            console.log(res.data);
+          })
+          .catch((error) => {
+            console.error('Error fetching vendor', error);
+            setVendorAssigned(false);
+          });
       })
       .catch((error) => {
         console.log(error);
@@ -90,9 +101,6 @@ export default function Details() {
           }, 2000);
         });
       });
-
-    // TODO: FETCH VENDOR ASSIGNED TO NODE
-    setVendorAssigned(false);
   }, [location.search]);
 
   useEffect(() => {
@@ -102,14 +110,15 @@ export default function Details() {
         setShowCodeComponent(true);
       }
       if (user.user_type === USER_TYPES.VENDOR) {
-        // Check if vendor is assigned to the node
-        setShowCodeComponent(false);
+        if (vendorAssigned) {
+          setShowCodeComponent(user.email === vendorAssigned.email);
+        }
       }
       if (user.user_type === USER_TYPES.USER) {
         setShowCodeComponent(false);
       }
     }
-  }, [isUserfetched]);
+  }, [isUserfetched, vendorAssigned]);
 
   const adminVendorAssignment = (
     <Grid item xs={12}>
@@ -118,12 +127,47 @@ export default function Details() {
       </Typography>
       {vendorAssigned ? (
         <Box>
-          <Typography variant="body1" gutterBottom>
-            {vendorAssigned.name}
+          <Typography variant="body2" color="text.secondary">
+            <strong>Username: </strong> {vendorAssigned.username}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            <strong>Email: </strong> {vendorAssigned.email}
           </Typography>
         </Box>
       ) : (
-        <Box component="form" onSubmit={() => null} noValidate sx={{ mt: 1 }}>
+        <Box
+          component="form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const vendorEmail = document.getElementById('vendorEmail').value;
+            axiosAuthInstance
+              .post(`/nodes/assign-vendor`, {
+                vendor_email: vendorEmail,
+                node_id: selectedData.node_name
+              })
+              .then((res) => {
+                console.log(res);
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Vendor assigned successfully!',
+                  timer: 2000
+                }).then(() => {
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                });
+              })
+              .catch((error) => {
+                console.error('Error assigning vendor', error);
+                Swal.fire({
+                  icon: 'error',
+                  title: error.response.data.detail || 'Error assigning vendor',
+                  timer: 2000
+                });
+              });
+          }}
+          noValidate
+          sx={{ mt: 1 }}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -143,6 +187,21 @@ export default function Details() {
     </Grid>
   );
 
+  const vendorVendorAssignment = (
+    <Grid item xs={12}>
+      <Typography variant="h5" gutterBottom>
+        Assigned Vendor
+      </Typography>
+      {vendorAssigned ? (
+        <Typography variant="body2" color="text.secondary">
+          <strong>Username: </strong> {vendorAssigned.username} <br />
+          <strong>Email: </strong> {vendorAssigned.email}
+        </Typography>
+      ) : (
+        <Typography gutterBottom>Not Assigned</Typography>
+      )}
+    </Grid>
+  );
   return loading ? (
     <Box sx={{ p: 3, m: 3 }}>
       <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
@@ -177,20 +236,16 @@ export default function Details() {
 
                   <Grid item xs={6}>
                     {user.user_type === USER_TYPES.ADMIN && adminVendorAssignment}
-                    {user.user_type === USER_TYPES.VENDOR && (
-                      <Grid item xs={12}>
-                        <Typography variant="h5" gutterBottom>
-                          Assigned Vendor
-                        </Typography>
-                        {/* Add logic to display whether user is assigned or not for vendor */}
-                      </Grid>
-                    )}
+                    {user.user_type === USER_TYPES.VENDOR && vendorVendorAssignment}
                     {user.user_type === USER_TYPES.USER && (
                       <Grid item xs={12}>
                         <Typography variant="h5" gutterBottom>
                           Vendor Assignment
                         </Typography>
-                        {/* Add logic to display whether a vendor is assigned or not for user */}
+                        <Typography variant="body1">
+                          <strong>Vendor: </strong>
+                          {vendorAssigned ? vendorAssigned.username : 'Not Assigned'}
+                        </Typography>
                       </Grid>
                     )}
                   </Grid>
