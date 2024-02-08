@@ -18,17 +18,12 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import { axiosAuthInstance } from '../services/axiosConfig';
 import { AuthContext } from '../contexts/AuthContext';
-
-const USER_TYPES = {
-  ADMIN: 1,
-  VENDOR: 2,
-  USER: 3
-};
+import { DataContext } from '../contexts/DataContext';
 
 const UserProfile = () => {
   const { logout } = useContext(AuthContext);
+  const { user, fetchUser, isUserfetched, USER_TYPES } = useContext(DataContext);
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -40,14 +35,7 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    axiosAuthInstance
-      .get('/user/profile')
-      .then((response) => {
-        setUser(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching user data', error);
-      });
+    if (!isUserfetched) fetchUser();
 
     axiosAuthInstance
       .get('/user/getusers')
