@@ -104,7 +104,7 @@ export default function Details() {
   }, [location.search]);
 
   useEffect(() => {
-    if (isUserfetched) {
+    if (isUserfetched && vendorAssigned) {
       setLoading(false);
       if (user.user_type === USER_TYPES.ADMIN) {
         setShowCodeComponent(true);
