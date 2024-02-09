@@ -22,7 +22,7 @@ import { DataContext } from '../contexts/DataContext';
 
 const UserProfile = () => {
   const { logout } = useContext(AuthContext);
-  const { user, fetchUser, isUserfetched, USER_TYPES } = useContext(DataContext);
+  const { user, fetchUser, isUserfetched, setUser, USER_TYPES } = useContext(DataContext);
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [oldPassword, setOldPassword] = useState('');
@@ -31,6 +31,7 @@ const UserProfile = () => {
 
   const handleLogout = () => {
     logout();
+    setUser(null);
     navigate('/');
   };
 

@@ -57,6 +57,7 @@ export function DataProvider({ children }) {
       fetchUser,
       isUserfetched,
       user,
+      setUser,
       USER_TYPES
     }),
     [verticals, nodes, user]
