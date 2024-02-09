@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useContext, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 // import Home from './components/Home';
@@ -20,7 +19,6 @@ import AllNodes from './components/Allnodes';
 import UserProfile from './components/UserProfile';
 import CreateUser from './components/CreateUser';
 import AddAdvanced from './components/AddAdvanced';
-import { DataContext } from './contexts/DataContext';
 
 function PrivateRoute() {
   const { isLoggedIn } = useAuth();
@@ -33,12 +31,6 @@ function PublicRoute() {
 }
 
 function App() {
-  const { fetchUser, isUserfetched } = useContext(DataContext);
-
-  useEffect(() => {
-    if (!isUserfetched) fetchUser();
-  }, []);
-
   return (
     <Router>
       <TopBar>
