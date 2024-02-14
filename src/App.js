@@ -1,6 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
+
 // import Home from './components/Home';
 import Home from './homepage/Home';
 import Add from './components/Add';
@@ -20,6 +22,8 @@ import UserProfile from './components/UserProfile';
 import CreateUser from './components/CreateUser';
 import AddAdvanced from './components/AddAdvanced';
 
+import { isAxiosReady } from './services/axiosConfig';
+
 function PrivateRoute() {
   const { isLoggedIn } = useAuth();
   return isLoggedIn ? <Outlet /> : <Navigate to="/login" />;
@@ -31,6 +35,22 @@ function PublicRoute() {
 }
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAxiosReady = async () => {
+      isAxiosReady.then(() => {
+        setIsLoading(false);
+      });
+    };
+
+    checkAxiosReady();
+  }, [isAxiosReady]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Router>
       <TopBar>

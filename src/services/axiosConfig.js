@@ -11,16 +11,13 @@ let BACKEND_API_URL;
 
 const fetchConfig = async () => {
   try {
-    const response = await axios.get(
-      'https://raw.githubusercontent.com/ctOP-IIITH/config/main/api_url.json'
-    );
-    BACKEND_API_URL = response.data.BACKEND_API_URL;
+    const response = await fetch('./backend.json');
+    const data = await response.json();
+    BACKEND_API_URL = data.BACKEND_API_URL;
   } catch (error) {
     console.error('Error fetching BACKEND_API_URL:', error);
   }
-};
 
-fetchConfig().then(() => {
   axiosInstance = axios.create({
     baseURL: BACKEND_API_URL,
     timeout: 10000,
@@ -111,6 +108,8 @@ fetchConfig().then(() => {
       return Promise.reject(error);
     }
   );
-});
+};
 
-export { axiosInstance, axiosAuthInstance, BACKEND_API_URL };
+const isAxiosReady = fetchConfig();
+
+export { axiosInstance, axiosAuthInstance, BACKEND_API_URL, isAxiosReady };
