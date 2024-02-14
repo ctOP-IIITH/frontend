@@ -1,4 +1,5 @@
 import { Fragment, useContext, useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -18,17 +19,12 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import { axiosAuthInstance } from '../services/axiosConfig';
 import { AuthContext } from '../contexts/AuthContext';
-
-const USER_TYPES = {
-  ADMIN: 1,
-  VENDOR: 2,
-  USER: 3
-};
+import { DataContext } from '../contexts/DataContext';
 
 const UserProfile = () => {
   const { logout } = useContext(AuthContext);
+  const { user, fetchUser, isUserfetched, setUser, USER_TYPES } = useContext(DataContext);
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -36,18 +32,12 @@ const UserProfile = () => {
 
   const handleLogout = () => {
     logout();
+    setUser(null);
     navigate('/');
   };
 
   useEffect(() => {
-    axiosAuthInstance
-      .get('/user/profile')
-      .then((response) => {
-        setUser(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching user data', error);
-      });
+    if (!isUserfetched) fetchUser();
 
     axiosAuthInstance
       .get('/user/getusers')
@@ -55,6 +45,15 @@ const UserProfile = () => {
         setUsers(response.data);
       })
       .catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error fetching users',
+          showConfirmButton: false,
+          timer: 1500,
+          toast: true,
+          position: 'center-end'
+        });
         console.error('Error fetching users', error);
       });
   }, []);

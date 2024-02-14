@@ -49,10 +49,10 @@ function AreaTable({ selectedSegment }) {
 
   const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(odd)': {
-      backgroundColor: lighten(color, 0.5) // lighter shade of the selected color
+      backgroundColor: lighten(color, 0.3) // lighter shade of the selected color
     },
     '&:nth-of-type(even)': {
-      backgroundColor: darken(color, 0.5) // darker shade of the selected color,
+      backgroundColor: darken(color, 0.3) // darker shade of the selected color,
     },
     // hide last border
     '&:last-child td, &:last-child th': {

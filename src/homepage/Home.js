@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Typography, Container } from '@mui/material';
+import Swal from 'sweetalert2';
+
 import StatCard from './StatCard';
 import DomainCard from './DomainCard';
 import PieChart from './piechart';
@@ -48,9 +50,23 @@ function Home() {
   };
 
   useEffect(() => {
-    axiosAuthInstance.get('/stats/loners').then((response) => {
-      setLonerStats(response.data);
-    });
+    axiosAuthInstance
+      .get('/stats/loners')
+      .then((response) => {
+        setLonerStats(response.data);
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error fetching stats',
+          showConfirmButton: false,
+          timer: 1500,
+          toast: true,
+          position: 'center-end'
+        });
+        console.error('Error fetching stats:', err);
+      });
   }, []);
 
   return (

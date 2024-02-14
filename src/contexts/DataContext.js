@@ -7,6 +7,14 @@ export function DataProvider({ children }) {
   const [verticals, setVerticals] = useState([]);
   const [nodes, setNodes] = useState([]);
   const [fetchedVerticals, setFetchedVerticals] = useState(false);
+  const [isUserfetched, setIsUserfetched] = useState(false);
+  const [user, setUser] = useState(null);
+
+  const USER_TYPES = {
+    ADMIN: 1,
+    VENDOR: 2,
+    USER: 3
+  };
 
   const fetchAllVerticals = () => {
     axiosAuthInstance.get('/verticals/all').then((response) => {
@@ -24,9 +32,35 @@ export function DataProvider({ children }) {
     });
   };
 
+  const fetchUser = () => {
+    axiosAuthInstance
+      .get('/user/profile')
+      .then((response) => {
+        setUser(response.data);
+        setIsUserfetched(true);
+      })
+      .catch((error) => {
+        console.error('Error fetching user data', error);
+        setIsUserfetched(false);
+        setUser(null);
+      });
+  };
+
   const value = useMemo(
-    () => ({ verticals, setVerticals, nodes, setNodes, fetchAllVerticals, fetchedVerticals }),
-    [verticals, nodes]
+    () => ({
+      verticals,
+      setVerticals,
+      nodes,
+      setNodes,
+      fetchAllVerticals,
+      fetchedVerticals,
+      fetchUser,
+      isUserfetched,
+      user,
+      setUser,
+      USER_TYPES
+    }),
+    [verticals, nodes, user]
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
