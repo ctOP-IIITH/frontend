@@ -104,10 +104,10 @@ export default function Details() {
   }, [location.search]);
 
   useEffect(() => {
-    if (isUserfetched && vendorAssigned) {
+    if (isUserfetched) {
       setLoading(false);
       if (user.user_type === USER_TYPES.ADMIN) {
-        setShowCodeComponent(true);
+        setShowCodeComponent(vendorAssigned);
       }
       if (user.user_type === USER_TYPES.VENDOR) {
         if (vendorAssigned) {
@@ -263,6 +263,7 @@ export default function Details() {
               token={selectedData.token_num}
               nodeParams={selectedData.parameters}
               dataTypes={selectedData.data_types}
+              apiToken={vendorAssigned.api_token}
             />
           )}
           <Grid item xs={12}>
