@@ -1,5 +1,6 @@
 import React from 'react';
 import { Typography, Container, Button } from '@mui/material';
+import { APP_NAME } from '../constants';
 
 function NotFound() {
   return (
@@ -12,7 +13,7 @@ function NotFound() {
       </Typography>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Button variant="contained" color="primary" href="/">
-          Go to Homepage
+          Go to {APP_NAME} Home
         </Button>
       </div>
     </Container>
