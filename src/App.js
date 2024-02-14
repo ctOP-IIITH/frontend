@@ -1,9 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
+import { RingLoader } from 'react-spinners';
+import { Box } from '@mui/system';
 
-// import Home from './components/Home';
+import { useAuth } from './contexts/AuthContext';
 import Home from './homepage/Home';
 import Add from './components/Add';
 import Vertical from './components/Vertical';
@@ -48,7 +49,12 @@ function App() {
   }, [isAxiosReady]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Box
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <RingLoader color="#123462" loading />
+      </Box>
+    );
   }
 
   return (
