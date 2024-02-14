@@ -18,7 +18,6 @@ import PrivateComponent from './components/PrivateComponent';
 import NotFound from './components/NotFound';
 import TopBar from './components/TopBar';
 import Login from './components/Login';
-import AllNodes from './components/Allnodes';
 import UserProfile from './components/UserProfile';
 import CreateUser from './components/CreateUser';
 import AddAdvanced from './components/AddAdvanced';
@@ -85,9 +84,6 @@ function App() {
           </Route>
           <Route path="details" element={<PrivateRoute />}>
             <Route path="/details" element={<Details />} />
-          </Route>
-          <Route path="allnodes" element={<PrivateRoute />}>
-            <Route path="/allnodes" element={<AllNodes />} />
           </Route>
           <Route path="nodedata" element={<PrivateRoute />}>
             <Route path="/nodedata" element={<Nodedata />} />

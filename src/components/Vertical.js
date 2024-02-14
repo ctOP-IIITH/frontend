@@ -59,6 +59,15 @@ const Vertical = () => {
         }
       })
       .catch((error) => {
+        SweetAlert.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error Deleting Vertical',
+          showConfirmButton: false,
+          timer: 1500,
+          toast: true,
+          position: 'center-end'
+        });
         console.log(error);
       });
   };

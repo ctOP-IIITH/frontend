@@ -47,9 +47,23 @@ export default function MultipleSelect() {
     setSelectedData(selectedItem);
     setSelectedDataError(false);
 
-    axiosAuthInstance.get(`/sensor-types/get/${value}`).then((response) => {
-      setSensorTypes(response.data);
-    });
+    axiosAuthInstance
+      .get(`/sensor-types/get/${value}`)
+      .then((response) => {
+        setSensorTypes(response.data);
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error fetching sensor types',
+          showConfirmButton: false,
+          timer: 1500,
+          toast: true,
+          position: 'center-end'
+        });
+        console.error('Error fetching stats:', err);
+      });
   };
 
   const handleAddNodeType = () => {
