@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { HashRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 // import Home from './components/Home';
 import Home from './homepage/Home';
