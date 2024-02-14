@@ -9,5 +9,7 @@ RUN npm run build
 
 FROM nginx:alpine
 COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx_conf/default /etc/nginx/conf.d/default.conf
+COPY start.sh /start.sh
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/bin/sh", "/start.sh"]
