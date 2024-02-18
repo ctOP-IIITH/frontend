@@ -212,7 +212,7 @@ export default function Details() {
         if (response.status === 204) {
           SweetAlert.fire({
             icon: 'success',
-            title: 'Vertical Deleted Successfully',
+            title: 'Node Deleted Successfully',
             showConfirmButton: false,
             timer: 1500
           });

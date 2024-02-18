@@ -97,6 +97,16 @@ function CreateSensorType() {
       return;
     }
 
+    // check if at least one parameter is added
+    if (parameters.length === 0) {
+      MySwal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'At least one parameter is required.'
+      });
+      return;
+    }
+
     axiosAuthInstance
       .post('sensor-types/create', {
         res_name: sensorTypeName,
