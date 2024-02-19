@@ -126,7 +126,6 @@ export default function Details() {
 
   useEffect(() => {
     if(nodeId === false) return;
-
     const code = selectedData.node_name.slice(0, 2);
 
     axiosAuthInstance

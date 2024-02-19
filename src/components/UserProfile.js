@@ -12,9 +12,10 @@ import {
   ListItem,
   ListItemText,
   CardHeader,
-  IconButton
+  IconButton,
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { DataGrid } from '@mui/x-data-grid';
 
 import { axiosAuthInstance } from '../services/axiosConfig';
 import { AuthContext } from '../contexts/AuthContext';
@@ -25,6 +26,12 @@ const USER_TYPES = {
   USER: 3
 };
 
+const columns = [
+  { field: 'node_id', headerName: 'Node ID', width: 300 },
+  { field: 'created_date', headerName: 'Created Date', width: 400 },
+  { field: 'url', headerName: 'URL', width: 400}
+];
+
 const UserProfile = () => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -34,7 +41,7 @@ const UserProfile = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const {user, users, fetchedUser, fetchedUsers, fetchUserDetails, fetchUsers} = useContext(AuthContext)
-
+  const [userSubscriptions, setUserSubscriptions] = useState([])
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -75,6 +82,33 @@ const UserProfile = () => {
       });
   };
 
+  const getUserSubscriptions = () => {
+    axiosAuthInstance
+      .get('/subscription/get-user-subscriptions')
+      .then((response) => {
+        if (response.status === 200) {
+          // update the created date to a more readable format
+          for (let i = 0; i < response.data.length; i+=1) {
+            response.data[i].created_date = new Date(response.data[i].created_date).toLocaleString();
+          }
+          setUserSubscriptions(response.data);
+          console.log('User subscriptions', response.data);
+        }
+      })
+      .catch((error) => {
+        console.error('Error getting user subscriptions', error);
+        if (error.response) alert(error.response.data.detail);
+        else alert('Error getting user subscriptions');
+      });
+  };
+
+  useEffect(() => {
+    if (user) {
+      getUserSubscriptions();
+    }
+  }, [user]);
+
+
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -86,6 +120,30 @@ const UserProfile = () => {
           <Typography variant="h4">User Profile</Typography>
           <Typography variant="h6">Name: {user.username}</Typography>
           <Typography variant="h6">Email: {user.email}</Typography>
+        </CardContent>
+      </Card>
+      <Card sx={{ mb: 2 }}>
+        <CardHeader
+          title={
+            <Typography variant="h4" component="div">
+              Subscriptions
+            </Typography>
+          }
+        />
+        <CardContent>
+          <DataGrid
+            rows={userSubscriptions}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 5 },
+              },
+            }}
+            pageSizeOptions={[5, 10, 20]}
+            // checkboxSelection
+            autoHeight
+            disableSelectionOnClick
+          />  
         </CardContent>
       </Card>
       <Card sx={{ mb: 2 }}>
@@ -161,6 +219,7 @@ const UserProfile = () => {
         </Button>
       </Box>
     </Box>
+    
   );
 };
 
