@@ -19,12 +19,7 @@ import { DataGrid } from '@mui/x-data-grid';
 
 import { axiosAuthInstance } from '../services/axiosConfig';
 import { AuthContext } from '../contexts/AuthContext';
-
-const USER_TYPES = {
-  ADMIN: 1,
-  VENDOR: 2,
-  USER: 3
-};
+import { DataContext } from '../contexts/DataContext';
 
 const columns = [
   { field: 'node_id', headerName: 'Node ID', width: 300 },
@@ -35,15 +30,17 @@ const columns = [
 const UserProfile = () => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const {USER_TYPES} = useContext(DataContext);
   // const [user, setUser] = useState(null);
   // const [users, setUsers] = useState([]);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const {user, users, fetchedUser, fetchedUsers, fetchUserDetails, fetchUsers} = useContext(AuthContext)
+  const {user, users, setUser, fetchedUser, fetchedUsers, fetchUserDetails, fetchUsers} = useContext(AuthContext)
   const [userSubscriptions, setUserSubscriptions] = useState([])
   const handleLogout = () => {
     logout();
+    setUser(null);
     navigate('/');
   };
 

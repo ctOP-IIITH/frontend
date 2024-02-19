@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useMemo } from 'react';
+import Swal from 'sweetalert2';
 import authService from '../services/authService';
 import { axiosAuthInstance } from '../services/axiosConfig';
 // import axios from 'axios';
@@ -28,7 +29,16 @@ export function AuthProvider({ children }) {
       setFetchedUsers(true)
     })
     .catch((error) => {
-      console.error("Error fetching users ", error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error fetching users',
+        showConfirmButton: false,
+        timer: 1500,
+        toast: true,
+        position: 'center-end'
+      });
+      console.error('Error fetching users', error);
     })
   }
 

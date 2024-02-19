@@ -1,7 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { RingLoader } from 'react-spinners';
+import { Box } from '@mui/system';
+
 import { useAuth } from './contexts/AuthContext';
-// import Home from './components/Home';
 import Home from './homepage/Home';
 import Add from './components/Add';
 import Vertical from './components/Vertical';
@@ -15,10 +18,11 @@ import PrivateComponent from './components/PrivateComponent';
 import NotFound from './components/NotFound';
 import TopBar from './components/TopBar';
 import Login from './components/Login';
-import AllNodes from './components/Allnodes';
 import UserProfile from './components/UserProfile';
 import CreateUser from './components/CreateUser';
 import AddAdvanced from './components/AddAdvanced';
+
+import { isAxiosReady } from './services/axiosConfig';
 
 function PrivateRoute() {
   const { isLoggedIn } = useAuth();
@@ -31,6 +35,27 @@ function PublicRoute() {
 }
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAxiosReady = async () => {
+      isAxiosReady.then(() => {
+        setIsLoading(false);
+      });
+    };
+
+    checkAxiosReady();
+  }, [isAxiosReady]);
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <RingLoader color="#123462" loading />
+      </Box>
+    );
+  }
+
   return (
     <Router>
       <TopBar>
@@ -59,9 +84,6 @@ function App() {
           </Route>
           <Route path="details" element={<PrivateRoute />}>
             <Route path="/details" element={<Details />} />
-          </Route>
-          <Route path="allnodes" element={<PrivateRoute />}>
-            <Route path="/allnodes" element={<AllNodes />} />
           </Route>
           <Route path="nodedata" element={<PrivateRoute />}>
             <Route path="/nodedata" element={<Nodedata />} />

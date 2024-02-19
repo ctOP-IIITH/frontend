@@ -1,7 +1,6 @@
 // React imports
 import { useContext, useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
 // Material UI imports
 import {
   Box,
@@ -91,22 +90,36 @@ export default function Details() {
   const navigate = useNavigate();
 
   const fetchNodes = (curFilter) => {
-    axiosAuthInstance.get(`/nodes/${curFilter}`).then((response) => {
-      const selectedItem = {
-        id: curFilter,
-        name: curFilter,
-        nodes: response.data.map((node) => ({
-          nodeName: node.node_name,
-          nodeSensorType: node.res_name,
-          nodeOrid: node.orid,
-          nodeDataOrid: node.data_orid,
-          nodeArea: node.area,
-          nodeTokenNumber: node.token_num,
-          nodeSensorNumber: node.sensor_node_number
-        }))
-      };
-      setSelectedData(selectedItem);
-    });
+    axiosAuthInstance
+      .get(`/nodes/${curFilter}`)
+      .then((response) => {
+        const selectedItem = {
+          id: curFilter,
+          name: curFilter,
+          nodes: response.data.map((node) => ({
+            nodeName: node.node_name,
+            nodeSensorType: node.res_name,
+            nodeOrid: node.orid,
+            nodeDataOrid: node.data_orid,
+            nodeArea: node.area,
+            nodeTokenNumber: node.token_num,
+            nodeSensorNumber: node.sensor_node_number
+          }))
+        };
+        setSelectedData(selectedItem);
+      })
+      .catch((err) => {
+        SweetAlert.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error fetching node',
+          showConfirmButton: false,
+          timer: 1500,
+          toast: true,
+          position: 'center-end'
+        });
+        console.error('Error fetching stats:', err);
+      });
   };
 
   useEffect(() => {
