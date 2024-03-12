@@ -162,7 +162,7 @@ export default function Details() {
   }, [nodeId]);
 
   useEffect(() => {
-    if (isUserfetched && vendorAssigned) {
+    if (isUserfetched) {
       setLoading(false);
       if (user.user_type === USER_TYPES.ADMIN) {
         setShowCodeComponent(vendorAssigned);
