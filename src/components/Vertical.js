@@ -62,9 +62,9 @@ const Vertical = () => {
         SweetAlert.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Error Deleting Vertical',
+          text: error?.response?.data?.detail || `Error Deleting Vertical`,
           showConfirmButton: false,
-          timer: 1500,
+          timer: 3000,
           toast: true,
           position: 'center-end'
         });

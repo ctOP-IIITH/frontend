@@ -165,7 +165,7 @@ export default function Details() {
     if (isUserfetched && vendorAssigned) {
       setLoading(false);
       if (user.user_type === USER_TYPES.ADMIN) {
-        setShowCodeComponent(true);
+        setShowCodeComponent(vendorAssigned);
       }
       if (user.user_type === USER_TYPES.VENDOR) {
         if (vendorAssigned) {
@@ -340,6 +340,7 @@ export default function Details() {
               token={selectedData.token_num}
               nodeParams={selectedData.parameters}
               dataTypes={selectedData.data_types}
+              apiToken={vendorAssigned.api_token}
             />
           )}
           {/* Data Collected */}
