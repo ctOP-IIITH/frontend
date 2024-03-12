@@ -128,19 +128,27 @@ const UserProfile = () => {
           }
         />
         <CardContent>
-          <DataGrid
-            rows={userSubscriptions}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 5 },
-              },
-            }}
-            pageSizeOptions={[5, 10, 20]}
-            // checkboxSelection
-            autoHeight
-            disableSelectionOnClick
-          />  
+            {userSubscriptions.length > 0 ? (
+                <DataGrid
+                    rows={userSubscriptions}
+                    columns={columns}
+                    initialState={{
+                        pagination: {
+                            paginationModel: { page: 0, pageSize: 5 },
+                        },
+                    }}
+                    pageSizeOptions={[5, 10, 20]}
+                    // checkboxSelection
+                    autoHeight
+                    disableSelectionOnClick
+                />
+            ) : (
+                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                    <Typography variant="h6" color="textSecondary">
+                        No subscriptions
+                    </Typography>
+                </Box>
+            )}
         </CardContent>
       </Card>
       <Card sx={{ mb: 2 }}>
