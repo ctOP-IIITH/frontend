@@ -7,7 +7,7 @@ export function DataProvider({ children }) {
   const [verticals, setVerticals] = useState([]);
   const [nodes, setNodes] = useState([]);
   const [fetchedVerticals, setFetchedVerticals] = useState(false);
-  const [isUserfetched, setIsUserfetched] = useState(false);
+  const [isUserfetched, setIsUserFetched] = useState(false);
   const [user, setUser] = useState(null);
 
   const USER_TYPES = {
@@ -37,11 +37,11 @@ export function DataProvider({ children }) {
       .get('/user/profile')
       .then((response) => {
         setUser(response.data);
-        setIsUserfetched(true);
+        setIsUserFetched(true);
       })
       .catch((error) => {
         console.error('Error fetching user data', error);
-        setIsUserfetched(false);
+        setIsUserFetched(false);
         setUser(null);
       });
   };
@@ -56,6 +56,7 @@ export function DataProvider({ children }) {
       fetchedVerticals,
       fetchUser,
       isUserfetched,
+      setIsUserFetched,
       user,
       setUser,
       USER_TYPES

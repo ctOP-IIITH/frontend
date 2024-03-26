@@ -30,7 +30,7 @@ const columns = [
 const UserProfile = () => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const {USER_TYPES} = useContext(DataContext);
+  const {setIsUserFetched, USER_TYPES} = useContext(DataContext);
   // const [user, setUser] = useState(null);
   // const [users, setUsers] = useState([]);
   const [oldPassword, setOldPassword] = useState('');
@@ -41,6 +41,7 @@ const UserProfile = () => {
   const handleLogout = () => {
     logout();
     setUser(null);
+    setIsUserFetched(false);
     navigate('/');
   };
 
