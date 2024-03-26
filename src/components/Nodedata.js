@@ -1,6 +1,28 @@
 import { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Alert, Box, Typography, Grid, Card, CardContent, Chip, Button, Table, TableBody, TableCell, TableContainer, TableRow, IconButton, Link, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Chip,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  IconButton,
+  Link,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Snackbar
+} from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import Swal from 'sweetalert2';
@@ -20,7 +42,7 @@ export default function Details() {
   const [subscribedUrls, setSubscribedUrls] = useState([]);
   const [notificationType, setNotificationType] = useState('');
   const [notificationMessage, setNotificationMessage] = useState('');
-  const [showSubscribedUrls, setShowSubscribedUrls] = useState(false); 
+  const [showSubscribedUrls, setShowSubscribedUrls] = useState(false);
 
   const { user, fetchUser, isUserfetched, USER_TYPES } = useContext(DataContext);
 
@@ -46,7 +68,7 @@ export default function Details() {
       setNotificationType('info');
       setNotificationMessage('Already subscribed to this URL');
       return;
-    } 
+    }
 
     const code = selectedData.node_name.slice(0, 2);
 
@@ -143,7 +165,7 @@ export default function Details() {
   }, [location.search]);
 
   useEffect(() => {
-    if(nodeId === false) return;
+    if (nodeId === false) return;
     const code = selectedData.node_name.slice(0, 2);
 
     axiosAuthInstance
@@ -153,7 +175,7 @@ export default function Details() {
       .then((response) => {
         if (response.status === 200) {
           const res = response.data.map((sub) => sub.url);
-          setSubscribedUrls(res)
+          setSubscribedUrls(res);
         }
       })
       .catch((error) => {
@@ -311,11 +333,19 @@ export default function Details() {
                 </Grid>
                 <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>
                   Subscriptions:
-                  <Button variant="contained" color="primary" sx={{ ml: 2 }} onClick={handleSubscriptionDialogOpen}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ ml: 2 }}
+                    onClick={handleSubscriptionDialogOpen}>
                     Subscribe
                   </Button>
                 </Typography>
-                <Button onClick={toggleSubscribedUrls} variant='contained' color="primary" sx={{ mt: 2 }}>
+                <Button
+                  onClick={toggleSubscribedUrls}
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 2 }}>
                   {showSubscribedUrls ? 'Hide Subscribed URLs' : 'Show Subscribed URLs'}
                 </Button>
                 {showSubscribedUrls && (
@@ -323,11 +353,11 @@ export default function Details() {
                     <Typography variant="h6" gutterBottom>
                       Subscribed URLs:
                     </Typography>
-                    { subscribedUrls.map((url, index) =>  (
+                    {subscribedUrls.map((url, index) => (
                       <Typography key={url} variant="body1">
                         {index + 1}. {url}
                       </Typography>
-                    )) }
+                    ))}
                   </Box>
                 )}
               </CardContent>
@@ -433,7 +463,10 @@ export default function Details() {
           >
             Subscribe
           </Button>
-          <Button onClick={handleSubscriptionDialogClose} color="primary" sx={{ color: 'primary.dark' }}>
+          <Button
+            onClick={handleSubscriptionDialogClose}
+            color="primary"
+            sx={{ color: 'primary.dark' }}>
             Cancel
           </Button>
         </DialogActions>
@@ -443,14 +476,12 @@ export default function Details() {
       <Snackbar
         open={!!notificationMessage}
         autoHideDuration={6000}
-        onClose={handleSnackbarClose} 
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
         <Alert onClose={handleSnackbarClose} severity={notificationType} sx={{ width: '100%' }}>
           {notificationMessage}
         </Alert>
       </Snackbar>
-
     </Box>
   );
 }
