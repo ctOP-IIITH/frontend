@@ -43,6 +43,41 @@ export default function Details() {
   const [notificationType, setNotificationType] = useState('');
   const [notificationMessage, setNotificationMessage] = useState('');
   const [showSubscribedUrls, setShowSubscribedUrls] = useState(false);
+  const [showSampleData, setShowSampleData] = useState(false);
+
+  // Sample JSON data for demonstration
+  const sampleData = (params) => `{
+  "m2m:sgn": {
+    "m2m:nev": {
+      "m2m:rep": {
+        "m2m:cin": {
+          "rn": "<node_name>",
+          "ty": 4,
+          "ri": "<resource_id>",
+          "pi": "<parent_id>",
+          "ct": "<creation_time>",
+          "lt": "<last_modified_time>",
+          "lbl": ["<label>"],
+          "st": 0,
+          "cnf": "text/plain:0",
+          "cs": 6,
+          "con": ${JSON.stringify(params)}
+        }
+      },
+      "m2m:rss": 1
+    },
+    "m2m:sud": false,
+    "m2m:sur": "<subscription_id>"
+  }
+}`;
+
+  const handleShowSampleData = () => {
+    setShowSampleData(true);
+  };
+
+  const handleCloseSampleData = () => {
+    setShowSampleData(false);
+  };
 
   const { user, fetchUser, isUserfetched, USER_TYPES } = useContext(DataContext);
 
@@ -341,13 +376,22 @@ export default function Details() {
                     Subscribe
                   </Button>
                 </Typography>
-                <Button
-                  onClick={toggleSubscribedUrls}
-                  variant="contained"
-                  color="primary"
-                  sx={{ mt: 2 }}>
-                  {showSubscribedUrls ? 'Hide Subscribed URLs' : 'Show Subscribed URLs'}
-                </Button>
+                <Box display="flex" gap={2}>
+                  <Button
+                    onClick={toggleSubscribedUrls}
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 2 }}>
+                    {showSubscribedUrls ? 'Hide Subscribed URLs' : 'Show Subscribed URLs'}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleShowSampleData}
+                    sx={{ mt: 2 }}>
+                    Show Sample Data
+                  </Button>
+                </Box>
                 {showSubscribedUrls && (
                   <Box>
                     <Typography variant="h6" gutterBottom>
@@ -360,6 +404,20 @@ export default function Details() {
                     ))}
                   </Box>
                 )}
+
+                {/* Dialog to display sample data */}
+                <Dialog
+                  open={showSampleData}
+                  onClose={handleCloseSampleData}
+                  fullWidth
+                  maxWidth="md">
+                  <DialogTitle>Sample JSON Data</DialogTitle>
+                  <DialogContent dividers>
+                    <Typography variant="body1" component="div">
+                      <pre>{sampleData(selectedData.parameters)}</pre>
+                    </Typography>
+                  </DialogContent>
+                </Dialog>
               </CardContent>
             </Card>
           </Grid>
