@@ -105,6 +105,13 @@ export default function Details() {
       return;
     }
 
+    //  Check if url is http or not (we only support http for now)
+    if (!subscriptionUrl.startsWith('http')) {
+      setNotificationType('error');
+      setNotificationMessage('Only HTTP URLs are supported');
+      return;
+    }
+
     const code = selectedData.node_name.slice(0, 2);
 
     axiosAuthInstance
