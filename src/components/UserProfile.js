@@ -1,5 +1,4 @@
 import { Fragment, useContext, useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -13,24 +12,32 @@ import {
   ListItem,
   ListItemText,
   CardHeader,
-  IconButton
+  IconButton,
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { DataGrid } from '@mui/x-data-grid';
 
 import { axiosAuthInstance } from '../services/axiosConfig';
 import { AuthContext } from '../contexts/AuthContext';
 import { DataContext } from '../contexts/DataContext';
 
+const columns = [
+  { field: 'node_id', headerName: 'Node ID', width: 300 },
+  { field: 'created_date', headerName: 'Created Date', width: 400 },
+  { field: 'url', headerName: 'URL', width: 400}
+];
+
 const UserProfile = () => {
   const { logout } = useContext(AuthContext);
-  const { user, fetchUser, isUserfetched, setIsUserFetched, setUser, USER_TYPES } =
-    useContext(DataContext);
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
+  const {setIsUserFetched, USER_TYPES} = useContext(DataContext);
+  // const [user, setUser] = useState(null);
+  // const [users, setUsers] = useState([]);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
+  const {user, users, setUser, fetchedUser, fetchedUsers, fetchUserDetails, fetchUsers} = useContext(AuthContext)
+  const [userSubscriptions, setUserSubscriptions] = useState([])
   const handleLogout = () => {
     logout();
     setUser(null);
@@ -39,26 +46,9 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    if (!isUserfetched) fetchUser();
-
-    axiosAuthInstance
-      .get('/user/getusers')
-      .then((response) => {
-        setUsers(response.data);
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error fetching users',
-          showConfirmButton: false,
-          timer: 1500,
-          toast: true,
-          position: 'center-end'
-        });
-        console.error('Error fetching users', error);
-      });
-  }, []);
+    if(!fetchedUser) fetchUserDetails()
+    if(!fetchedUsers) fetchUsers()
+  })
 
   const handlePasswordChange = () => {
     // check if new password and confirm password match
@@ -90,6 +80,33 @@ const UserProfile = () => {
       });
   };
 
+  const getUserSubscriptions = () => {
+    axiosAuthInstance
+      .get('/subscription/get-user-subscriptions')
+      .then((response) => {
+        if (response.status === 200) {
+          // update the created date to a more readable format
+          for (let i = 0; i < response.data.length; i+=1) {
+            response.data[i].created_date = new Date(response.data[i].created_date).toLocaleString();
+          }
+          setUserSubscriptions(response.data);
+          console.log('User subscriptions', response.data);
+        }
+      })
+      .catch((error) => {
+        console.error('Error getting user subscriptions', error);
+        if (error.response) alert(error.response.data.detail);
+        else alert('Error getting user subscriptions');
+      });
+  };
+
+  useEffect(() => {
+    if (user) {
+      getUserSubscriptions();
+    }
+  }, [user]);
+
+
   if (!user) {
     return <div>Loading...</div>;
   }
@@ -101,6 +118,38 @@ const UserProfile = () => {
           <Typography variant="h4">User Profile</Typography>
           <Typography variant="h6">Name: {user.username}</Typography>
           <Typography variant="h6">Email: {user.email}</Typography>
+        </CardContent>
+      </Card>
+      <Card sx={{ mb: 2 }}>
+        <CardHeader
+          title={
+            <Typography variant="h4" component="div">
+              Subscriptions
+            </Typography>
+          }
+        />
+        <CardContent>
+            {userSubscriptions.length > 0 ? (
+                <DataGrid
+                    rows={userSubscriptions}
+                    columns={columns}
+                    initialState={{
+                        pagination: {
+                            paginationModel: { page: 0, pageSize: 5 },
+                        },
+                    }}
+                    pageSizeOptions={[5, 10, 20]}
+                    // checkboxSelection
+                    autoHeight
+                    disableSelectionOnClick
+                />
+            ) : (
+                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                    <Typography variant="h6" color="textSecondary">
+                        No subscriptions
+                    </Typography>
+                </Box>
+            )}
         </CardContent>
       </Card>
       <Card sx={{ mb: 2 }}>
@@ -176,6 +225,7 @@ const UserProfile = () => {
         </Button>
       </Box>
     </Box>
+    
   );
 };
 

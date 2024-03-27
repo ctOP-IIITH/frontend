@@ -1,41 +1,144 @@
-import { useContext, useEffect, useState } from 'react';
-import Paper from '@mui/material/Paper';
+import { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
 import {
-  Typography,
+  Alert,
   Box,
-  Chip,
+  Typography,
   Grid,
   Card,
   CardContent,
+  Chip,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  IconButton,
   Link,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   TextField,
-  Button
+  Snackbar
 } from '@mui/material';
-import IconButton from '@mui/material/IconButton';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableRow from '@mui/material/TableRow';
+import Swal from 'sweetalert2';
 import { axiosAuthInstance, BACKEND_API_URL } from '../services/axiosConfig';
 import CodeComponent from './CodeComponent';
 import { DataContext } from '../contexts/DataContext';
 
 export default function Details() {
   const [selectedData, setSelectedData] = useState(null);
+  const [nodeId, setNodeId] = useState(false);
   const [sortOrder, setSortOrder] = useState('desc');
   const [loading, setLoading] = useState(true);
   const [vendorAssigned, setVendorAssigned] = useState(false);
   const [showCodeComponent, setShowCodeComponent] = useState(false);
+  const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false);
+  const [subscriptionUrl, setSubscriptionUrl] = useState('');
+  const [subscribedUrls, setSubscribedUrls] = useState([]);
+  const [notificationType, setNotificationType] = useState('');
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [showSubscribedUrls, setShowSubscribedUrls] = useState(false);
+  const [showSampleData, setShowSampleData] = useState(false);
+
+  // Sample JSON data for demonstration
+  const sampleData = (params) => `{
+  "m2m:sgn": {
+    "m2m:nev": {
+      "m2m:rep": {
+        "m2m:cin": {
+          "rn": "<node_name>",
+          "ty": 4,
+          "ri": "<resource_id>",
+          "pi": "<parent_id>",
+          "ct": "<creation_time>",
+          "lt": "<last_modified_time>",
+          "lbl": ["<label>"],
+          "st": 0,
+          "cnf": "text/plain:0",
+          "cs": 6,
+          "con": ${JSON.stringify(params)}
+        }
+      },
+      "m2m:rss": 1
+    },
+    "m2m:sud": false,
+    "m2m:sur": "<subscription_id>"
+  }
+}`;
+
+  const handleShowSampleData = () => {
+    setShowSampleData(true);
+  };
+
+  const handleCloseSampleData = () => {
+    setShowSampleData(false);
+  };
 
   const { user, fetchUser, isUserfetched, USER_TYPES } = useContext(DataContext);
 
+  const toggleSubscribedUrls = () => {
+    setShowSubscribedUrls(!showSubscribedUrls);
+  };
+
   const handleSort = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
+
+  const handleSubscriptionDialogOpen = () => {
+    setSubscriptionDialogOpen(true);
+  };
+
+  const handleSubscriptionDialogClose = () => {
+    setSubscriptionDialogOpen(false);
+    setSubscriptionUrl('');
+  };
+
+  const handleSubscribe = () => {
+    if (subscribedUrls.includes(subscriptionUrl)) {
+      setNotificationType('info');
+      setNotificationMessage('Already subscribed to this URL');
+      return;
+    }
+
+    //  Check if url is http or not (we only support http for now)
+    if (!subscriptionUrl.startsWith('http')) {
+      setNotificationType('error');
+      setNotificationMessage('Only HTTP URLs are supported');
+      return;
+    }
+
+    const code = selectedData.node_name.slice(0, 2);
+
+    axiosAuthInstance
+      .post('/subscription/subscribe', {
+        node_id: `AE-${code}/${selectedData.node_name}`,
+        url: subscriptionUrl
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          setSubscribedUrls([...subscribedUrls, subscriptionUrl]);
+          setNotificationType('success');
+          setNotificationMessage('Subscription successful');
+        }
+      })
+      .catch((error) => {
+        console.error('Error Subscribing: ', error);
+        setNotificationType('error');
+        if (error.response) setNotificationMessage(error.response.data.detail);
+        else setNotificationMessage('Error Subscribing to that url.');
+      });
+
+    handleSubscriptionDialogClose();
+  };
+
+  const handleSnackbarClose = () => {
+    setNotificationType('');
+    setNotificationMessage('');
   };
 
   const sortedData = selectedData
@@ -76,7 +179,7 @@ export default function Details() {
           });
         }
         setSelectedData(selectedItem);
-        console.log(selectedItem);
+        setNodeId(true);
         axiosAuthInstance
           .get(`/nodes/get-vendor/${selectedItem.node_name}`)
           .then((res) => {
@@ -102,6 +205,25 @@ export default function Details() {
         });
       });
   }, [location.search]);
+
+  useEffect(() => {
+    if (nodeId === false) return;
+    const code = selectedData.node_name.slice(0, 2);
+
+    axiosAuthInstance
+      .post('/subscription/get-subscriptions', {
+        node_id: `AE-${code}/${selectedData.node_name}`
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          const res = response.data.map((sub) => sub.url);
+          setSubscribedUrls(res);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [nodeId]);
 
   useEffect(() => {
     if (isUserfetched) {
@@ -202,6 +324,7 @@ export default function Details() {
       )}
     </Grid>
   );
+
   return loading ? (
     <Box sx={{ p: 3, m: 3 }}>
       <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
@@ -252,11 +375,60 @@ export default function Details() {
                 </Grid>
                 <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>
                   Subscriptions:
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ ml: 2 }}
+                    onClick={handleSubscriptionDialogOpen}>
+                    Subscribe
+                  </Button>
                 </Typography>
-                <Typography variant="body1">To DO subscription url</Typography>
+                <Box display="flex" gap={2}>
+                  <Button
+                    onClick={toggleSubscribedUrls}
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 2 }}>
+                    {showSubscribedUrls ? 'Hide Subscribed URLs' : 'Show Subscribed URLs'}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleShowSampleData}
+                    sx={{ mt: 2 }}>
+                    Show Sample Data
+                  </Button>
+                </Box>
+                {showSubscribedUrls && (
+                  <Box>
+                    <Typography variant="h6" gutterBottom>
+                      Subscribed URLs:
+                    </Typography>
+                    {subscribedUrls.map((url, index) => (
+                      <Typography key={url} variant="body1">
+                        {index + 1}. {url}
+                      </Typography>
+                    ))}
+                  </Box>
+                )}
+
+                {/* Dialog to display sample data */}
+                <Dialog
+                  open={showSampleData}
+                  onClose={handleCloseSampleData}
+                  fullWidth
+                  maxWidth="md">
+                  <DialogTitle>Sample JSON Data</DialogTitle>
+                  <DialogContent dividers>
+                    <Typography variant="body1" component="div">
+                      <pre>{sampleData(selectedData.parameters)}</pre>
+                    </Typography>
+                  </DialogContent>
+                </Dialog>
               </CardContent>
             </Card>
           </Grid>
+          {/* Code Part */}
 
           {showCodeComponent && (
             <CodeComponent
@@ -266,8 +438,9 @@ export default function Details() {
               apiToken={vendorAssigned.api_token}
             />
           )}
+          {/* Data Collected */}
           <Grid item xs={12}>
-            <TableContainer component={Paper}>
+            <TableContainer component={Card}>
               <Table aria-label="custom pagination table">
                 <TableBody>
                   <TableRow>
@@ -304,6 +477,7 @@ export default function Details() {
               </Table>
             </TableContainer>
           </Grid>
+          {/* Fetch the latest data */}
           <Grid item xs={12}>
             <Card>
               <CardContent>
@@ -329,6 +503,50 @@ export default function Details() {
           Loading...
         </Typography>
       )}
+
+      {/* Subscription Dialog */}
+      <Dialog open={subscriptionDialogOpen} onClose={handleSubscriptionDialogClose}>
+        <DialogTitle>Subscribe to Updates</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="subscriptionUrl"
+            label="Subscription URL"
+            type="url"
+            fullWidth
+            value={subscriptionUrl}
+            onChange={(e) => setSubscriptionUrl(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleSubscribe}
+            color="primary"
+            disabled={!subscriptionUrl.trim()} // Disable button if input is empty
+            sx={{ color: subscriptionUrl.trim() ? 'primary.dark' : 'grey.500' }} // Set button color based on input
+          >
+            Subscribe
+          </Button>
+          <Button
+            onClick={handleSubscriptionDialogClose}
+            color="primary"
+            sx={{ color: 'primary.dark' }}>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={!!notificationMessage}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+        <Alert onClose={handleSnackbarClose} severity={notificationType} sx={{ width: '100%' }}>
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
