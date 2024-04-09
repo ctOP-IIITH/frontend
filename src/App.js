@@ -35,6 +35,15 @@ function PublicRoute() {
   return isLoggedIn ? <Navigate to="/" /> : <Outlet />;
 }
 
+function CenteredLoading() {
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <RingLoader color="#123462" loading />
+    </Box>
+  );
+}
+
+
 function App() {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -49,17 +58,12 @@ function App() {
   }, [isAxiosReady]);
 
   if (isLoading) {
-    return (
-      <Box
-        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <RingLoader color="#123462" loading />
-      </Box>
-    );
+    return <CenteredLoading />;
   }
 
   return (
     <Router basename={process.env.PUBLIC_URL}>
-      <Suspense fallback={<RingLoader color="#123462" loading />}>
+      <Suspense fallback={<CenteredLoading />}>
         <TopBar>
           <Routes>
             {/* Open Routes */}
