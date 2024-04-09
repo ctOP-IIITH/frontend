@@ -11,7 +11,7 @@ let BACKEND_API_URL;
 
 const fetchConfig = async () => {
   try {
-    const response = await fetch('./backend.json');
+    const response = await fetch(`${process.env.PUBLIC_URL}/backend.json`);
     const data = await response.json();
     BACKEND_API_URL = data.BACKEND_API_URL;
   } catch (error) {

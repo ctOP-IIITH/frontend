@@ -106,7 +106,7 @@ export default function Details() {
     }
 
     //  Check if url is http or not (we only support http for now)
-    if (!subscriptionUrl.startsWith('http')) {
+    if (!subscriptionUrl.startsWith('http') || subscriptionUrl.startsWith('https')) {
       setNotificationType('error');
       setNotificationMessage('Only HTTP URLs are supported');
       return;

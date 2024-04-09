@@ -1,28 +1,30 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { RingLoader } from 'react-spinners';
 import { Box } from '@mui/system';
 
 import { useAuth } from './contexts/AuthContext';
-import Home from './homepage/Home';
-import Add from './components/Add';
-import Vertical from './components/Vertical';
-import Details from './components/Details';
-import Nodedata from './components/Nodedata';
-import Addnode from './components/Addnode';
-import Addvertical from './components/Addvertical';
-import Addsensor from './components/Addsensor';
+import { isAxiosReady } from './services/axiosConfig';
 
+import Home from './homepage/Home';
 import PrivateComponent from './components/PrivateComponent';
 import NotFound from './components/NotFound';
 import TopBar from './components/TopBar';
-import Login from './components/Login';
-import UserProfile from './components/UserProfile';
-import CreateUser from './components/CreateUser';
-import AddAdvanced from './components/AddAdvanced';
 
-import { isAxiosReady } from './services/axiosConfig';
+// Lazy load other components
+const Add = lazy(() => import('./components/Add'));
+const Vertical = lazy(() => import('./components/Vertical'));
+const Details = lazy(() => import('./components/Details'));
+const Nodedata = lazy(() => import('./components/Nodedata'));
+const Addnode = lazy(() => import('./components/Addnode'));
+const Addvertical = lazy(() => import('./components/Addvertical'));
+const Addsensor = lazy(() => import('./components/Addsensor'));
+const Login = lazy(() => import('./components/Login'));
+const UserProfile = lazy(() => import('./components/UserProfile'));
+const CreateUser = lazy(() => import('./components/CreateUser'));
+const AddAdvanced = lazy(() => import('./components/AddAdvanced'));
+
 
 function PrivateRoute() {
   const { isLoggedIn } = useAuth();
@@ -57,7 +59,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename={process.env.PUBLIC_URL}>
       <TopBar>
         <Routes>
           {/* Open Routes */}
