@@ -17,37 +17,34 @@ function AddAdvanced() {
   const nodesSchema = {
     title: 'Nodes',
     type: 'object',
-    required: ['sensors'],
+    required: ['nodes'],
     properties: {
-      sensors: {
+      nodes: {
         type: 'array',
-        title: 'Sensors',
+        title: 'Nodes',
         items: {
           type: 'object',
-          required: ['coordinates', 'sensor_type', 'area'],
+          required: ['latitude', 'longitude', 'area', 'sensor_name', 'domain'],
           properties: {
-            coordinates: {
-              type: 'object',
-              title: 'Coordinates',
-              required: ['latitude', 'longitude'],
-              properties: {
-                latitude: {
-                  type: 'number',
-                  title: 'Latitude'
-                },
-                longitude: {
-                  type: 'number',
-                  title: 'Longitude'
-                }
-              }
+            latitude: {
+              type: 'number',
+              title: 'Latitude'
             },
-            sensor_type: {
-              type: 'string',
-              title: 'Sensor Type'
+            longitude: {
+              type: 'number',
+              title: 'Longitude'
             },
             area: {
               type: 'string',
               title: 'Area'
+            },
+            sensor_name: {
+              type: 'string',
+              title: 'Sensor Name'
+            },
+            domain: {
+              type: 'string',
+              title: 'Domain'
             }
           }
         }
