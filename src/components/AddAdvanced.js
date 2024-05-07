@@ -11,7 +11,6 @@ function AddAdvanced() {
   const ajv = new Ajv();
 
   const [nodesJson, setNodesJson] = useState('');
-  const [isFileImported, setIsFileImported] = useState(false);
 
   const navigate = useNavigate();
 
@@ -77,21 +76,6 @@ function AddAdvanced() {
     setNodesJson(data);
   };
 
-  const handleImport = () => {
-    console.log('Importing...');
-    const data = JSON.parse(nodesJson);
-    const schema = nodesSchema;
-
-    const validate = ajv.compile(schema);
-    const valid = validate(data);
-
-    if (!valid) {
-      console.error('Invalid data:', validate.errors);
-    } else {
-      console.log('Valid data');
-    }
-  };
-
   const handleDownloadTemplate = () => {
     const element = document.createElement('a');
     const file = new Blob([nodesJson], { type: 'text/plain' });
@@ -116,7 +100,6 @@ function AddAdvanced() {
         if (valid) {
           // data is valid
           setNodesJson(JSON.stringify(data, null, 2));
-          setIsFileImported(true);
         } else {
           // data is invalid
           console.error('Invalid JSON data:', validate.errors);
@@ -152,7 +135,8 @@ function AddAdvanced() {
             editorProps={{ $blockScrolling: true }}
             setOptions={{
               showLineNumbers: true,
-              tabSize: 2
+              tabSize: 2,
+              useWorker: false
             }}
           />
         </CardContent>
