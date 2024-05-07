@@ -93,6 +93,23 @@ function AddAdvanced() {
     }
   };
 
+  const handleDownloadTemplate = () => {
+    const element = document.createElement('a');
+    const file = new Blob([nodesJson], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'import-template.json';
+    document.body.appendChild(element);
+    element.click();
+  };
+
+  const buttonStyle = {
+    bgcolor: 'primary.main',
+    color: 'white',
+    '&:hover': {
+      bgcolor: 'primary.dark'
+    }
+  };
+
   return (
     <Container maxWidth="sm">
       <Card sx={{ mb: 2 }}>
@@ -115,10 +132,19 @@ function AddAdvanced() {
 
       <Grid container spacing={2} justifyContent="flex-end">
         <Grid item>
-          <Button onClick={handleImport}>Import</Button>
+          <Button onClick={handleDownloadTemplate} sx={buttonStyle}>
+            Download Template
+          </Button>
         </Grid>
         <Grid item>
-          <Button onClick={() => navigate('/')}>Finish</Button>
+          <Button onClick={handleImport} sx={buttonStyle}>
+            Import
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button onClick={() => navigate('/')} sx={buttonStyle}>
+            Finish
+          </Button>
         </Grid>
       </Grid>
     </Container>
