@@ -1,0 +1,29 @@
+{
+    "sensors": [
+      {
+        "coordinates": {
+          "latitude": 17.446919,
+          "longitude": 78.348122
+        },
+        "sensor_type": "Kristnam",
+        "area": "Gachibowli"
+      },
+      {
+        "coordinates": {
+          "latitude": 5.4455,
+          "longitude": 8.3499
+        },
+        "sensor_type": "Phillips",
+        "area": "Gachibowli"
+      },
+      {
+        "coordinates": {
+          "latitude": 4.455,
+          "longitude": 8.3499
+        },
+        "sensor_type": "Kristnam",
+        "area": "Madhapur"
+      }
+    ]
+  }
+  

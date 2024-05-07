@@ -1,14 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Ajv from 'ajv';
 import { useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Grid
-} from '@mui/material';
+import { Button, Container, Typography, Card, CardContent, Grid } from '@mui/material';
 import AceEditor from 'react-ace';
 
 import 'ace-builds/src-noconflict/mode-json';
@@ -17,40 +10,7 @@ import 'ace-builds/src-noconflict/theme-monokai';
 function AddAdvanced() {
   const ajv = new Ajv();
 
-  const [nodesJson, setNodesJson] = useState(
-    JSON.stringify(
-      {
-        sensors: [
-          {
-            coordinates: {
-              latitude: 17.446919,
-              longitude: 78.348122
-            },
-            sensor_type: 'Kristnam',
-            area: 'Gachibowli'
-          },
-          {
-            coordinates: {
-              latitude: 5.4455,
-              longitude: 8.3499
-            },
-            sensor_type: 'Phillips',
-            area: 'Gachibowli'
-          },
-          {
-            coordinates: {
-              latitude: 4.455,
-              longitude: 8.3499
-            },
-            sensor_type: 'Kristnam',
-            area: 'Madhapur'
-          }
-        ]
-      },
-      null,
-      2
-    )
-  );
+  const [nodesJson, setNodesJson] = useState('');
 
   const navigate = useNavigate();
 
@@ -94,6 +54,24 @@ function AddAdvanced() {
       }
     }
   };
+
+  useEffect(() => {
+    // fetching the template file
+    async function fetchTemplate() {
+      try {
+        const res = await fetch('/import-template.json');
+        if (!res.ok) {
+          throw new Error('Failed to fetch the template');
+        }
+        const data = await res.json();
+        setNodesJson(JSON.stringify(data, null, 2));
+      } catch (error) {
+        console.error('error fetching json: ', error);
+      }
+    }
+
+    fetchTemplate();
+  }, []);
 
   const handleNodesChange = (data) => {
     setNodesJson(data);
