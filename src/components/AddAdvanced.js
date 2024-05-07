@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Ajv from 'ajv';
 import { useNavigate } from 'react-router-dom';
 import { Button, Container, Typography, Card, CardContent, Grid } from '@mui/material';
@@ -11,8 +11,11 @@ function AddAdvanced() {
   const ajv = new Ajv();
 
   const [nodesJson, setNodesJson] = useState('');
+  const [isFileImported, setIsFileImported] = useState(false);
 
   const navigate = useNavigate();
+
+  const fileInputRef = useRef(null);
 
   const nodesSchema = {
     title: 'Nodes',
@@ -75,7 +78,6 @@ function AddAdvanced() {
   };
 
   const handleImport = () => {
-    // Implement your import logic here
     console.log('Importing...');
     const data = JSON.parse(nodesJson);
     const schema = nodesSchema;
@@ -97,6 +99,35 @@ function AddAdvanced() {
     element.download = 'import-template.json';
     document.body.appendChild(element);
     element.click();
+  };
+
+  const handleFileSelect = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      try {
+        const fileContent = await file.text();
+
+        const data = JSON.parse(fileContent);
+
+        // validating with schema
+        const validate = ajv.compile(nodesSchema);
+        const valid = validate(data);
+
+        if (valid) {
+          // data is valid
+          setNodesJson(JSON.stringify(data, null, 2));
+          setIsFileImported(true);
+        } else {
+          // data is invalid
+          console.error('Invalid JSON data:', validate.errors);
+          alert('The JSON data is not in the correct format. Please check and try again.');
+        }
+      } catch (error) {
+        // Handle parsing and validation errors
+        console.error('Error parsing or validating JSON data:', error);
+        alert('Error parsing or validating JSON data. Please check and try again.');
+      }
+    }
   };
 
   const buttonStyle = {
@@ -134,9 +165,15 @@ function AddAdvanced() {
           </Button>
         </Grid>
         <Grid item>
-          <Button onClick={handleImport} sx={buttonStyle}>
+          <Button onClick={() => fileInputRef.current.click()} sx={buttonStyle}>
             Import
           </Button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleFileSelect}
+          />
         </Grid>
         <Grid item>
           <Button onClick={() => navigate('/')} sx={buttonStyle}>
