@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Ajv from 'ajv';
-import { useNavigate } from 'react-router-dom';
 import { Button, Container, Typography, Card, CardContent, Grid } from '@mui/material';
 import AceEditor from 'react-ace';
+import { axiosAuthInstance } from '../services/axiosConfig';
 
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-monokai';
@@ -11,8 +11,6 @@ function AddAdvanced() {
   const ajv = new Ajv();
 
   const [nodesJson, setNodesJson] = useState('');
-
-  const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
 
@@ -113,6 +111,20 @@ function AddAdvanced() {
     }
   };
 
+  const handleBulkImport = () => {
+    const data = JSON.parse(nodesJson);
+    axiosAuthInstance
+      .post('/import/import', data)
+      .then((response) => {
+        console.log('Import successful:', response.data);
+        alert('Nodes imported successfully!');
+      })
+      .catch((error) => {
+        console.error('Import failed:', error);
+        alert('Failed to import nodes. Please try again.');
+      });
+  };
+
   const buttonStyle = {
     bgcolor: 'primary.main',
     color: 'white',
@@ -160,8 +172,8 @@ function AddAdvanced() {
           />
         </Grid>
         <Grid item>
-          <Button onClick={() => navigate('/')} sx={buttonStyle}>
-            Finish
+          <Button onClick={handleBulkImport} sx={buttonStyle}>
+            Bulk Import
           </Button>
         </Grid>
       </Grid>
