@@ -93,17 +93,19 @@ export default function Details() {
     axiosAuthInstance
       .get(`/nodes/${curFilter}`)
       .then((response) => {
+        console.log(1, curFilter);
         const selectedItem = {
           id: curFilter,
           name: curFilter,
           nodes: response.data.map((node) => ({
-            nodeName: node.node_name,
+            nodeID: node.node_name,
             nodeSensorType: node.res_name,
             nodeOrid: node.orid,
             nodeDataOrid: node.data_orid,
             nodeArea: node.area,
             nodeTokenNumber: node.token_num,
-            nodeSensorNumber: node.sensor_node_number
+            nodeSensorNumber: node.sensor_node_number,
+            nodeName: node.name // an issue -> name , node_name ?
           }))
         };
         setSelectedData(selectedItem);
@@ -302,14 +304,14 @@ export default function Details() {
             {filteredNodes && filteredNodes.length > 0 ? (
               <Stack spacing={3} sx={{ marginTop: 2 }}>
                 {filteredNodes.map((node) => (
-                  <StyledPaper key={node.nodeName}>
+                  <StyledPaper key={node.nodeID}>
                     <Typography variant="h6">
-                      {/* {node.nodeName}{' '} */}
+                      {/* {node.nodeID}{' '} */}
                       {node.nodeSensorType} {node.nodeSensorNumber}{' '}
                       <Button
                         variant="outlined"
                         color="secondary"
-                        onClick={() => handleVerticalClick(node.nodeName)}>
+                        onClick={() => handleVerticalClick(node.nodeID)}>
                         View Node Details
                       </Button>
                     </Typography>
@@ -325,7 +327,7 @@ export default function Details() {
                         marginTop: '-20px',
                         paddingRight: '8px'
                       }}>
-                      <DeleteIcon onClick={() => handleDeleteClick(node.nodeName)} />
+                      <DeleteIcon onClick={() => handleDeleteClick(node.nodeID)} />
                     </div>
                   </StyledPaper>
                 ))}

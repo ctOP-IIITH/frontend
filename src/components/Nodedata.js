@@ -344,6 +344,9 @@ export default function Details() {
                       Device Information
                     </Typography>
                     <Typography variant="body1">
+                      <strong>Node Name:</strong> {selectedData.name}
+                    </Typography>
+                    <Typography variant="body1">
                       <strong>Node ID:</strong> {selectedData.node_name}
                     </Typography>
                     <Typography variant="body1">

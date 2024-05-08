@@ -24,7 +24,7 @@ function AddAdvanced() {
         title: 'Nodes',
         items: {
           type: 'object',
-          required: ['latitude', 'longitude', 'area', 'sensor_name', 'domain'],
+          required: ['latitude', 'longitude', 'area', 'sensor_name', 'domain', 'name'],
           properties: {
             latitude: {
               type: 'number',
@@ -45,6 +45,10 @@ function AddAdvanced() {
             domain: {
               type: 'string',
               title: 'Domain'
+            },
+            name: {
+              type: 'string',
+              title: 'Name'
             }
           }
         }
