@@ -77,6 +77,8 @@ export default function MultipleSelect() {
 
     if(!name) {
       setNameError(true);
+    }else {
+      setNameError(false);
     }
     if (!area) {
       setAreaError(true);
@@ -112,6 +114,7 @@ export default function MultipleSelect() {
     // "latitude": 17.446920,
     // "longitude": 78.348122,
     // "area": "Miyapur"
+    // "name" : "unique name"
     axiosAuthInstance
       .post('nodes/create-node', {
         sensor_type_id: sensorTypes.find((type) => type.res_name === selectedSensorType).id,
