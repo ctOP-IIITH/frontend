@@ -30,9 +30,11 @@ export default function MultipleSelect() {
 
   const [selectedData, setSelectedData] = useState(null);
   const [selectedDataError, setSelectedDataError] = useState(false);
+  const [name, setName] = useState('');
   const [area, setArea] = useState('');
   const [latitude, setlatitude] = useState('');
   const [longitude, setlongitude] = useState('');
+  const [nameError, setNameError] = useState(false);
   const [areaError, setAreaError] = useState(false);
   const [latitudeError, setlatitudeError] = useState(false);
   const [longitudeError, setlongitudeError] = useState(false);
@@ -73,6 +75,14 @@ export default function MultipleSelect() {
       setSelectedDataError(false);
     }
 
+    if(!name) {
+      setNameError(true);
+    }
+    if (!area) {
+      setAreaError(true);
+    } else {
+      setAreaError(false);
+    }
     if (!latitude) {
       setlatitudeError(true);
     } else {
@@ -85,14 +95,10 @@ export default function MultipleSelect() {
       setlongitudeError(false);
     }
 
-    if (!area) {
-      setAreaError(true);
-    } else {
-      setAreaError(false);
-    }
 
-    if (!selectedData || !latitude || !longitude || !area) {
-      return;
+
+    if (!selectedData || !latitude || !longitude || !area || !name) {
+      return; 
     }
 
     // Log selected vertical, node type, and added parameters to the console
@@ -101,7 +107,7 @@ export default function MultipleSelect() {
     console.log('latitude:', latitude);
     console.log('longitude:', longitude);
     console.log('area:', area);
-
+    console.log('name:', name);
     //     "sensor_type_id": 1,
     // "latitude": 17.446920,
     // "longitude": 78.348122,
@@ -111,7 +117,8 @@ export default function MultipleSelect() {
         sensor_type_id: sensorTypes.find((type) => type.res_name === selectedSensorType).id,
         latitude,
         longitude,
-        area
+        area,
+        name
       })
       .then((response) => {
         if (response.data.detail === 'Node created') {
@@ -212,7 +219,21 @@ export default function MultipleSelect() {
             Select Domain to enable menu options
           </Typography>
         </FormControl>
-
+        {/* Field for Name */}
+        <TextField
+          id="text-field"
+          error={nameError}
+          helperText={nameError ? 'Name is required' : ''}
+          label="Name"
+          variant="outlined"
+          fullWidth
+          sx={{ m: 1 }}
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            setNameError(false); // Reset error on change
+          }}
+        />
         {/* Field for Area */}
         <TextField
           id="text-field"
