@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Ajv from 'ajv';
-import { Button, Container, Typography, Card, CardContent, Grid } from '@mui/material';
+import { Button, Container, Typography, Card, CardContent, Grid, Modal, Box } from '@mui/material';
 import AceEditor from 'react-ace';
 import { axiosAuthInstance } from '../services/axiosConfig';
 
@@ -11,6 +11,8 @@ function AddAdvanced() {
   const ajv = new Ajv();
 
   const [nodesJson, setNodesJson] = useState('');
+  const [importStatus, setImportStatus] = useState({ inProgress: false, message: '' });
+  const [modalOpen, setModalOpen] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -117,17 +119,54 @@ function AddAdvanced() {
 
   const handleBulkImport = () => {
     const data = JSON.parse(nodesJson);
+    setImportStatus({ inProgress: true, message: 'Import in progress...' });
+    setModalOpen(true);
+
     axiosAuthInstance
       .post('/import/import', data)
       .then((response) => {
-        console.log('Import successful:', response.data);
-        alert('Nodes imported successfully!');
+        console.log('Import response:', response.data);
+        const {
+          created_nodes: createdNodes = [],
+          failed_nodes: failedNodes = [],
+          invalid_sensor_nodes: invalidSensorNodes = []
+        } = response.data;
+        let message = `Import completed.\n`;
+        message += `Created nodes: ${createdNodes.length}\n`;
+        message += `Failed nodes: ${failedNodes.length}\n`;
+        message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
+
+        if (failedNodes.length > 0) {
+          message += `Failed nodes:\n`;
+          failedNodes.forEach((node, index) => {
+            message += `${index + 1}. Name: ${node.node.name}, Error: ${node.error}\n`;
+          });
+          message += '\n';
+        }
+
+        if (invalidSensorNodes.length > 0) {
+          message += `Invalid sensor nodes:\n`;
+          invalidSensorNodes.forEach((node, index) => {
+            message += `${index + 1}. Name: ${node.node.name}, Error: ${node.error}\n`;
+          });
+        }
+        if (createdNodes.length > 0) {
+          message += `Created  nodes:\n`;
+          createdNodes.forEach((node, index) => {
+            message += `${index + 1}. Name: ${node.node.name}\n`;
+          });
+        }
+        setImportStatus({ inProgress: false, message });
       })
       .catch((error) => {
         console.error('Import failed:', error);
-        alert('Failed to import nodes. Please try again.');
+        setImportStatus({
+          inProgress: false,
+          message: 'Failed to import nodes. Please try again.'
+        });
       });
   };
+
 
   const buttonStyle = {
     bgcolor: 'primary.main',
@@ -135,6 +174,17 @@ function AddAdvanced() {
     '&:hover': {
       bgcolor: 'primary.dark'
     }
+  };
+
+  const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4
   };
 
   return (
@@ -176,11 +226,22 @@ function AddAdvanced() {
           />
         </Grid>
         <Grid item>
-          <Button onClick={handleBulkImport} sx={buttonStyle}>
-            Bulk Import
+          <Button onClick={handleBulkImport} disabled={importStatus.inProgress} sx={buttonStyle}>
+            {importStatus.inProgress ? 'Importing...' : 'Bulk Import'}
           </Button>
         </Grid>
       </Grid>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box sx={modalStyle}>
+          {importStatus.inProgress && <Typography>Import in progress...</Typography>}
+          {importStatus.message && (
+            <Typography whiteSpace="pre-line">{importStatus.message}</Typography>
+          )}
+          <Button onClick={() => setModalOpen(false)} sx={{ mt: 2 }}>
+            Close
+          </Button>
+        </Box>
+      </Modal>
     </Container>
   );
 }
