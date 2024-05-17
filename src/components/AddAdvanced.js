@@ -15,6 +15,7 @@ function AddAdvanced() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const fileInputRef = useRef(null);
+  const csvFileInputRef = useRef(null);
 
   const nodesSchema = {
     title: 'Nodes',
@@ -117,6 +118,74 @@ function AddAdvanced() {
     }
   };
 
+  const handleCsvFileSelect = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        setImportStatus({ inProgress: true, message: 'Import in progress...' });
+        setModalOpen(true);
+
+        axiosAuthInstance
+          .post('/import/import_csv', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          .then((response) => {
+            console.log('Import response:', response.data);
+            const {
+              created_nodes: createdNodes = [],
+              failed_nodes: failedNodes = [],
+              invalid_sensor_nodes: invalidSensorNodes = []
+            } = response.data;
+            let message = `Import completed.\n`;
+            message += `Created nodes: ${createdNodes.length}\n`;
+            message += `Failed nodes: ${failedNodes.length}\n`;
+            message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
+
+            if (failedNodes.length > 0) {
+              message += `Failed nodes:\n`;
+              failedNodes.forEach((node, index) => {
+                message += `${index + 1}. Area: ${node.node.area}, Name: ${node.node.name}, Error: ${node.error}\n`;
+              });
+              message += '\n';
+            }
+
+            if (invalidSensorNodes.length > 0) {
+              message += `Invalid sensor nodes:\n`;
+              invalidSensorNodes.forEach((node, index) => {
+                message += `${index + 1}. Area: ${node.node.area}, Name: ${node.node.name}, Error: ${node.error}\n`;
+              });
+            }
+
+            if (createdNodes.length > 0) {
+              message += `Created nodes:\n`;
+              createdNodes.forEach((node, index) => {
+                message += `${index + 1}. Area: ${node.node.area}, Name: ${node.node.name}\n`;
+              });
+            }
+            setImportStatus({ inProgress: false, message });
+          })
+          .catch((error) => {
+            console.error('Import failed:', error);
+            setImportStatus({
+              inProgress: false,
+              message: 'Failed to import nodes. Please try again.'
+            });
+          });
+      } catch (error) {
+        console.error('Error processing CSV file:', error);
+        setImportStatus({
+          inProgress: false,
+          message: 'Error processing CSV file. Please try again.'
+        });
+      }
+    }
+  };
+
   const handleBulkImport = () => {
     const data = JSON.parse(nodesJson);
     setImportStatus({ inProgress: true, message: 'Import in progress...' });
@@ -167,7 +236,6 @@ function AddAdvanced() {
       });
   };
 
-
   const buttonStyle = {
     bgcolor: 'primary.main',
     color: 'white',
@@ -216,13 +284,25 @@ function AddAdvanced() {
         </Grid>
         <Grid item>
           <Button onClick={() => fileInputRef.current.click()} sx={buttonStyle}>
-            Import
+            Import JSON
           </Button>
           <input
             type="file"
             ref={fileInputRef}
             style={{ display: 'none' }}
             onChange={handleFileSelect}
+          />
+        </Grid>
+        <Grid item>
+          <Button onClick={() => csvFileInputRef.current.click()} sx={buttonStyle}>
+            Import CSV
+          </Button>
+          <input
+            type="file"
+            ref={csvFileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleCsvFileSelect}
+            accept=".csv"
           />
         </Grid>
         <Grid item>
@@ -245,5 +325,4 @@ function AddAdvanced() {
     </Container>
   );
 }
-
 export default AddAdvanced;
