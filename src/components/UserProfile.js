@@ -16,10 +16,12 @@ import {
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { DataGrid } from '@mui/x-data-grid';
+import Swal from 'sweetalert2';
 
 import { axiosAuthInstance } from '../services/axiosConfig';
 import { AuthContext } from '../contexts/AuthContext';
 import { DataContext } from '../contexts/DataContext';
+
 
 const columns = [
   { field: 'node_id', headerName: 'Node ID', width: 300 },
@@ -46,19 +48,19 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    if(!fetchedUser) fetchUserDetails()
-    if(!fetchedUsers) fetchUsers()
-  })
+    if (!fetchedUser) fetchUserDetails();
+    if (!fetchedUsers && fetchedUser) fetchUsers();
+  });
 
   const handlePasswordChange = () => {
     // check if new password and confirm password match
     if (newPassword !== confirmPassword) {
-      alert('New password and confirm password do not match');
+      Swal.fire('Error', 'New password and confirm password do not match', 'error');
       return;
     }
     // if one of the fields is empty
     if (!oldPassword || !newPassword || !confirmPassword) {
-      alert('Please fill all the fields');
+      Swal.fire('Error', 'All fields are required', 'error');
       return;
     }
 
@@ -70,13 +72,13 @@ const UserProfile = () => {
       })
       .then((response) => {
         if (response.status === 200) {
-          alert('Password changed successfully');
+          Swal.fire('Success', 'Password changed successfully', 'success');
         }
       })
       .catch((error) => {
         console.error('Error changing password', error);
-        if (error.response) alert(error.response.data.detail);
-        else alert('Error changing password');
+        if (error.response) Swal.fire('Error', error.response.data.detail, 'error');
+        else Swal.fire('Error', 'Failed to change password', 'error');
       });
   };
 
@@ -95,13 +97,13 @@ const UserProfile = () => {
       })
       .catch((error) => {
         console.error('Error getting user subscriptions', error);
-        if (error.response) alert(error.response.data.detail);
-        else alert('Error getting user subscriptions');
+        if (error.response) Swal.fire('Error', error.response.data.detail, 'error');
+        else Swal.fire('Error', 'Failed to get user subscriptions', 'error');
       });
   };
 
   useEffect(() => {
-    if (user) {
+    if (fetchedUser) {
       getUserSubscriptions();
     }
   }, [user]);
