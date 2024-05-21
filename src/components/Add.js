@@ -128,11 +128,15 @@ function Add() {
               </Button>
 
               <Box sx={{ flex: '1 1 auto' }} />
-              <Button onClick={() => navigate('/')} sx={{ mr: 1, bgcolor: '#b4bce3' }}>
+              <Button
+              color="inherit"
+              onClick={() => navigate('/')} sx={{ mr: 1, bgcolor: '#b4bce3' }}>
                 Cancel
               </Button>
               {activeStep !== steps.length && (
-                <Button onClick={handleComplete} sx={{ bgcolor: '#b4bce3' }}>
+                <Button 
+                color="inherit"
+                onClick={handleComplete} sx={{ bgcolor: '#b4bce3' }}>
                   {activeStep === steps.length - 1 ? 'Finish' : 'NEXT'}
                 </Button>
               )}
