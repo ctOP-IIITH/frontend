@@ -274,73 +274,77 @@ function AddAdvanced() {
     boxShadow: 24,
     p: 4
   };
-
   return (
-    <Container maxWidth="sm">
-      <Card sx={{ mb: 2 }}>
-        <CardContent>
-          <AceEditor
-            mode="json"
-            theme="monokai"
-            value={nodesJson}
-            onChange={handleNodesChange}
-            name="UNIQUE_ID_OF_DIV"
-            editorProps={{ $blockScrolling: true }}
-            setOptions={{
-              showLineNumbers: true,
-              tabSize: 2,
-              useWorker: false
-            }}
-          />
-        </CardContent>
-      </Card>
-
-      <Grid container spacing={2} justifyContent="flex-end">
-        <Grid item>
-          <Button onClick={handleDownloadTemplate} sx={buttonStyle}>
-            Download Template
-          </Button>
+    <Box sx={{ width: '100%', marginTop: '30px' }}>
+      <Container>
+   
+  
+        <Card sx={{ mt: 4 }}>
+          <CardContent>
+            <AceEditor
+              mode="json"
+              theme="monokai"
+              value={nodesJson}
+              onChange={handleNodesChange}
+              name="UNIQUE_ID_OF_DIV"
+              editorProps={{ $blockScrolling: true }}
+              setOptions={{
+                showLineNumbers: true,
+                tabSize: 2,
+                useWorker: false,
+              }}
+              style={{ width: '100%', height: '400px' }}
+            />
+          </CardContent>
+        </Card>
+  
+        <Grid container spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
+          <Grid item>
+            <Button onClick={handleDownloadTemplate} sx={buttonStyle}>
+              Download Template
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button onClick={() => fileInputRef.current.click()} sx={buttonStyle}>
+              Import JSON
+            </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handleFileSelect}
+            />
+          </Grid>
+          <Grid item>
+            <Button onClick={() => csvFileInputRef.current.click()} sx={buttonStyle}>
+              Import CSV
+            </Button>
+            <input
+              type="file"
+              ref={csvFileInputRef}
+              style={{ display: 'none' }}
+              onChange={handleCsvFileSelect}
+              accept=".csv"
+            />
+          </Grid>
+          <Grid item>
+            <Button onClick={handleBulkImport} disabled={importStatus.inProgress} sx={buttonStyle}>
+              {importStatus.inProgress ? 'Importing...' : 'Bulk Import'}
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Button onClick={() => fileInputRef.current.click()} sx={buttonStyle}>
-            Import JSON
-          </Button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            onChange={handleFileSelect}
-          />
-        </Grid>
-        <Grid item>
-          <Button onClick={() => csvFileInputRef.current.click()} sx={buttonStyle}>
-            Import CSV
-          </Button>
-          <input
-            type="file"
-            ref={csvFileInputRef}
-            style={{ display: 'none' }}
-            onChange={handleCsvFileSelect}
-            accept=".csv"
-          />
-        </Grid>
-        <Grid item>
-          <Button onClick={handleBulkImport} disabled={importStatus.inProgress} sx={buttonStyle}>
-            {importStatus.inProgress ? 'Importing...' : 'Bulk Import'}
-          </Button>
-        </Grid>
-      </Grid>
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Box sx={modalStyle}>
-          {importStatus.message && (
-            <Typography whiteSpace="pre-line">{importStatus.message}</Typography>
-          )}
-          <Button onClick={() => setModalOpen(false)} sx={{ mt: 2 }}>
-            Close
-          </Button>
-        </Box>
-      </Modal>
-    </Container>
+        <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+          <Box sx={modalStyle}>
+            {importStatus.message && (
+              <Typography whiteSpace="pre-line">{importStatus.message}</Typography>
+            )}
+            <Button onClick={() => setModalOpen(false)} sx={{ mt: 2 }}>
+              Close
+            </Button>
+          </Box>
+        </Modal>
+      </Container>
+    </Box>
   );
 }
 export default AddAdvanced;

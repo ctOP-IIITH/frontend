@@ -23,6 +23,7 @@ import CreateUser from './components/CreateUser';
 import AddAdvanced from './components/AddAdvanced';
 
 import { isAxiosReady } from './services/axiosConfig';
+import BulkImport from './components/BulkImport';
 
 function PrivateRoute() {
   const { isLoggedIn } = useAuth();
@@ -104,7 +105,9 @@ function App() {
           <Route path="add-advanced" element={<PrivateRoute />}>
             <Route path="/add-advanced" element={<AddAdvanced />} />
           </Route>
-
+          <Route path="bulk-import" element={<PrivateRoute />}>
+            <Route path="/bulk-import" element={<BulkImport />} />
+          </Route>
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
