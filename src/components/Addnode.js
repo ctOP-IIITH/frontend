@@ -104,12 +104,12 @@ export default function MultipleSelect() {
     }
 
     // Log selected vertical, node type, and added parameters to the console
-    console.log('Selected Domain:', selectedData);
-    console.log('Sensor Type:', document.getElementById('text-field').value);
-    console.log('latitude:', latitude);
-    console.log('longitude:', longitude);
-    console.log('area:', area);
-    console.log('name:', name);
+    // console.log('Selected Domain:', selectedData);
+    // console.log('Sensor Type:', document.getElementById('text-field').value);
+    // console.log('latitude:', latitude);
+    // console.log('longitude:', longitude);
+    // console.log('area:', area);
+    // console.log('name:', name);
     //     "sensor_type_id": 1,
     // "latitude": 17.446920,
     // "longitude": 78.348122,
@@ -133,14 +133,19 @@ export default function MultipleSelect() {
             timer: 1500 // Auto close after 1.5 seconds
           });
         }
+        console.log(response?.data?.response?.status);
+        console.log(response?.data?.response?.message);
+        if(response?.data?.response?.status === "error"){
+          throw new Error(response?.data?.response?.message);
+        }
       })
       .catch((error) => {
         console.log(error);
         MySwal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: 'Something went wrong!',
-          footer: '<p>Check console for more details</p>'
+          text: `${error.message}`,
+          footer: `<p>Check console for more details</p>`
         });
       });
   };

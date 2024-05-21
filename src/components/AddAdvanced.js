@@ -141,7 +141,7 @@ function AddAdvanced() {
               failed_nodes: failedNodes = [],
               invalid_sensor_nodes: invalidSensorNodes = []
             } = response.data;
-            let message = `Import completed.\n`;
+            let message = `Status:\n`;
             message += `Created nodes: ${createdNodes.length}\n`;
             message += `Failed nodes: ${failedNodes.length}\n`;
             message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
@@ -149,7 +149,7 @@ function AddAdvanced() {
             if (failedNodes.length > 0) {
               message += `Failed nodes:\n`;
               failedNodes.forEach((node, index) => {
-                message += `${index + 1}. Area: ${node.node.area}, Name: ${node.node.name}, Error: ${node.error}\n`;
+                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
               });
               message += '\n';
             }
@@ -157,14 +157,14 @@ function AddAdvanced() {
             if (invalidSensorNodes.length > 0) {
               message += `Invalid sensor nodes:\n`;
               invalidSensorNodes.forEach((node, index) => {
-                message += `${index + 1}. Area: ${node.node.area}, Name: ${node.node.name}, Error: ${node.error}\n`;
+                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
               });
             }
 
             if (createdNodes.length > 0) {
               message += `Created nodes:\n`;
               createdNodes.forEach((node, index) => {
-                message += `${index + 1}. Area: ${node.node.area}, Name: ${node.node.name}\n`;
+                message += `${index + 1}. ${node.node.name}\n`;
               });
             }
             setImportStatus({ inProgress: false, message });
@@ -187,55 +187,75 @@ function AddAdvanced() {
   };
 
   const handleBulkImport = () => {
-    const data = JSON.parse(nodesJson);
-    setImportStatus({ inProgress: true, message: 'Import in progress...' });
-    setModalOpen(true);
+    try {
+      const data = JSON.parse(nodesJson);
 
-    axiosAuthInstance
-      .post('/import/import', data)
-      .then((response) => {
-        console.log('Import response:', response.data);
-        const {
-          created_nodes: createdNodes = [],
-          failed_nodes: failedNodes = [],
-          invalid_sensor_nodes: invalidSensorNodes = []
-        } = response.data;
-        let message = `Import completed.\n`;
-        message += `Created nodes: ${createdNodes.length}\n`;
-        message += `Failed nodes: ${failedNodes.length}\n`;
-        message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
+      // Validate the parsed data against the schema
+      const validate = ajv.compile(nodesSchema);
+      const valid = validate(data);
 
-        if (failedNodes.length > 0) {
-          message += `Failed nodes:\n`;
-          failedNodes.forEach((node, index) => {
-            message += `${index + 1}. Name: ${node.node.name}, Error: ${node.error}\n`;
-          });
-          message += '\n';
-        }
+      if (valid) {
+        setImportStatus({ inProgress: true, message: 'Import in progress...' });
+        setModalOpen(true);
 
-        if (invalidSensorNodes.length > 0) {
-          message += `Invalid sensor nodes:\n`;
-          invalidSensorNodes.forEach((node, index) => {
-            message += `${index + 1}. Name: ${node.node.name}, Error: ${node.error}\n`;
+        axiosAuthInstance
+          .post('/import/import', data)
+          .then((response) => {
+            console.log('Import response:', response.data);
+            const {
+              created_nodes: createdNodes = [],
+              failed_nodes: failedNodes = [],
+              invalid_sensor_nodes: invalidSensorNodes = []
+            } = response.data;
+            let message = `Import completed.\n`;
+            message += `Created nodes: ${createdNodes.length}\n`;
+            message += `Failed nodes: ${failedNodes.length}\n`;
+            message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
+
+            if (failedNodes.length > 0) {
+              message += `Failed nodes:\n`;
+              failedNodes.forEach((node, index) => {
+                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+              });
+              message += '\n';
+            }
+
+            if (invalidSensorNodes.length > 0) {
+              message += `Invalid sensor nodes:\n`;
+              invalidSensorNodes.forEach((node, index) => {
+                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+              });
+              message += '\n';
+            }
+            if (createdNodes.length > 0) {
+              console.log(createdNodes);
+              message += `Created  nodes:\n`;
+              createdNodes.forEach((node, index) => {
+                console.log(index, node);
+
+                message += `${index + 1}. ${node.name}\n`;
+              });
+            }
+            setImportStatus({ inProgress: false, message });
+          })
+          .catch((error) => {
+            console.error('Import failed:', error);
+            setImportStatus({
+              inProgress: false,
+              message: 'Failed to import nodes. Please try again.'
+            });
           });
-        }
-        if (createdNodes.length > 0) {
-          message += `Created  nodes:\n`;
-          createdNodes.forEach((node, index) => {
-            message += `${index + 1}. Name: ${node.node.name}\n`;
-          });
-        }
-        setImportStatus({ inProgress: false, message });
-      })
-      .catch((error) => {
-        console.error('Import failed:', error);
-        setImportStatus({
-          inProgress: false,
-          message: 'Failed to import nodes. Please try again.'
-        });
-      });
+      } else {
+        // Data is invalid according to the schema
+        console.error('Invalid JSON data:', validate.errors);
+        alert('The JSON data is not in the correct format. Please check and try again.');
+      }
+    } catch (error) {
+      // Handle parsing errors
+      console.error('Error parsing JSON data:', error);
+      alert('Invalid JSON format. Please check and try again.');
+    }
   };
-
   const buttonStyle = {
     bgcolor: 'primary.main',
     color: 'white',
@@ -259,7 +279,6 @@ function AddAdvanced() {
     <Container maxWidth="sm">
       <Card sx={{ mb: 2 }}>
         <CardContent>
-          <Typography>Import Nodes</Typography>
           <AceEditor
             mode="json"
             theme="monokai"
@@ -313,7 +332,6 @@ function AddAdvanced() {
       </Grid>
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Box sx={modalStyle}>
-          {importStatus.inProgress && <Typography>Import in progress...</Typography>}
           {importStatus.message && (
             <Typography whiteSpace="pre-line">{importStatus.message}</Typography>
           )}
