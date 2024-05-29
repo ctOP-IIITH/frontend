@@ -19,25 +19,31 @@ import { axiosAuthInstance } from '../services/axiosConfig';
 const BulkForm = () => {
   const { verticals } = useContext(DataContext);
   const [nodes, setNodes] = useState([
-    { id: 1, selectedData: null, name: '', area: '', latitude: '', longitude: '', sensorType: '' }
+    { id: 1, selectedData: null, name: '', area: '', latitude: '', longitude: '', sensorType: '', sensorTypes: [] }
   ]);
   const [importStatus, setImportStatus] = useState({ inProgress: false, message: '' });
   const [modalOpen, setModalOpen] = useState(false);
 
   const addNode = () => {
+    const lastNode = nodes[nodes.length - 1];
     const newNodeId = nodes.length + 1;
     setNodes([
       ...nodes,
       {
         id: newNodeId,
-        selectedData: null,
+        selectedData: lastNode.selectedData,
         name: '',
-        area: '',
+        area: lastNode.area,
         latitude: '',
         longitude: '',
-        sensorType: ''
+        sensorType: lastNode.sensorType,
+        sensorTypes: lastNode.sensorTypes
       }
     ]);
+  };
+
+  const removeNode = (nodeId) => {
+    setNodes((prevNodes) => prevNodes.filter((node) => node.id !== nodeId));
   };
 
   const fetchSensorTypes = (domainId, index) => {
@@ -72,6 +78,7 @@ const BulkForm = () => {
       fetchSensorTypes(value, index);
     }
   };
+
   const nodesSchema = {
     title: 'Nodes',
     type: 'object',
@@ -82,7 +89,7 @@ const BulkForm = () => {
         title: 'Nodes',
         items: {
           type: 'object',
-          required: ['latitude', 'longitude', 'area', 'sensor_name', 'domain', 'name'],
+          required: ['latitude', 'longitude', 'area', 'sensor_type', 'domain', 'name'],
           properties: {
             latitude: {
               type: 'number',
@@ -96,7 +103,7 @@ const BulkForm = () => {
               type: 'string',
               title: 'Area'
             },
-            sensor_name: {
+            sensor_type: {
               type: 'string',
               title: 'Sensor Name'
             },
@@ -121,7 +128,7 @@ const BulkForm = () => {
       latitude: parseFloat(node.latitude),
       longitude: parseFloat(node.longitude),
       area: node.area,
-      sensor_name: node.sensorTypes.find((sensorType) => sensorType.id === node.sensorType)
+      sensor_type: node.sensorTypes.find((sensorType) => sensorType.id === node.sensorType)
         .res_name,
       domain: verticals.find((vertical) => vertical.id === node.selectedData).name,
       name: node.name
@@ -159,16 +166,17 @@ const BulkForm = () => {
               failedNodes.forEach((node, index) => {
                 message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
               });
-              message += '\n';
             }
+            message += '\n';
 
             if (invalidSensorNodes.length > 0) {
               message += `Invalid sensor nodes:\n`;
               invalidSensorNodes.forEach((node, index) => {
                 message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
               });
-              message += '\n';
             }
+            message += '\n';
+
             if (createdNodes.length > 0) {
               console.log(createdNodes);
               message += `Created nodes:\n`;
@@ -177,6 +185,7 @@ const BulkForm = () => {
                 message += `${index + 1}. ${node.name}\n`;
               });
             }
+
             setImportStatus({ inProgress: false, message });
           })
           .catch((error) => {
@@ -269,6 +278,13 @@ const BulkForm = () => {
                 value={node.longitude}
                 onChange={(e) => handleChange(nodes.indexOf(node), 'longitude', e.target.value)}
               />
+            </Grid>
+          </Grid>
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Button variant="contained" color="error" onClick={() => removeNode(node.id)}>
+                Delete
+              </Button>
             </Grid>
           </Grid>
         </Paper>
