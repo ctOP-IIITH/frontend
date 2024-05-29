@@ -27,7 +27,7 @@ function AddAdvanced() {
         title: 'Nodes',
         items: {
           type: 'object',
-          required: ['latitude', 'longitude', 'area', 'sensor_name', 'domain', 'name'],
+          required: ['latitude', 'longitude', 'area', 'sensor_type', 'domain', 'name'],
           properties: {
             latitude: {
               type: 'number',
@@ -41,7 +41,7 @@ function AddAdvanced() {
               type: 'string',
               title: 'Area'
             },
-            sensor_name: {
+            sensor_type: {
               type: 'string',
               title: 'Sensor Name'
             },
@@ -58,7 +58,7 @@ function AddAdvanced() {
       }
     }
   };
-
+ 
   useEffect(() => {
     // fetching the template file
     async function fetchTemplate() {
@@ -193,7 +193,10 @@ function AddAdvanced() {
       // Validate the parsed data against the schema
       const validate = ajv.compile(nodesSchema);
       const valid = validate(data);
-
+      if (data?.nodes?.length && data.nodes.length > 5000 ){
+        alert('Import less than 5000 nodes!');
+        return;
+      }
       if (valid) {
         setImportStatus({ inProgress: true, message: 'Import in progress...' });
         setModalOpen(true);

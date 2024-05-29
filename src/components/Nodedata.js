@@ -350,7 +350,7 @@ export default function Details() {
                       <strong>Node ID:</strong> {selectedData.node_name}
                     </Typography>
                     <Typography variant="body1">
-                      <strong>Node Type:</strong> {selectedData.res_name}
+                      <strong>Sensor Type:</strong> {selectedData.res_name}
                     </Typography>
                     <Typography variant="body1">
                       <strong>Parameters:</strong>

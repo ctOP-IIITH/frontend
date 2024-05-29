@@ -53,6 +53,7 @@ export default function MultipleSelect() {
       .get(`/sensor-types/get/${value}`)
       .then((response) => {
         setSensorTypes(response.data);
+        // console.log(response.data);
       })
       .catch((err) => {
         Swal.fire({
