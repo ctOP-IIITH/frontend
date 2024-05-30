@@ -92,13 +92,53 @@ function AddAdvanced() {
     setNodesJson(data);
   };
 
-  const handleDownloadTemplate = () => {
-    const element = document.createElement('a');
-    const file = new Blob([nodesJson], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = 'import-template.json';
-    document.body.appendChild(element);
-    element.click();
+  // const handleDownloadJSONTemplate = () => {
+  //   const element = document.createElement('a');
+  //   const file = new Blob([nodesJson], { type: 'text/plain' });
+  //   element.href = URL.createObjectURL(file);
+  //   element.download = 'import-template.json';
+  //   document.body.appendChild(element);
+  //   element.click();
+  // };
+
+  const handleDownloadJSONTemplate = async () => {
+    try {
+      const response = await fetch('/import-template.json');
+      if (!response.ok) {
+        throw new Error('Failed to fetch the JSON template');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const element = document.createElement('a');
+      element.href = url;
+      element.download = 'template.json';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading JSON template:', error);
+    }
+  };
+
+  const handleDownloadCSVTemplate = async () => {
+    try {
+      const response = await fetch('/import-template.csv');
+      if (!response.ok) {
+        throw new Error('Failed to fetch the CSV template');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const element = document.createElement('a');
+      element.href = url;
+      element.download = 'import-template.csv';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading CSV template:', error);
+    }
   };
 
   const handleFileSelect = async (event) => {
@@ -139,7 +179,7 @@ function AddAdvanced() {
         callback();
       }
       setLoadingProgress(progress);
-    }, 500);
+    }, 200);
   };
 
   const handleCsvFileSelect = async (event) => {
@@ -333,13 +373,18 @@ function AddAdvanced() {
 
         <Grid container spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
           <Grid item>
-            <Button onClick={handleDownloadTemplate} sx={buttonStyle}>
-              Download Template
+            <Button onClick={handleDownloadJSONTemplate} sx={buttonStyle}>
+              Download JSON Template
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button onClick={handleDownloadCSVTemplate} sx={buttonStyle}>
+              Download CSV Template
             </Button>
           </Grid>
           <Grid item>
             <Button onClick={() => fileInputRef.current.click()} sx={buttonStyle}>
-              Import JSON
+              Import JSON File
             </Button>
             <input
               type="file"
@@ -350,7 +395,7 @@ function AddAdvanced() {
           </Grid>
           <Grid item>
             <Button onClick={() => csvFileInputRef.current.click()} sx={buttonStyle}>
-              Import CSV
+              Bulk Import CSV
             </Button>
             <input
               type="file"
@@ -362,7 +407,7 @@ function AddAdvanced() {
           </Grid>
           <Grid item>
             <Button onClick={handleBulkImport} disabled={importStatus.inProgress} sx={buttonStyle}>
-              {importStatus.inProgress ? 'Importing...' : 'Bulk Import'}
+              {importStatus.inProgress ? 'Importing...' : 'Start Bulk Import'}
             </Button>
           </Grid>
         </Grid>
