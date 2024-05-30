@@ -1,6 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Ajv from 'ajv';
-import { Button, Container, Typography, Card, CardContent, Grid, Modal, Box } from '@mui/material';
+import {
+  Button,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  Modal,
+  Box,
+  LinearProgress
+} from '@mui/material';
 import AceEditor from 'react-ace';
 import { axiosAuthInstance } from '../services/axiosConfig';
 
@@ -13,6 +23,7 @@ function AddAdvanced() {
   const [nodesJson, setNodesJson] = useState('');
   const [importStatus, setImportStatus] = useState({ inProgress: false, message: '' });
   const [modalOpen, setModalOpen] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   const fileInputRef = useRef(null);
   const csvFileInputRef = useRef(null);
@@ -58,7 +69,7 @@ function AddAdvanced() {
       }
     }
   };
- 
+
   useEffect(() => {
     // fetching the template file
     async function fetchTemplate() {
@@ -118,6 +129,19 @@ function AddAdvanced() {
     }
   };
 
+  const simulateLoadingProgress = (callback) => {
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.floor(Math.random() * 10) + 5;
+      if (progress >= 95) {
+        progress = 95;
+        clearInterval(interval);
+        callback();
+      }
+      setLoadingProgress(progress);
+    }, 500);
+  };
+
   const handleCsvFileSelect = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -126,56 +150,59 @@ function AddAdvanced() {
         formData.append('file', file);
 
         setImportStatus({ inProgress: true, message: 'Import in progress...' });
+        setLoadingProgress(0);
         setModalOpen(true);
 
-        axiosAuthInstance
-          .post('/import/import_csv', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          })
-          .then((response) => {
-            console.log('Import response:', response.data);
-            const {
-              created_nodes: createdNodes = [],
-              failed_nodes: failedNodes = [],
-              invalid_sensor_nodes: invalidSensorNodes = []
-            } = response.data;
-            let message = `Status:\n`;
-            message += `Created nodes: ${createdNodes.length}\n`;
-            message += `Failed nodes: ${failedNodes.length}\n`;
-            message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
+        simulateLoadingProgress(() => {
+          axiosAuthInstance
+            .post('/import/import_csv', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            })
+            .then((response) => {
+              console.log('Import response:', response.data);
+              const {
+                created_nodes: createdNodes = [],
+                failed_nodes: failedNodes = [],
+                invalid_sensor_nodes: invalidSensorNodes = []
+              } = response.data;
+              let message = `Status:\n`;
+              message += `Created nodes: ${createdNodes.length}\n`;
+              message += `Failed nodes: ${failedNodes.length}\n`;
+              message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
 
-            if (failedNodes.length > 0) {
-              message += `Failed nodes:\n`;
-              failedNodes.forEach((node, index) => {
-                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
-              });
-              message += '\n';
-            }
+              if (failedNodes.length > 0) {
+                message += `Failed nodes:\n`;
+                failedNodes.forEach((node, index) => {
+                  message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+                });
+                message += '\n';
+              }
 
-            if (invalidSensorNodes.length > 0) {
-              message += `Invalid sensor nodes:\n`;
-              invalidSensorNodes.forEach((node, index) => {
-                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
-              });
-            }
+              if (invalidSensorNodes.length > 0) {
+                message += `Invalid sensor nodes:\n`;
+                invalidSensorNodes.forEach((node, index) => {
+                  message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+                });
+              }
 
-            if (createdNodes.length > 0) {
-              message += `Created nodes:\n`;
-              createdNodes.forEach((node, index) => {
-                message += `${index + 1}. ${node.node.name}\n`;
+              if (createdNodes.length > 0) {
+                message += `Created nodes:\n`;
+                createdNodes.forEach((node, index) => {
+                  message += `${index + 1}. ${node.name}\n`;
+                });
+              }
+              setImportStatus({ inProgress: false, message });
+            })
+            .catch((error) => {
+              console.error('Import failed:', error);
+              setImportStatus({
+                inProgress: false,
+                message: 'Failed to import nodes. Please try again.'
               });
-            }
-            setImportStatus({ inProgress: false, message });
-          })
-          .catch((error) => {
-            console.error('Import failed:', error);
-            setImportStatus({
-              inProgress: false,
-              message: 'Failed to import nodes. Please try again.'
             });
-          });
+        });
       } catch (error) {
         console.error('Error processing CSV file:', error);
         setImportStatus({
@@ -193,61 +220,64 @@ function AddAdvanced() {
       // Validate the parsed data against the schema
       const validate = ajv.compile(nodesSchema);
       const valid = validate(data);
-      if (data?.nodes?.length && data.nodes.length > 5000 ){
+      if (data?.nodes?.length && data.nodes.length > 5000) {
         alert('Import less than 5000 nodes!');
         return;
       }
       if (valid) {
         setImportStatus({ inProgress: true, message: 'Import in progress...' });
+        setLoadingProgress(0);
         setModalOpen(true);
 
-        axiosAuthInstance
-          .post('/import/import', data)
-          .then((response) => {
-            console.log('Import response:', response.data);
-            const {
-              created_nodes: createdNodes = [],
-              failed_nodes: failedNodes = [],
-              invalid_sensor_nodes: invalidSensorNodes = []
-            } = response.data;
-            let message = `Import completed.\n`;
-            message += `Created nodes: ${createdNodes.length}\n`;
-            message += `Failed nodes: ${failedNodes.length}\n`;
-            message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
+        simulateLoadingProgress(() => {
+          axiosAuthInstance
+            .post('/import/import', data)
+            .then((response) => {
+              console.log('Import response:', response.data);
+              const {
+                created_nodes: createdNodes = [],
+                failed_nodes: failedNodes = [],
+                invalid_sensor_nodes: invalidSensorNodes = []
+              } = response.data;
+              let message = `Import completed.\n`;
+              message += `Created nodes: ${createdNodes.length}\n`;
+              message += `Failed nodes: ${failedNodes.length}\n`;
+              message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
 
-            if (failedNodes.length > 0) {
-              message += `Failed nodes:\n`;
-              failedNodes.forEach((node, index) => {
-                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
-              });
-              message += '\n';
-            }
+              if (failedNodes.length > 0) {
+                message += `Failed nodes:\n`;
+                failedNodes.forEach((node, index) => {
+                  message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+                });
+                message += '\n';
+              }
 
-            if (invalidSensorNodes.length > 0) {
-              message += `Invalid sensor nodes:\n`;
-              invalidSensorNodes.forEach((node, index) => {
-                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
-              });
-              message += '\n';
-            }
-            if (createdNodes.length > 0) {
-              console.log(createdNodes);
-              message += `Created  nodes:\n`;
-              createdNodes.forEach((node, index) => {
-                console.log(index, node);
+              if (invalidSensorNodes.length > 0) {
+                message += `Invalid sensor nodes:\n`;
+                invalidSensorNodes.forEach((node, index) => {
+                  message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+                });
+                message += '\n';
+              }
+              if (createdNodes.length > 0) {
+                console.log(createdNodes);
+                message += `Created  nodes:\n`;
+                createdNodes.forEach((node, index) => {
+                  console.log(index, node);
 
-                message += `${index + 1}. ${node.name}\n`;
+                  message += `${index + 1}. ${node.name}\n`;
+                });
+              }
+              setImportStatus({ inProgress: false, message });
+            })
+            .catch((error) => {
+              console.error('Import failed:', error);
+              setImportStatus({
+                inProgress: false,
+                message: 'Failed to import nodes. Please try again.'
               });
-            }
-            setImportStatus({ inProgress: false, message });
-          })
-          .catch((error) => {
-            console.error('Import failed:', error);
-            setImportStatus({
-              inProgress: false,
-              message: 'Failed to import nodes. Please try again.'
             });
-          });
+        });
       } else {
         // Data is invalid according to the schema
         console.error('Invalid JSON data:', validate.errors);
@@ -259,6 +289,7 @@ function AddAdvanced() {
       alert('Invalid JSON format. Please check and try again.');
     }
   };
+
   const buttonStyle = {
     bgcolor: 'primary.main',
     color: 'white',
@@ -277,11 +308,10 @@ function AddAdvanced() {
     boxShadow: 24,
     p: 4
   };
+
   return (
     <Box sx={{ width: '100%', marginTop: '30px' }}>
       <Container>
-   
-  
         <Card sx={{ mt: 4 }}>
           <CardContent>
             <AceEditor
@@ -294,13 +324,13 @@ function AddAdvanced() {
               setOptions={{
                 showLineNumbers: true,
                 tabSize: 2,
-                useWorker: false,
+                useWorker: false
               }}
               style={{ width: '100%', height: '400px' }}
             />
           </CardContent>
         </Card>
-  
+
         <Grid container spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
           <Grid item>
             <Button onClick={handleDownloadTemplate} sx={buttonStyle}>
@@ -336,10 +366,18 @@ function AddAdvanced() {
             </Button>
           </Grid>
         </Grid>
+
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
           <Box sx={modalStyle}>
-            {importStatus.message && (
-              <Typography whiteSpace="pre-line">{importStatus.message}</Typography>
+            {importStatus.inProgress ? (
+              <Box>
+                <Typography>Import in progress... {loadingProgress}%</Typography>
+                <LinearProgress variant="determinate" value={loadingProgress} />
+              </Box>
+            ) : (
+              importStatus.message && (
+                <Typography whiteSpace="pre-line">{importStatus.message}</Typography>
+              )
             )}
             <Button onClick={() => setModalOpen(false)} sx={{ mt: 2 }}>
               Close
