@@ -10,7 +10,8 @@ import {
   TextField,
   Typography,
   Paper,
-  Modal
+  Modal,
+  LinearProgress
 } from '@mui/material';
 import Ajv from 'ajv';
 import { DataContext } from '../contexts/DataContext';
@@ -19,9 +20,19 @@ import { axiosAuthInstance } from '../services/axiosConfig';
 const BulkForm = () => {
   const { verticals } = useContext(DataContext);
   const [nodes, setNodes] = useState([
-    { id: 1, selectedData: null, name: '', area: '', latitude: '', longitude: '', sensorType: '', sensorTypes: [] }
+    {
+      id: 1,
+      selectedData: null,
+      name: '',
+      area: '',
+      latitude: '',
+      longitude: '',
+      sensorType: '',
+      sensorTypes: []
+    }
   ]);
   const [importStatus, setImportStatus] = useState({ inProgress: false, message: '' });
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
 
   const addNode = () => {
@@ -123,6 +134,19 @@ const BulkForm = () => {
 
   const ajv = new Ajv();
 
+  const simulateLoadingProgress = (callback) => {
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.floor(Math.random() * 10) + 5;
+      if (progress >= 95) {
+        progress = 95;
+        clearInterval(interval);
+        callback();
+      }
+      setLoadingProgress(progress);
+    }, 200);
+  };
+
   const handleBulkImport = () => {
     const nodesData = nodes.map((node) => ({
       latitude: parseFloat(node.latitude),
@@ -146,55 +170,58 @@ const BulkForm = () => {
       if (valid) {
         setImportStatus({ inProgress: true, message: 'Import in progress...' });
         setModalOpen(true);
+        setLoadingProgress(0);
 
-        axiosAuthInstance
-          .post('/import/import', data)
-          .then((response) => {
-            console.log('Import response:', response.data);
-            const {
-              created_nodes: createdNodes = [],
-              failed_nodes: failedNodes = [],
-              invalid_sensor_nodes: invalidSensorNodes = []
-            } = response.data;
-            let message = `Import completed.\n`;
-            message += `Created nodes: ${createdNodes.length}\n`;
-            message += `Failed nodes: ${failedNodes.length}\n`;
-            message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
+        simulateLoadingProgress(() => {
+          axiosAuthInstance
+            .post('/import/import', data)
+            .then((response) => {
+              console.log('Import response:', response.data);
+              const {
+                created_nodes: createdNodes = [],
+                failed_nodes: failedNodes = [],
+                invalid_sensor_nodes: invalidSensorNodes = []
+              } = response.data;
+              let message = `Import completed.\n`;
+              message += `Created nodes: ${createdNodes.length}\n`;
+              message += `Failed nodes: ${failedNodes.length}\n`;
+              message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
 
-            if (failedNodes.length > 0) {
-              message += `Failed nodes:\n`;
-              failedNodes.forEach((node, index) => {
-                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+              if (failedNodes.length > 0) {
+                message += `Failed nodes:\n`;
+                failedNodes.forEach((node, index) => {
+                  message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+                });
+              }
+              message += '\n';
+
+              if (invalidSensorNodes.length > 0) {
+                message += `Invalid sensor nodes:\n`;
+                invalidSensorNodes.forEach((node, index) => {
+                  message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+                });
+              }
+              message += '\n';
+
+              if (createdNodes.length > 0) {
+                console.log(createdNodes);
+                message += `Created nodes:\n`;
+                createdNodes.forEach((node, index) => {
+                  console.log(index, node);
+                  message += `${index + 1}. ${node.name}\n`;
+                });
+              }
+
+              setImportStatus({ inProgress: false, message });
+            })
+            .catch((error) => {
+              console.error('Import failed:', error);
+              setImportStatus({
+                inProgress: false,
+                message: 'Failed to import nodes. Please try again.'
               });
-            }
-            message += '\n';
-
-            if (invalidSensorNodes.length > 0) {
-              message += `Invalid sensor nodes:\n`;
-              invalidSensorNodes.forEach((node, index) => {
-                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
-              });
-            }
-            message += '\n';
-
-            if (createdNodes.length > 0) {
-              console.log(createdNodes);
-              message += `Created nodes:\n`;
-              createdNodes.forEach((node, index) => {
-                console.log(index, node);
-                message += `${index + 1}. ${node.name}\n`;
-              });
-            }
-
-            setImportStatus({ inProgress: false, message });
-          })
-          .catch((error) => {
-            console.error('Import failed:', error);
-            setImportStatus({
-              inProgress: false,
-              message: 'Failed to import nodes. Please try again.'
             });
-          });
+        });
       } else {
         // Data is invalid according to the schema
         console.error('Invalid JSON data:', validate.errors);
@@ -310,13 +337,22 @@ const BulkForm = () => {
             transform: 'translate(-50%, -50%)',
             bgcolor: 'background.paper',
             boxShadow: 24,
-            p: 4
+            p: 4,
+            width: '80%',
+            maxWidth: 600
           }}>
           <Typography variant="h6" gutterBottom>
             Import Status
           </Typography>
-          <Typography>{importStatus.message}</Typography>
-          <Button onClick={() => setModalOpen(false)}>Close</Button>
+          {importStatus.inProgress && (
+            <LinearProgress variant="determinate" value={loadingProgress} />
+          )}
+          <Typography sx={{ marginTop: 2, whiteSpace: 'pre-line' }}>
+            {importStatus.message}
+          </Typography>
+          <Button onClick={() => setModalOpen(false)} sx={{ marginTop: 2 }}>
+            Close
+          </Button>
         </Box>
       </Modal>
     </Box>
