@@ -13,7 +13,11 @@ import {
   Modal,
   LinearProgress
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import Ajv from 'ajv';
+
 import { DataContext } from '../contexts/DataContext';
 import { axiosAuthInstance } from '../services/axiosConfig';
 
@@ -236,21 +240,23 @@ const BulkForm = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
+    <Box sx={{ padding: 3 }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
         Bulk Node Form
       </Typography>
       {nodes.map((node) => (
-        <Paper key={node.id} sx={{ padding: 2, marginBottom: 2 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Select Domain</InputLabel>
+        <Paper key={node.id} sx={{ padding: 3, marginBottom: 3, borderRadius: 2, boxShadow: 3 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel id={`domain-label-${node.id}`}>Select Domain</InputLabel>
                 <Select
+                  labelId={`domain-label-${node.id}`}
                   value={node.selectedData || ''}
                   onChange={(e) =>
                     handleChange(nodes.indexOf(node), 'selectedData', e.target.value)
-                  }>
+                  }
+                  label="Select Domain">
                   {verticals.map((item) => (
                     <MenuItem key={item.id} value={item.id}>
                       {item.name}
@@ -259,12 +265,14 @@ const BulkForm = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Select Sensor Type</InputLabel>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel id={`sensor-type-label-${node.id}`}>Select Sensor Type</InputLabel>
                 <Select
+                  labelId={`sensor-type-label-${node.id}`}
                   value={node.sensorType || ''}
-                  onChange={(e) => handleChange(nodes.indexOf(node), 'sensorType', e.target.value)}>
+                  onChange={(e) => handleChange(nodes.indexOf(node), 'sensorType', e.target.value)}
+                  label="Select Sensor Type">
                   {node.sensorTypes &&
                     node.sensorTypes.map((sensorType) => (
                       <MenuItem key={sensorType.id} value={sensorType.id}>
@@ -274,86 +282,101 @@ const BulkForm = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Name"
+                variant="outlined"
                 value={node.name}
                 onChange={(e) => handleChange(nodes.indexOf(node), 'name', e.target.value)}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Area"
+                variant="outlined"
                 value={node.area}
                 onChange={(e) => handleChange(nodes.indexOf(node), 'area', e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Latitude"
+                variant="outlined"
                 value={node.latitude}
                 onChange={(e) => handleChange(nodes.indexOf(node), 'latitude', e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Longitude"
+                variant="outlined"
                 value={node.longitude}
                 onChange={(e) => handleChange(nodes.indexOf(node), 'longitude', e.target.value)}
               />
             </Grid>
           </Grid>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Button variant="contained" color="error" onClick={() => removeNode(node.id)}>
-                Delete
-              </Button>
-            </Grid>
-          </Grid>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => removeNode(node.id)}
+              startIcon={<DeleteIcon />}>
+              Delete Node
+            </Button>
+          </Box>
         </Paper>
       ))}
-      <Grid container justifyContent="space-between" alignItems="center">
+      <Grid container justifyContent="space-between" alignItems="center" sx={{ mt: 4 }}>
         <Grid item>
-          <Button variant="contained" onClick={addNode}>
+          <Button variant="contained" onClick={addNode} startIcon={<AddIcon />}>
             Add Node
           </Button>
         </Grid>
         <Grid item>
-          <Button variant="contained" onClick={handleBulkImport} disabled={importStatus.inProgress}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleBulkImport}
+            disabled={importStatus.inProgress}
+            startIcon={<CloudUploadIcon />}>
             {importStatus.inProgress ? 'Importing...' : 'Bulk Import'}
           </Button>
         </Grid>
       </Grid>
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Box
+        <Paper
           sx={{
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
             width: '80%',
-            maxWidth: 600
+            maxWidth: 600,
+            p: 4,
+            borderRadius: 2
           }}>
           <Typography variant="h6" gutterBottom>
             Import Status
           </Typography>
           {importStatus.inProgress && (
-            <LinearProgress variant="determinate" value={loadingProgress} />
+            <Box sx={{ width: '100%', mb: 2 }}>
+              <LinearProgress variant="determinate" value={loadingProgress} />
+              <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1 }}>
+                {`${Math.round(loadingProgress)}%`}
+              </Typography>
+            </Box>
           )}
-          <Typography sx={{ marginTop: 2, whiteSpace: 'pre-line' }}>
-            {importStatus.message}
-          </Typography>
-          <Button onClick={() => setModalOpen(false)} sx={{ marginTop: 2 }}>
-            Close
-          </Button>
-        </Box>
+          <Typography sx={{ mt: 2, whiteSpace: 'pre-line' }}>{importStatus.message}</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+            <Button variant="contained" onClick={() => setModalOpen(false)}>
+              Close
+            </Button>
+          </Box>
+        </Paper>
       </Modal>
     </Box>
   );
