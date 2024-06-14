@@ -1,20 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Ajv from 'ajv';
-import {
-  Button,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  Modal,
-  Box,
-  LinearProgress
-} from '@mui/material';
 import AceEditor from 'react-ace';
+import {
+  Box,
+  Container,
+  Grid,
+  Button,
+  Modal,
+  Typography,
+  LinearProgress,
+  Paper,
+  Tooltip
+} from '@mui/material';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DownloadIcon from '@mui/icons-material/Download';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+
 import { axiosAuthInstance } from '../services/axiosConfig';
 
 import 'ace-builds/src-noconflict/mode-json';
+import 'ace-builds/src-noconflict/theme-github';
 import 'ace-builds/src-noconflict/theme-monokai';
 
 function AddAdvanced() {
@@ -331,7 +336,9 @@ function AddAdvanced() {
   };
 
   const buttonStyle = {
-    bgcolor: 'primary.main',
+    textTransform: 'none',
+    minWidth: '180px',
+    bgcolor: 'info.main',
     color: 'white',
     '&:hover': {
       bgcolor: 'primary.dark'
@@ -346,46 +353,69 @@ function AddAdvanced() {
     width: 400,
     bgcolor: 'background.paper',
     boxShadow: 24,
-    p: 4
+    p: 4,
+    borderRadius: 2
   };
 
   return (
     <Box sx={{ width: '100%', marginTop: '30px' }}>
-      <Container>
-        <Card sx={{ mt: 4 }}>
-          <CardContent>
-            <AceEditor
-              mode="json"
-              theme="monokai"
-              value={nodesJson}
-              onChange={handleNodesChange}
-              name="UNIQUE_ID_OF_DIV"
-              editorProps={{ $blockScrolling: true }}
-              setOptions={{
-                showLineNumbers: true,
-                tabSize: 2,
-                useWorker: false
-              }}
-              style={{ width: '100%', height: '400px' }}
-            />
-          </CardContent>
-        </Card>
+      <Container maxWidth="lg">
+        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            JSON Editor
+          </Typography>
+          <AceEditor
+            mode="json"
+            theme="github"
+            value={nodesJson}
+            onChange={handleNodesChange}
+            name="UNIQUE_ID_OF_DIV"
+            editorProps={{ $blockScrolling: true }}
+            setOptions={{
+              showLineNumbers: true,
+              tabSize: 2,
+              useWorker: false
+            }}
+            style={{ width: '100%', height: '400px', borderRadius: '4px' }}
+          />
+        </Paper>
 
-        <Grid container spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
-          <Grid item>
-            <Button onClick={handleDownloadJSONTemplate} sx={buttonStyle}>
-              Download JSON Template
-            </Button>
+        <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Tooltip title="Download JSON Template">
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<DownloadIcon />}
+                onClick={handleDownloadJSONTemplate}
+                sx={buttonStyle}>
+                JSON Template
+              </Button>
+            </Tooltip>
           </Grid>
-          <Grid item>
-            <Button onClick={handleDownloadCSVTemplate} sx={buttonStyle}>
-              Download CSV Template
-            </Button>
+          <Grid item xs={12} sm={6} md={4}>
+            <Tooltip title="Download CSV Template">
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<DownloadIcon />}
+                onClick={handleDownloadCSVTemplate}
+                sx={buttonStyle}>
+                CSV Template
+              </Button>
+            </Tooltip>
           </Grid>
-          <Grid item>
-            <Button onClick={() => fileInputRef.current.click()} sx={buttonStyle}>
-              Import JSON File
-            </Button>
+          <Grid item xs={12} sm={6} md={4}>
+            <Tooltip title="Import JSON File">
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<CloudUploadIcon />}
+                onClick={() => fileInputRef.current.click()}
+                sx={buttonStyle}>
+                Import JSON
+              </Button>
+            </Tooltip>
             <input
               type="file"
               ref={fileInputRef}
@@ -393,10 +423,17 @@ function AddAdvanced() {
               onChange={handleFileSelect}
             />
           </Grid>
-          <Grid item>
-            <Button onClick={() => csvFileInputRef.current.click()} sx={buttonStyle}>
-              Bulk Import CSV
-            </Button>
+          <Grid item xs={12} sm={6} md={4}>
+            <Tooltip title="Bulk Import CSV">
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<CloudUploadIcon />}
+                onClick={() => csvFileInputRef.current.click()}
+                sx={buttonStyle}>
+                Import CSV
+              </Button>
+            </Tooltip>
             <input
               type="file"
               ref={csvFileInputRef}
@@ -405,29 +442,50 @@ function AddAdvanced() {
               accept=".csv"
             />
           </Grid>
-          <Grid item>
-            <Button onClick={handleBulkImport} disabled={importStatus.inProgress} sx={buttonStyle}>
-              {importStatus.inProgress ? 'Importing...' : 'Start Bulk Import'}
-            </Button>
+          <Grid item xs={12} sm={6} md={4}>
+            <Tooltip title="Start Bulk Import">
+              <Button
+                fullWidth
+                variant="contained"
+                color="success"
+                startIcon={<PlayArrowIcon />}
+                onClick={handleBulkImport}
+                disabled={importStatus.inProgress}
+                sx={buttonStyle}>
+                {importStatus.inProgress ? 'Importing...' : 'Start Bulk Import'}
+              </Button>
+            </Tooltip>
           </Grid>
         </Grid>
 
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-          <Box sx={modalStyle}>
+          <Paper sx={modalStyle}>
             {importStatus.inProgress ? (
               <Box>
-                <Typography>Import in progress... {loadingProgress}%</Typography>
-                <LinearProgress variant="determinate" value={loadingProgress} />
+                <Typography variant="h6" gutterBottom>
+                  Import Progress
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  {loadingProgress}% Complete
+                </Typography>
+                <LinearProgress variant="determinate" value={loadingProgress} sx={{ mb: 2 }} />
               </Box>
             ) : (
               importStatus.message && (
-                <Typography whiteSpace="pre-line">{importStatus.message}</Typography>
+                <>
+                  <Typography variant="h6" gutterBottom>
+                    Import Status
+                  </Typography>
+                  <Typography variant="body1" whiteSpace="pre-line">
+                    {importStatus.message}
+                  </Typography>
+                </>
               )
             )}
-            <Button onClick={() => setModalOpen(false)} sx={{ mt: 2 }}>
+            <Button variant="contained" onClick={() => setModalOpen(false)} sx={{ mt: 2 }}>
               Close
             </Button>
-          </Box>
+          </Paper>
         </Modal>
       </Container>
     </Box>
