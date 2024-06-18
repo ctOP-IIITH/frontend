@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Ajv from 'ajv';
-import AceEditor from 'react-ace';
 import {
   Box,
   Container,
@@ -92,10 +91,6 @@ function AddAdvanced() {
 
     fetchTemplate();
   }, []);
-
-  const handleNodesChange = (data) => {
-    setNodesJson(data);
-  };
 
   // const handleDownloadJSONTemplate = () => {
   //   const element = document.createElement('a');
@@ -362,102 +357,85 @@ function AddAdvanced() {
       <Container maxWidth="lg">
         <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
           <Typography variant="h5" gutterBottom>
-            JSON Editor
+            <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
+              <Grid item xs={12} sm={6} md={4}>
+                <Tooltip title="Download JSON Template">
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<DownloadIcon />}
+                    onClick={handleDownloadJSONTemplate}
+                    sx={buttonStyle}>
+                    JSON Template
+                  </Button>
+                </Tooltip>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Tooltip title="Download CSV Template">
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<DownloadIcon />}
+                    onClick={handleDownloadCSVTemplate}
+                    sx={buttonStyle}>
+                    CSV Template
+                  </Button>
+                </Tooltip>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Tooltip title="Import JSON File">
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<CloudUploadIcon />}
+                    onClick={() => fileInputRef.current.click()}
+                    sx={buttonStyle}>
+                    Import JSON
+                  </Button>
+                </Tooltip>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleFileSelect}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Tooltip title="Bulk Import CSV">
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<CloudUploadIcon />}
+                    onClick={() => csvFileInputRef.current.click()}
+                    sx={buttonStyle}>
+                    Import CSV
+                  </Button>
+                </Tooltip>
+                <input
+                  type="file"
+                  ref={csvFileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleCsvFileSelect}
+                  accept=".csv"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Tooltip title="Start Bulk Import">
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="success"
+                    startIcon={<PlayArrowIcon />}
+                    onClick={handleBulkImport}
+                    disabled={importStatus.inProgress}
+                    sx={buttonStyle}>
+                    {importStatus.inProgress ? 'Importing...' : 'Start Bulk Import'}
+                  </Button>
+                </Tooltip>
+              </Grid>
+            </Grid>
           </Typography>
-          <AceEditor
-            mode="json"
-            theme="github"
-            value={nodesJson}
-            onChange={handleNodesChange}
-            name="UNIQUE_ID_OF_DIV"
-            editorProps={{ $blockScrolling: true }}
-            setOptions={{
-              showLineNumbers: true,
-              tabSize: 2,
-              useWorker: false
-            }}
-            style={{ width: '100%', height: '400px', borderRadius: '4px' }}
-          />
         </Paper>
-
-        <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Tooltip title="Download JSON Template">
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<DownloadIcon />}
-                onClick={handleDownloadJSONTemplate}
-                sx={buttonStyle}>
-                JSON Template
-              </Button>
-            </Tooltip>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Tooltip title="Download CSV Template">
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<DownloadIcon />}
-                onClick={handleDownloadCSVTemplate}
-                sx={buttonStyle}>
-                CSV Template
-              </Button>
-            </Tooltip>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Tooltip title="Import JSON File">
-              <Button
-                fullWidth
-                variant="contained"
-                startIcon={<CloudUploadIcon />}
-                onClick={() => fileInputRef.current.click()}
-                sx={buttonStyle}>
-                Import JSON
-              </Button>
-            </Tooltip>
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              onChange={handleFileSelect}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Tooltip title="Bulk Import CSV">
-              <Button
-                fullWidth
-                variant="contained"
-                startIcon={<CloudUploadIcon />}
-                onClick={() => csvFileInputRef.current.click()}
-                sx={buttonStyle}>
-                Import CSV
-              </Button>
-            </Tooltip>
-            <input
-              type="file"
-              ref={csvFileInputRef}
-              style={{ display: 'none' }}
-              onChange={handleCsvFileSelect}
-              accept=".csv"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Tooltip title="Start Bulk Import">
-              <Button
-                fullWidth
-                variant="contained"
-                color="success"
-                startIcon={<PlayArrowIcon />}
-                onClick={handleBulkImport}
-                disabled={importStatus.inProgress}
-                sx={buttonStyle}>
-                {importStatus.inProgress ? 'Importing...' : 'Start Bulk Import'}
-              </Button>
-            </Tooltip>
-          </Grid>
-        </Grid>
-
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
           <Paper sx={modalStyle}>
             {importStatus.inProgress ? (
