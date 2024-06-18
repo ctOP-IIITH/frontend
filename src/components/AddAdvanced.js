@@ -9,11 +9,14 @@ import {
   Typography,
   LinearProgress,
   Paper,
-  Tooltip
+  Tooltip,
+  Menu,
+  MenuItem
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DownloadIcon from '@mui/icons-material/Download';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 import { axiosAuthInstance } from '../services/axiosConfig';
 
@@ -28,9 +31,39 @@ function AddAdvanced() {
   const [importStatus, setImportStatus] = useState({ inProgress: false, message: '' });
   const [modalOpen, setModalOpen] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const fileInputRef = useRef(null);
   const csvFileInputRef = useRef(null);
+
+  const handleDownloadClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleDownloadClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDownloadTemplate = async (type) => {
+    try {
+      const response = await fetch(`/import-template.${type}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch the ${type.toUpperCase()} template`);
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const element = document.createElement('a');
+      element.href = url;
+      element.download = `import-template.${type}`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(`Error downloading ${type.toUpperCase()} template:`, error);
+    }
+    handleDownloadClose();
+  };
 
   const nodesSchema = {
     title: 'Nodes',
@@ -92,54 +125,6 @@ function AddAdvanced() {
     fetchTemplate();
   }, []);
 
-  // const handleDownloadJSONTemplate = () => {
-  //   const element = document.createElement('a');
-  //   const file = new Blob([nodesJson], { type: 'text/plain' });
-  //   element.href = URL.createObjectURL(file);
-  //   element.download = 'import-template.json';
-  //   document.body.appendChild(element);
-  //   element.click();
-  // };
-
-  const handleDownloadJSONTemplate = async () => {
-    try {
-      const response = await fetch('/import-template.json');
-      if (!response.ok) {
-        throw new Error('Failed to fetch the JSON template');
-      }
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const element = document.createElement('a');
-      element.href = url;
-      element.download = 'template.json';
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading JSON template:', error);
-    }
-  };
-
-  const handleDownloadCSVTemplate = async () => {
-    try {
-      const response = await fetch('/import-template.csv');
-      if (!response.ok) {
-        throw new Error('Failed to fetch the CSV template');
-      }
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const element = document.createElement('a');
-      element.href = url;
-      element.download = 'import-template.csv';
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading CSV template:', error);
-    }
-  };
 
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];
@@ -356,85 +341,80 @@ function AddAdvanced() {
     <Box sx={{ width: '100%', marginTop: '30px' }}>
       <Container maxWidth="lg">
         <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
-              <Grid item xs={12} sm={6} md={4}>
-                <Tooltip title="Download JSON Template">
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<DownloadIcon />}
-                    onClick={handleDownloadJSONTemplate}
-                    sx={buttonStyle}>
-                    JSON Template
-                  </Button>
-                </Tooltip>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Tooltip title="Download CSV Template">
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<DownloadIcon />}
-                    onClick={handleDownloadCSVTemplate}
-                    sx={buttonStyle}>
-                    CSV Template
-                  </Button>
-                </Tooltip>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Tooltip title="Import JSON File">
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={<CloudUploadIcon />}
-                    onClick={() => fileInputRef.current.click()}
-                    sx={buttonStyle}>
-                    Import JSON
-                  </Button>
-                </Tooltip>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  style={{ display: 'none' }}
-                  onChange={handleFileSelect}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Tooltip title="Bulk Import CSV">
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={<CloudUploadIcon />}
-                    onClick={() => csvFileInputRef.current.click()}
-                    sx={buttonStyle}>
-                    Import CSV
-                  </Button>
-                </Tooltip>
-                <input
-                  type="file"
-                  ref={csvFileInputRef}
-                  style={{ display: 'none' }}
-                  onChange={handleCsvFileSelect}
-                  accept=".csv"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Tooltip title="Start Bulk Import">
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="success"
-                    startIcon={<PlayArrowIcon />}
-                    onClick={handleBulkImport}
-                    disabled={importStatus.inProgress}
-                    sx={buttonStyle}>
-                    {importStatus.inProgress ? 'Importing...' : 'Start Bulk Import'}
-                  </Button>
-                </Tooltip>
-              </Grid>
+          <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Tooltip title="Download Template">
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<DownloadIcon />}
+                  endIcon={<ArrowDropDownIcon />}
+                  onClick={handleDownloadClick}
+                  sx={buttonStyle}>
+                  Download Template
+                </Button>
+              </Tooltip>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleDownloadClose}
+              >
+                <MenuItem onClick={() => handleDownloadTemplate('json')}>JSON Template</MenuItem>
+                <MenuItem onClick={() => handleDownloadTemplate('csv')}>CSV Template</MenuItem>
+              </Menu>
             </Grid>
-          </Typography>
+            <Grid item xs={12} sm={6} md={4}>
+              <Tooltip title="Import JSON File">
+                <Button
+                  fullWidth
+                  variant="contained"
+                  startIcon={<CloudUploadIcon />}
+                  onClick={() => fileInputRef.current.click()}
+                  sx={buttonStyle}>
+                  Import JSON
+                </Button>
+              </Tooltip>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileSelect}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Tooltip title="Bulk Import CSV">
+                <Button
+                  fullWidth
+                  variant="contained"
+                  startIcon={<CloudUploadIcon />}
+                  onClick={() => csvFileInputRef.current.click()}
+                  sx={buttonStyle}>
+                  Import CSV
+                </Button>
+              </Tooltip>
+              <input
+                type="file"
+                ref={csvFileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleCsvFileSelect}
+                accept=".csv"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Tooltip title="Start Bulk Import">
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="success"
+                  startIcon={<PlayArrowIcon />}
+                  onClick={handleBulkImport}
+                  disabled={importStatus.inProgress}
+                  sx={buttonStyle}>
+                  {importStatus.inProgress ? 'Importing...' : 'Start Bulk Import'}
+                </Button>
+              </Tooltip>
+            </Grid>
+          </Grid>
         </Paper>
         <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
           <Paper sx={modalStyle}>
