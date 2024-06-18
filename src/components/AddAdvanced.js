@@ -341,10 +341,13 @@ function AddAdvanced() {
   };
 
   return (
-    <Box sx={{ width: '100%', marginTop: '30px' }}>
+    <Box sx={{ padding: 3 }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+        Bulk Import from file
+      </Typography>
       <Container maxWidth="lg">
-        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
+        <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2, boxShadow: 3 }}>
+          <Grid container spacing={3} justifyContent="center" sx={{ mb: 4 }}>
             <Grid item xs={12} sm={6} md={4}>
               <Tooltip title="Download Template">
                 <Button
