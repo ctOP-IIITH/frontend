@@ -28,6 +28,8 @@ function AddAdvanced() {
   const [modalOpen, setModalOpen] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [fileSelected, setFileSelected] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
 
   const fileInputRef = useRef(null);
 
@@ -238,6 +240,12 @@ function AddAdvanced() {
       } else {
         alert('Please select a JSON or CSV file.');
       }
+
+      setFileSelected(true);
+      setSelectedFileName(file.name);
+    } else {
+      setFileSelected(false);
+      setSelectedFileName('');
     }
   };
 
@@ -388,8 +396,8 @@ function AddAdvanced() {
                   variant="contained"
                   startIcon={<CloudUploadIcon />}
                   onClick={() => fileInputRef.current.click()}
-                  sx={buttonStyle}>
-                  Import File
+                  sx={fileSelected ? "" : buttonStyle}>
+                  {fileSelected ? selectedFileName : 'Import File'}
                 </Button>
               </Tooltip>
               <input
