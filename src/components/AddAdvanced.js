@@ -112,7 +112,7 @@ function AddAdvanced() {
         if (!res.ok) {
           throw new Error('Failed to fetch the template');
         }
-        const data = await res.json();
+        // const data = await res.json();
         // setNodesJson(JSON.stringify(data, null, 2));
       } catch (error) {
         console.error('error fetching json: ', error);
