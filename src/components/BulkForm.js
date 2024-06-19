@@ -38,6 +38,7 @@ const BulkForm = () => {
   const [importStatus, setImportStatus] = useState({ inProgress: false, message: '' });
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
+  const [errorModal, setErrorModal] = useState({ open: false, message: '' });
 
   const addNode = () => {
     const lastNode = nodes[nodes.length - 1];
@@ -46,13 +47,13 @@ const BulkForm = () => {
       ...nodes,
       {
         id: newNodeId,
-        selectedData: lastNode.selectedData,
+        selectedData: lastNode?.selectedData || null,
         name: '',
-        area: lastNode.area,
+        area: lastNode?.area || '',
         latitude: '',
         longitude: '',
-        sensorType: lastNode.sensorType,
-        sensorTypes: lastNode.sensorTypes
+        sensorType: lastNode?.sensorType || '',
+        sensorTypes: lastNode?.sensorTypes || []
       }
     ]);
   };
@@ -152,6 +153,21 @@ const BulkForm = () => {
   };
 
   const handleBulkImport = () => {
+    const hasEmptyFields = nodes.some(
+      (node) =>
+        !node.selectedData ||
+        !node.name ||
+        !node.area ||
+        !node.latitude ||
+        !node.longitude ||
+        !node.sensorType
+    );
+
+    if (hasEmptyFields) {
+      setErrorModal({ open: true, message: 'Please fill in all the required fields.' });
+      return;
+    }
+
     const nodesData = nodes.map((node) => ({
       latitude: parseFloat(node.latitude),
       longitude: parseFloat(node.longitude),
@@ -373,6 +389,31 @@ const BulkForm = () => {
           <Typography sx={{ mt: 2, whiteSpace: 'pre-line' }}>{importStatus.message}</Typography>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
             <Button variant="contained" onClick={() => setModalOpen(false)}>
+              Close
+            </Button>
+          </Box>
+        </Paper>
+      </Modal>
+      <Modal open={errorModal.open} onClose={() => setErrorModal({ open: false, message: '' })}>
+        <Paper
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '80%',
+            maxWidth: 400,
+            p: 4,
+            borderRadius: 2
+          }}>
+          <Typography variant="h6" gutterBottom>
+            Error
+          </Typography>
+          <Typography>{errorModal.message}</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+            <Button
+              variant="contained"
+              onClick={() => setErrorModal({ open: false, message: '' })}>
               Close
             </Button>
           </Box>
