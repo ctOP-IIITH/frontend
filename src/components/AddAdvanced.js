@@ -318,6 +318,16 @@ function AddAdvanced() {
     }
   };
 
+  const handleDownloadStatus = () => {
+    const element = document.createElement('a');
+    const file = new Blob([importStatus.message], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'import_status.txt';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
   const buttonStyle = {
     textTransform: 'none',
     minWidth: '180px',
@@ -333,11 +343,13 @@ function AddAdvanced() {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: '60vw',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
-    borderRadius: 2
+    borderRadius: 2,
+    maxHeight: '80vh',
+    overflow: 'auto'
   };
 
   return (
@@ -422,6 +434,9 @@ function AddAdvanced() {
                   <Typography variant="h6" gutterBottom>
                     Import Status
                   </Typography>
+                  <Button variant="contained" onClick={handleDownloadStatus} sx={{ mt: 2 }}>
+                    Download Status
+                  </Button>
                   <Typography variant="body1" whiteSpace="pre-line">
                     {importStatus.message}
                   </Typography>
