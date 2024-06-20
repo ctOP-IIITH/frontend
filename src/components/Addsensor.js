@@ -235,7 +235,7 @@ function CreateSensorType() {
             </Box>
           ))}
 
-        <Button startIcon={<AddCircleOutlineIcon />} onClick={handleAddParameter} sx={{ mt: 2 }}>
+        <Button  variant="contained" color="primary" startIcon={<AddCircleOutlineIcon />} onClick={handleAddParameter} sx={{ mt: 2 , mr: 2 }}>
           Add Parameter
         </Button>
 

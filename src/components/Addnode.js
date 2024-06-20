@@ -134,11 +134,6 @@ export default function MultipleSelect() {
             timer: 1500 // Auto close after 1.5 seconds
           });
         }
-        console.log(response?.data?.response?.status);
-        console.log(response?.data?.response?.message);
-        if(response?.data?.response?.status === "error"){
-          throw new Error(response?.data?.response?.message);
-        }
       })
       .catch((error) => {
         console.log(error);
@@ -146,7 +141,7 @@ export default function MultipleSelect() {
           icon: 'error',
           title: 'Oops...',
           text: `${error.message}`,
-          footer: `<p>Check console for more details</p>`
+          footer: `<p>${error?.response?.data?.detail}</p>`
         });
       });
   };
