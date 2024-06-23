@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
+import { RingLoader } from 'react-spinners';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Alert,
@@ -21,8 +22,9 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Snackbar
+  Snackbar,
 } from '@mui/material';
+import { Delete as DeleteIcon } from '@mui/icons-material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import Swal from 'sweetalert2';
@@ -30,6 +32,13 @@ import { axiosAuthInstance, BACKEND_API_URL } from '../services/axiosConfig';
 import CodeComponent from './CodeComponent';
 import { DataContext } from '../contexts/DataContext';
 
+function CenteredLoading() {
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <RingLoader color="#123462" loading />
+    </Box>
+  );
+}
 export default function Details() {
   const [selectedData, setSelectedData] = useState(null);
   const [nodeId, setNodeId] = useState(false);
@@ -325,12 +334,22 @@ export default function Details() {
     </Grid>
   );
 
+  const handleDeleteSubscrpition = (index) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `You will not be able to recover this subscription: ${subscribedUrls[index]}`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      console.log(result);
+    });
+  };
+  
+
   return loading ? (
-    <Box sx={{ p: 3, m: 3 }}>
-      <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
-        Loading...
-      </Typography>
-    </Box>
+    <CenteredLoading />
   ) : (
     <Box sx={{ p: 3, m: 3 }}>
       {selectedData ? (
@@ -407,10 +426,21 @@ export default function Details() {
                     <Typography variant="h6" gutterBottom>
                       Subscribed URLs:
                     </Typography>
+
                     {subscribedUrls.map((url, index) => (
-                      <Typography key={url} variant="body1">
-                        {index + 1}. {url}
-                      </Typography>
+                      <Box
+                        key={url}
+                        display="flex"
+                        alignItems="center"
+                      justifyContent="space-between"
+                        >
+                        <Typography variant="body1">
+                          {index + 1}. {url}
+                        </Typography>
+                        <IconButton onClick={() => handleDeleteSubscrpition(index)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
                     ))}
                   </Box>
                 )}
@@ -502,9 +532,7 @@ export default function Details() {
           </Grid>
         </Grid>
       ) : (
-        <Typography variant="h2" align="center" color="textPrimary" gutterBottom>
-          Loading...
-        </Typography>
+        <CenteredLoading />
       )}
 
       {/* Subscription Dialog */}

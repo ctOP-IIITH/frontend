@@ -125,7 +125,7 @@ export default function MultipleSelect() {
         name
       })
       .then((response) => {
-        if (response.data.detail === 'Node created') {
+        if (response.status === 200 || response.status === 201) {
           MySwal.fire({
             icon: 'success',
             title: 'Success!',

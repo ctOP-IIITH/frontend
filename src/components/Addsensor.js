@@ -115,7 +115,7 @@ function CreateSensorType() {
         vertical_id: verticals.find((v) => v.name === selectedVertical).id
       })
       .then((response) => {
-        if (response.data.detail === 'Sensor type created') {
+        if (response.status === 200 || response.status === 201) {
           // Show SweetAlert on success
           MySwal.fire({
             icon: 'success',
@@ -235,7 +235,11 @@ function CreateSensorType() {
             </Box>
           ))}
 
-        <Button  variant="contained" color="primary" startIcon={<AddCircleOutlineIcon />} onClick={handleAddParameter} sx={{ mt: 2 , mr: 2 }}>
+        <Button 
+        color="inherit"
+        startIcon={<AddCircleOutlineIcon />} onClick={handleAddParameter} sx={{ mt: 2,
+          marginRight: '0.5rem'
+         }}>
           Add Parameter
         </Button>
 

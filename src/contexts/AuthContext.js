@@ -20,9 +20,11 @@ export function AuthProvider({ children }) {
     }) 
     .catch((error) => {
       console.error("Error fetching user data", error);
+
     })
   }
 
+  
   const fetchUsers = () => {
     axiosAuthInstance.get('/user/getusers').then((response) => {
       setUsers(response.data)
