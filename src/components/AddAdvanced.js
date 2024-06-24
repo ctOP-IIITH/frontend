@@ -1,166 +1,102 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Ajv from 'ajv';
-import { useNavigate } from 'react-router-dom';
 import {
-  Button,
+  Box,
   Container,
-  Stepper,
-  Step,
-  StepButton,
+  Grid,
+  Button,
+  Modal,
   Typography,
-  Card,
-  CardContent,
-  Grid
+  LinearProgress,
+  Paper,
+  Tooltip,
+  Menu,
+  MenuItem
 } from '@mui/material';
-import AceEditor from 'react-ace';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DownloadIcon from '@mui/icons-material/Download';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-import 'ace-builds/src-noconflict/mode-json';
-import 'ace-builds/src-noconflict/theme-monokai';
-
-const steps = ['Import Verticals', 'Import Nodes'];
+import { axiosAuthInstance } from '../services/axiosConfig';
 
 function AddAdvanced() {
   const ajv = new Ajv();
 
-  const [activeStep, setActiveStep] = useState(0);
-  const [verticalsJson, setVerticalsJson] = useState(
-    JSON.stringify(
-      {
-        name: 'Weather Monitoring',
-        sensor_types: [
-          {
-            name: 'Kristnam',
-            parameters: {
-              'Flow Volume': 'int',
-              'Flow Rate': 'float',
-              pH: 'int'
-            }
-          },
-          {
-            name: 'Ganga',
-            parameters: {
-              pH: 'float'
-            }
-          },
-          {
-            name: 'Phillips',
-            parameters: {
-              value: 'float',
-              label: 'string'
-            }
-          }
-        ]
-      },
-      null,
-      2
-    )
-  );
-  const [nodesJson, setNodesJson] = useState(
-    JSON.stringify(
-      {
-        sensors: [
-          {
-            coordinates: {
-              latitude: 17.446919,
-              longitude: 78.348122
-            },
-            sensor_type: 'Kristnam',
-            area: 'Gachibowli'
-          },
-          {
-            coordinates: {
-              latitude: 5.4455,
-              longitude: 8.3499
-            },
-            sensor_type: 'Phillips',
-            area: 'Gachibowli'
-          },
+  const [nodesJson, setNodesJson] = useState('');
+  const [importStatus, setImportStatus] = useState({ inProgress: false, message: '' });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [fileSelected, setFileSelected] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
 
-          {
-            coordinates: {
-              latitude: 4.455,
-              longitude: 8.3499
-            },
-            sensor_type: 'Kristnam',
-            area: 'Madhapur'
-          }
-        ]
-      },
-      null,
-      2
-    )
-  );
+  const fileInputRef = useRef(null);
 
-  const navigate = useNavigate();
+  const handleDownloadClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-  const verticalsSchema = {
-    title: 'Verticals',
-    type: 'object',
-    required: ['name', 'sensor_types'],
-    properties: {
-      name: {
-        type: 'string',
-        title: 'Name'
-      },
-      sensor_types: {
-        type: 'array',
-        title: 'Sensor Types',
-        items: {
-          type: 'object',
-          required: ['name', 'parameters'],
-          properties: {
-            name: {
-              type: 'string',
-              title: 'Sensor Name'
-            },
-            parameters: {
-              type: 'object',
-              title: 'Parameters',
-              additionalProperties: {
-                type: 'string',
-                enum: ['int', 'float', 'string']
-              }
-            }
-          }
-        }
+  const handleDownloadClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDownloadTemplate = async (type) => {
+    try {
+      const response = await fetch(`/import-template.${type}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch the ${type.toUpperCase()} template`);
       }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const element = document.createElement('a');
+      element.href = url;
+      element.download = `import-template.${type}`;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(`Error downloading ${type.toUpperCase()} template:`, error);
     }
+    handleDownloadClose();
   };
 
   const nodesSchema = {
     title: 'Nodes',
     type: 'object',
-    required: ['sensors'],
+    required: ['nodes'],
     properties: {
-      sensors: {
+      nodes: {
         type: 'array',
-        title: 'Sensors',
+        title: 'Nodes',
         items: {
           type: 'object',
-          required: ['coordinates', 'sensor_type', 'area'],
+          required: ['latitude', 'longitude', 'area', 'sensor_type', 'domain', 'name'],
           properties: {
-            coordinates: {
-              type: 'object',
-              title: 'Coordinates',
-              required: ['latitude', 'longitude'],
-              properties: {
-                latitude: {
-                  type: 'number',
-                  title: 'Latitude'
-                },
-                longitude: {
-                  type: 'number',
-                  title: 'Longitude'
-                }
-              }
+            latitude: {
+              type: 'number',
+              title: 'Latitude'
             },
-            sensor_type: {
-              type: 'string',
-              title: 'Sensor Type'
+            longitude: {
+              type: 'number',
+              title: 'Longitude'
             },
             area: {
               type: 'string',
               title: 'Area'
+            },
+            sensor_type: {
+              type: 'string',
+              title: 'Sensor Name'
+            },
+            domain: {
+              type: 'string',
+              title: 'Domain'
+            },
+            name: {
+              type: 'string',
+              title: 'Name'
             }
           }
         }
@@ -168,119 +104,364 @@ function AddAdvanced() {
     }
   };
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleStep = (step) => () => {
-    setActiveStep(step);
-  };
-
-  const handleVerticalsChange = (data) => {
-    setVerticalsJson(data);
-  };
-
-  const handleNodesChange = (data) => {
-    setNodesJson(data);
-  };
-
-  const handleImport = () => {
-    // Implement your import logic here
-    console.log('Importing...');
-    let data;
-    let schema;
-    if (activeStep === 0) {
-      data = JSON.parse(verticalsJson);
-      schema = verticalsSchema;
-    } else {
-      data = JSON.parse(nodesJson);
-      schema = nodesSchema;
+  useEffect(() => {
+    // fetching the template file
+    async function fetchTemplate() {
+      try {
+        const res = await fetch('/import-template.json');
+        if (!res.ok) {
+          throw new Error('Failed to fetch the template');
+        }
+        // const data = await res.json();
+        // setNodesJson(JSON.stringify(data, null, 2));
+      } catch (error) {
+        console.error('error fetching json: ', error);
+      }
     }
 
-    const validate = ajv.compile(schema);
-    const valid = validate(data);
+    fetchTemplate();
+  }, []);
 
-    if (!valid) {
-      console.error('Invalid data:', validate.errors);
-    } else {
-      console.log('Valid data');
+
+  const simulateLoadingProgress = (callback) => {
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.floor(Math.random() * 10) + 5;
+      if (progress >= 95) {
+        progress = 95;
+        clearInterval(interval);
+        callback();
+      }
+      setLoadingProgress(progress);
+    }, 200);
+  };
+
+  const handleJsonFileSelect = async (file) => {
+    try {
+      const fileContent = await file.text();
+      const data = JSON.parse(fileContent);
+
+      // validating with schema
+      const validate = ajv.compile(nodesSchema);
+      const valid = validate(data);
+
+      if (valid) {
+        // data is valid
+        setNodesJson(JSON.stringify(data, null, 2));
+      } else {
+        // data is invalid
+        console.error('Invalid JSON data:', validate.errors);
+        alert('The JSON data is not in the correct format. Please check and try again.');
+      }
+    } catch (error) {
+      // Handle parsing and validation errors
+      console.error('Error parsing or validating JSON data:', error);
+      alert('Error parsing or validating JSON data. Please check and try again.');
     }
+  };
+
+  const handleCsvFileSelect = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      setImportStatus({ inProgress: true, message: 'Import in progress...' });
+      setLoadingProgress(0);
+      setModalOpen(true);
+
+      simulateLoadingProgress(() => {
+        axiosAuthInstance
+          .post('/import/import_csv', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          .then((response) => {
+            console.log('Import response:', response.data);
+            const {
+              created_nodes: createdNodes = [],
+              failed_nodes: failedNodes = [],
+              invalid_sensor_nodes: invalidSensorNodes = []
+            } = response.data;
+            let message = `Status:\n`;
+            message += `Created nodes: ${createdNodes.length}\n`;
+            message += `Failed nodes: ${failedNodes.length}\n`;
+            message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
+
+            if (failedNodes.length > 0) {
+              message += `Failed nodes:\n`;
+              failedNodes.forEach((node, index) => {
+                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+              });
+              message += '\n';
+            }
+
+            if (invalidSensorNodes.length > 0) {
+              message += `Invalid sensor nodes:\n`;
+              invalidSensorNodes.forEach((node, index) => {
+                message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+              });
+            }
+
+            if (createdNodes.length > 0) {
+              message += `Created nodes:\n`;
+              createdNodes.forEach((node, index) => {
+                message += `${index + 1}. ${node.name}\n`;
+              });
+            }
+            setImportStatus({ inProgress: false, message });
+          })
+          .catch((error) => {
+            console.error('Import failed:', error);
+            setImportStatus({
+              inProgress: false,
+              message: 'Failed to import nodes. Please try again.'
+            });
+          });
+      });
+    } catch (error) {
+      console.error('Error processing CSV file:', error);
+      setImportStatus({
+        inProgress: false,
+        message: 'Error processing CSV file. Please try again.'
+      });
+    }
+  };
+
+  const handleFileSelect = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+
+      if (fileExtension === 'json') {
+        handleJsonFileSelect(file);
+      } else if (fileExtension === 'csv') {
+        handleCsvFileSelect(file);
+      } else {
+        alert('Please select a JSON or CSV file.');
+      }
+
+      setFileSelected(true);
+      setSelectedFileName(file.name);
+    } else {
+      setFileSelected(false);
+      setSelectedFileName('');
+    }
+  };
+
+  const handleBulkImport = () => {
+    if (!fileSelected) {
+      alert('Please select a file first.');
+      return;
+    }
+    try {
+      const data = JSON.parse(nodesJson);
+
+      // Validate the parsed data against the schema
+      const validate = ajv.compile(nodesSchema);
+      const valid = validate(data);
+      if (data?.nodes?.length && data.nodes.length > 5000) {
+        alert('Import less than 5000 nodes!');
+        return;
+      }
+      if (valid) {
+        setImportStatus({ inProgress: true, message: 'Import in progress...' });
+        setLoadingProgress(0);
+        setModalOpen(true);
+
+        simulateLoadingProgress(() => {
+          axiosAuthInstance
+            .post('/import/import', data)
+            .then((response) => {
+              console.log('Import response:', response.data);
+              const {
+                created_nodes: createdNodes = [],
+                failed_nodes: failedNodes = [],
+                invalid_sensor_nodes: invalidSensorNodes = []
+              } = response.data;
+              let message = `Import completed.\n`;
+              message += `Created nodes: ${createdNodes.length}\n`;
+              message += `Failed nodes: ${failedNodes.length}\n`;
+              message += `Invalid sensor nodes: ${invalidSensorNodes.length}\n\n`;
+
+              if (failedNodes.length > 0) {
+                message += `Failed nodes:\n`;
+                failedNodes.forEach((node, index) => {
+                  message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+                });
+                message += '\n';
+              }
+
+              if (invalidSensorNodes.length > 0) {
+                message += `Invalid sensor nodes:\n`;
+                invalidSensorNodes.forEach((node, index) => {
+                  message += `${index + 1}. ${node.node.name}, Error: ${node.error}\n`;
+                });
+                message += '\n';
+              }
+              if (createdNodes.length > 0) {
+                console.log(createdNodes);
+                message += `Created  nodes:\n`;
+                createdNodes.forEach((node, index) => {
+                  console.log(index, node);
+
+                  message += `${index + 1}. ${node.name}\n`;
+                });
+              }
+              setImportStatus({ inProgress: false, message });
+            })
+            .catch((error) => {
+              console.error('Import failed:', error);
+              setImportStatus({
+                inProgress: false,
+                message: 'Failed to import nodes. Please try again.'
+              });
+            });
+        });
+      } else {
+        // Data is invalid according to the schema
+        console.error('Invalid JSON data:', validate.errors);
+        alert('The JSON data is not in the correct format. Please check and try again.');
+      }
+    } catch (error) {
+      // Handle parsing errors
+      console.error('Error parsing JSON data:', error);
+      alert('Invalid JSON format. Please check and try again.');
+    }
+  };
+
+  const handleDownloadStatus = () => {
+    const element = document.createElement('a');
+    const file = new Blob([importStatus.message], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'import_status.txt';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const buttonStyle = {
+    textTransform: 'none',
+    minWidth: '180px',
+    bgcolor: 'info.main',
+    color: 'white',
+    '&:hover': {
+      bgcolor: 'primary.dark'
+    }
+  };
+
+  const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '60vw',
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: 2,
+    maxHeight: '80vh',
+    overflow: 'auto'
   };
 
   return (
-    <Container maxWidth="sm">
-      <Card sx={{ mb: 2 }}>
-        <CardContent>
-          <Stepper nonLinear activeStep={activeStep}>
-            {steps.map((label, index) => (
-              <Step key={label}>
-                <StepButton onClick={handleStep(index)}>{label}</StepButton>
-              </Step>
-            ))}
-          </Stepper>
-        </CardContent>
-      </Card>
-
-      {activeStep === 0 && (
-        <Card sx={{ mb: 2 }}>
-          <CardContent>
-            <Typography>Import Verticals</Typography>
-            <AceEditor
-              mode="json"
-              theme="monokai"
-              value={verticalsJson}
-              onChange={handleVerticalsChange}
-              name="UNIQUE_ID_OF_DIV"
-              editorProps={{ $blockScrolling: true }}
-              setOptions={{
-                showLineNumbers: true,
-                tabSize: 2
-              }}
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {activeStep === 1 && (
-        <Card sx={{ mb: 2 }}>
-          <CardContent>
-            <Typography>Import Nodes</Typography>
-            <AceEditor
-              mode="json"
-              theme="monokai"
-              value={nodesJson}
-              onChange={handleNodesChange}
-              name="UNIQUE_ID_OF_DIV"
-              editorProps={{ $blockScrolling: true }}
-              setOptions={{
-                showLineNumbers: true,
-                tabSize: 2
-              }}
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      <Grid container spacing={2} justifyContent="space-between">
-        <Grid item>
-          <Button color="inherit" disabled={activeStep === 0} onClick={handleBack}>
-            Back
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button onClick={handleImport}>Import</Button>
-        </Grid>
-        <Grid item>
-          {activeStep !== steps.length - 1 && <Button onClick={handleNext}>Next</Button>}
-          {activeStep === steps.length - 1 && <Button onClick={() => navigate('/')}>Finish</Button>}
-        </Grid>
-      </Grid>
-    </Container>
+    <Box sx={{ padding: 3 }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+        Bulk Import from file
+      </Typography>
+      <Container maxWidth="lg">
+        <Paper elevation={3} sx={{ padding: 3, marginBottom: 3, borderRadius: 2, boxShadow: 3 }}>
+          <Grid container spacing={3} justifyContent="center" sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Tooltip title="Download Template">
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<DownloadIcon />}
+                  endIcon={<ArrowDropDownIcon />}
+                  onClick={handleDownloadClick}
+                  sx={buttonStyle}>
+                  Download Template
+                </Button>
+              </Tooltip>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleDownloadClose}
+              >
+                <MenuItem onClick={() => handleDownloadTemplate('json')}>JSON Template</MenuItem>
+                <MenuItem onClick={() => handleDownloadTemplate('csv')}>CSV Template</MenuItem>
+              </Menu>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Tooltip title="Import File">
+                <Button
+                  fullWidth
+                  variant="contained"
+                  startIcon={<CloudUploadIcon />}
+                  onClick={() => fileInputRef.current.click()}
+                  sx={fileSelected ? "" : buttonStyle}>
+                  {fileSelected ? selectedFileName : 'Import File'}
+                </Button>
+              </Tooltip>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileSelect}
+                accept=".json,.csv"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Tooltip title="Start Bulk Import">
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="success"
+                  startIcon={<PlayArrowIcon />}
+                  onClick={handleBulkImport}
+                  disabled={importStatus.inProgress}
+                  sx={buttonStyle}>
+                  {importStatus.inProgress ? 'Importing...' : 'Start Bulk Import'}
+                </Button>
+              </Tooltip>
+            </Grid>
+          </Grid>
+        </Paper>
+        <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+          <Paper sx={modalStyle}>
+            {importStatus.inProgress ? (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Import Progress
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  {loadingProgress}% Complete
+                </Typography>
+                <LinearProgress variant="determinate" value={loadingProgress} sx={{ mb: 2 }} />
+              </Box>
+            ) : (
+              importStatus.message && (
+                <>
+                  <Typography variant="h6" gutterBottom>
+                    Import Status
+                  </Typography>
+                  <Button variant="contained" onClick={handleDownloadStatus} sx={{ mt: 2 }}>
+                    Download Status
+                  </Button>
+                  <Typography variant="body1" whiteSpace="pre-line">
+                    {importStatus.message}
+                  </Typography>
+                </>
+              )
+            )}
+            <Button variant="contained" onClick={() => setModalOpen(false)} sx={{ mt: 2 }}>
+              Close
+            </Button>
+          </Paper>
+        </Modal>
+      </Container>
+    </Box>
   );
 }
-
 export default AddAdvanced;

@@ -15,7 +15,8 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
-  Select
+  Select,
+  IconButton
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from '@mui/material/styles';
@@ -93,17 +94,19 @@ export default function Details() {
     axiosAuthInstance
       .get(`/nodes/${curFilter}`)
       .then((response) => {
+        console.log(1, curFilter);
         const selectedItem = {
           id: curFilter,
           name: curFilter,
           nodes: response.data.map((node) => ({
-            nodeName: node.node_name,
+            nodeID: node.node_name,
             nodeSensorType: node.res_name,
             nodeOrid: node.orid,
             nodeDataOrid: node.data_orid,
             nodeArea: node.area,
             nodeTokenNumber: node.token_num,
-            nodeSensorNumber: node.sensor_node_number
+            nodeSensorNumber: node.sensor_node_number,
+            nodeName: node.name // an issue -> name , node_name ?
           }))
         };
         setSelectedData(selectedItem);
@@ -298,41 +301,33 @@ export default function Details() {
         </Grid>
         {/* Node display section */}
         <Grid item xs={12} md={9}>
-          <Stack spacing={2} sx={{ marginTop: 2 }}>
-            {filteredNodes && filteredNodes.length > 0 ? (
-              <Stack spacing={3} sx={{ marginTop: 2 }}>
-                {filteredNodes.map((node) => (
-                  <StyledPaper key={node.nodeName}>
-                    <Typography variant="h6">
-                      {/* {node.nodeName}{' '} */}
-                      {node.nodeSensorType} {node.nodeSensorNumber}{' '}
-                      <Button
-                        variant="outlined"
-                        color="secondary"
-                        onClick={() => handleVerticalClick(node.nodeName)}>
-                        View Node Details
-                      </Button>
-                    </Typography>
+          <Stack spacing={3} sx={{ marginTop: 2 }}>
+            {filteredNodes.map((node) => (
+              <StyledPaper key={node.nodeID}>
+                <Box display="flex" justifyContent="space-between">
+                  <Box>
+                    <Typography variant="h6">{node.nodeName} </Typography>
                     <Typography variant="body1">
-                      <strong>Node Name:</strong> {node.nodeName}
+                      <strong>ID:</strong> {node.nodeID}
                       <br />
-                      SensorType: {node.nodeSensorType}
+                      <strong>Sensor Type</strong>: {node.nodeSensorType}
                     </Typography>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        marginTop: '-20px',
-                        paddingRight: '8px'
-                      }}>
-                      <DeleteIcon onClick={() => handleDeleteClick(node.nodeName)} />
-                    </div>
-                  </StyledPaper>
-                ))}
-              </Stack>
-            ) : (
-              <StyledPaper>No nodes available</StyledPaper>
-            )}
+                  </Box>
+                  <Box display="flex" flexDirection="column" alignItems="flex-end">
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleVerticalClick(node.nodeID)}
+                      style={{ marginBottom: '8px' }}>
+                      View Node Details
+                    </Button>
+                    <IconButton onClick={() => handleDeleteClick(node.nodeID)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </StyledPaper>
+            ))}
           </Stack>
         </Grid>
       </Grid>

@@ -30,9 +30,11 @@ export default function MultipleSelect() {
 
   const [selectedData, setSelectedData] = useState(null);
   const [selectedDataError, setSelectedDataError] = useState(false);
+  const [name, setName] = useState('');
   const [area, setArea] = useState('');
   const [latitude, setlatitude] = useState('');
   const [longitude, setlongitude] = useState('');
+  const [nameError, setNameError] = useState(false);
   const [areaError, setAreaError] = useState(false);
   const [latitudeError, setlatitudeError] = useState(false);
   const [longitudeError, setlongitudeError] = useState(false);
@@ -51,6 +53,7 @@ export default function MultipleSelect() {
       .get(`/sensor-types/get/${value}`)
       .then((response) => {
         setSensorTypes(response.data);
+        // console.log(response.data);
       })
       .catch((err) => {
         Swal.fire({
@@ -73,6 +76,16 @@ export default function MultipleSelect() {
       setSelectedDataError(false);
     }
 
+    if(!name) {
+      setNameError(true);
+    }else {
+      setNameError(false);
+    }
+    if (!area) {
+      setAreaError(true);
+    } else {
+      setAreaError(false);
+    }
     if (!latitude) {
       setlatitudeError(true);
     } else {
@@ -85,36 +98,34 @@ export default function MultipleSelect() {
       setlongitudeError(false);
     }
 
-    if (!area) {
-      setAreaError(true);
-    } else {
-      setAreaError(false);
-    }
 
-    if (!selectedData || !latitude || !longitude || !area) {
-      return;
+
+    if (!selectedData || !latitude || !longitude || !area || !name) {
+      return; 
     }
 
     // Log selected vertical, node type, and added parameters to the console
-    console.log('Selected Domain:', selectedData);
-    console.log('Sensor Type:', document.getElementById('text-field').value);
-    console.log('latitude:', latitude);
-    console.log('longitude:', longitude);
-    console.log('area:', area);
-
+    // console.log('Selected Domain:', selectedData);
+    // console.log('Sensor Type:', document.getElementById('text-field').value);
+    // console.log('latitude:', latitude);
+    // console.log('longitude:', longitude);
+    // console.log('area:', area);
+    // console.log('name:', name);
     //     "sensor_type_id": 1,
     // "latitude": 17.446920,
     // "longitude": 78.348122,
     // "area": "Miyapur"
+    // "name" : "unique name"
     axiosAuthInstance
       .post('nodes/create-node', {
         sensor_type_id: sensorTypes.find((type) => type.res_name === selectedSensorType).id,
         latitude,
         longitude,
-        area
+        area,
+        name
       })
       .then((response) => {
-        if (response.data.detail === 'Node created') {
+        if (response.status === 200 || response.status === 201) {
           MySwal.fire({
             icon: 'success',
             title: 'Success!',
@@ -129,8 +140,8 @@ export default function MultipleSelect() {
         MySwal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: 'Something went wrong!',
-          footer: '<p>Check console for more details</p>'
+          text: `${error.message}`,
+          footer: `<p>${error?.response?.data?.detail}</p>`
         });
       });
   };
@@ -212,7 +223,21 @@ export default function MultipleSelect() {
             Select Domain to enable menu options
           </Typography>
         </FormControl>
-
+        {/* Field for Name */}
+        <TextField
+          id="text-field"
+          error={nameError}
+          helperText={nameError ? 'Name is required' : ''}
+          label="Name"
+          variant="outlined"
+          fullWidth
+          sx={{ m: 1 }}
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            setNameError(false); // Reset error on change
+          }}
+        />
         {/* Field for Area */}
         <TextField
           id="text-field"

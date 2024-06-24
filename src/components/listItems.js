@@ -5,6 +5,7 @@ import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import AppsIcon from '@mui/icons-material/Apps';
 import SettingsIcon from '@mui/icons-material/Settings';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import AccountTreeIcon from '@mui/icons-material/AccountTree'; // New icon for Nodes
 
 // import LockIcon from '@mui/icons-material/Lock';
@@ -46,7 +47,12 @@ function MainListItems() {
         </ListItemIcon>
         <ListItemText primary="Nodes" />
       </ListItemButton>
-
+      <ListItemButton onClick={() => handleItemClick('/bulk-import')}>
+        <ListItemIcon>
+          <SystemUpdateAltIcon />
+        </ListItemIcon>
+        <ListItemText primary="Bulk Import" />
+      </ListItemButton>
       {/* <ListItemButton onClick={() => handleItemClick('/addvertical')}>
         <ListItemIcon>
           <AddToQueueIcon />
