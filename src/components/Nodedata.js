@@ -53,6 +53,7 @@ export default function Details() {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [showSubscribedUrls, setShowSubscribedUrls] = useState(false);
   const [showSampleData, setShowSampleData] = useState(false);
+  const [locationData, setLocationData] = useState(null);
 
   // Sample JSON data for demonstration
   const sampleData = (params) => `{
@@ -152,14 +153,14 @@ export default function Details() {
 
   const sortedData = selectedData
     ? [...selectedData.cins].sort((a, b) => {
-        const dateA = new Date(
-          a[1].replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/, '$1-$2-$3T$4:$5:$6Z')
-        );
-        const dateB = new Date(
-          b[1].replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/, '$1-$2-$3T$4:$5:$6Z')
-        );
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-      })
+      const dateA = new Date(
+        a[1].replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/, '$1-$2-$3T$4:$5:$6Z')
+      );
+      const dateB = new Date(
+        b[1].replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/, '$1-$2-$3T$4:$5:$6Z')
+      );
+      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+    })
     : [];
 
   const location = useLocation();
@@ -189,6 +190,17 @@ export default function Details() {
         }
         setSelectedData(selectedItem);
         setNodeId(true);
+
+        // Fetch location data
+        axiosAuthInstance
+          .get(`/nodes/meta/id/${selectedItem.node_name}`)
+          .then((locationResponse) => {
+            setLocationData(locationResponse.data);
+          })
+          .catch((error) => {
+            console.error('Error fetching location data', error);
+          });
+
         axiosAuthInstance
           .get(`/nodes/get-vendor/${selectedItem.node_name}`)
           .then((res) => {
@@ -346,7 +358,7 @@ export default function Details() {
       console.log(result);
     });
   };
-  
+
 
   return loading ? (
     <CenteredLoading />
@@ -377,6 +389,19 @@ export default function Details() {
                         <Chip key={param} label={param} sx={{ m: 1 }} />
                       ))}
                     </Typography>
+                    {locationData && (
+                      <>
+                        <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                          Location
+                        </Typography>
+                        <Typography variant="body1">
+                          <strong>Latitude:</strong> {locationData.latitude}
+                        </Typography>
+                        <Typography variant="body1">
+                          <strong>Longitude:</strong> {locationData.longitude}
+                        </Typography>
+                      </>
+                    )}
                   </Grid>
 
                   <Grid item xs={6}>
@@ -432,8 +457,8 @@ export default function Details() {
                         key={url}
                         display="flex"
                         alignItems="center"
-                      justifyContent="space-between"
-                        >
+                        justifyContent="space-between"
+                      >
                         <Typography variant="body1">
                           {index + 1}. {url}
                         </Typography>
