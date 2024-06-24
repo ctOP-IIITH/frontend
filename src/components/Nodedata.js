@@ -383,25 +383,19 @@ export default function Details() {
                     <Typography variant="body1">
                       <strong>Sensor Type:</strong> {selectedData.res_name}
                     </Typography>
+                    {locationData && (
+                      <Typography
+                        variant="body1"
+                      >
+                        <strong>Coordinates:</strong> {locationData.latitude}, {locationData.longitude}
+                      </Typography>
+                    )}
                     <Typography variant="body1">
                       <strong>Parameters:</strong>
                       {selectedData.parameters.map((param) => (
                         <Chip key={param} label={param} sx={{ m: 1 }} />
                       ))}
                     </Typography>
-                    {locationData && (
-                      <>
-                        <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-                          Location
-                        </Typography>
-                        <Typography variant="body1">
-                          <strong>Latitude:</strong> {locationData.latitude}
-                        </Typography>
-                        <Typography variant="body1">
-                          <strong>Longitude:</strong> {locationData.longitude}
-                        </Typography>
-                      </>
-                    )}
                   </Grid>
 
                   <Grid item xs={6}>
